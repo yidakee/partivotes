@@ -1,0 +1,53 @@
+/* Standard Theme CSS */
+
+.standard-theme {
+  --primary-color: #1976d2;
+  --secondary-color: #f50057;
+  --background-color: #f5f5f5;
+  --card-bg: #ffffff;
+  --text-color: rgba(0, 0, 0, 0.87);
+  
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: all 0.5s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Add Montserrat font for both themes */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+
+/* Reset any animations or effects from futuristic theme */
+.standard-theme .MuiPaper-root {
+  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms !important;
+  transform: none !important;
+}
+
+.standard-theme .MuiPaper-root:hover {
+  transform: none !important;
+}
+
+/* Hide futuristic elements */
+.standard-theme .particles-container,
+.standard-theme .cyber-grid {
+  display: none;
+}
+
+/* Reset button effects */
+.standard-theme .MuiButton-contained::before {
+  display: none;
+}
+
+/* Reset text effects */
+.standard-theme .MuiTypography-h4,
+.standard-theme .MuiTypography-h5 {
+  text-shadow: none;
+}
+
+/* Reset icon effects */
+.standard-theme .MuiSvgIcon-root {
+  filter: none;
+}
+
+.standard-theme .MuiSvgIcon-root:hover {
+  transform: none;
+}

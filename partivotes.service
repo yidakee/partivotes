@@ -1,0 +1,15 @@
+[Unit]
+Description=PartiVotes Web Application
+After=network.target
+
+[Service]
+Type=simple
+User=partivotes
+WorkingDirectory=/home/partivotes/partivotes
+ExecStart=/home/partivotes/partivotes/node_modules/.bin/serve -s build -l 3000
+Restart=on-failure
+Environment=NODE_ENV=production
+Environment=REACT_APP_USE_MOCK_DATA=true
+
+[Install]
+WantedBy=multi-user.target
