@@ -1,10 +1,5 @@
 # PartiVotes - Private Voting Platform
 
-<div align="center">
-  <img src="public/images/logo.png" alt="PartiVotes Logo" width="200" height="auto" />
-  <p><strong>A secure and immersive voting platform built on Partisia Blockchain</strong></p>
-</div>
-
 ## Overview
 
 PartiVotes is an innovative voting platform built on Partisia Blockchain technology, designed to provide secure, transparent, and private voting experiences. The platform features both standard and futuristic user interfaces, with the latter offering an immersive 3D space travel effect that creates a unique user experience.
@@ -34,6 +29,43 @@ PartiVotes is an innovative voting platform built on Partisia Blockchain technol
   - Connect various blockchain wallets
   - Transaction signing and verification
   - Wallet status indicators
+
+## Technology Stack
+
+### Frontend
+- **Framework**: React.js 18.2.0
+- **UI Libraries**: 
+  - Material UI (MUI) 5.x for component styling
+  - Styled-components for custom component styling
+- **Routing**: React Router Dom 6.x
+- **State Management**: 
+  - React Context API
+  - Custom hooks
+- **Animations**: 
+  - Canvas API for starfield effect
+  - CSS animations and transitions
+- **Data Visualization**: Chart.js with React wrappers
+
+### Backend & Blockchain
+- **Blockchain**: Partisia Blockchain (MPC-based hybrid blockchain)
+- **Smart Contracts**: ZK Voting contracts
+- **Wallet Integration**: Web3.js, Ethers.js
+- **Authentication**: JWT-based authentication
+- **Data Storage**: IPFS for decentralized data
+
+### Development & Tooling
+- **Package Manager**: npm/Node.js
+- **Bundler**: Webpack 5.x
+- **Transpiler**: Babel 7.x
+- **Testing**: Jest, React Testing Library
+- **Code Quality**: ESLint, Prettier
+- **Build System**: CI/CD with GitHub Actions
+
+### Deployment & Infrastructure
+- **Hosting**: Netlify for frontend, dedicated servers for backend
+- **Server**: Node.js with Express
+- **DevOps**: Docker containers, Systemd services
+- **Monitoring**: Prometheus, Grafana
 
 ## Getting Started
 
