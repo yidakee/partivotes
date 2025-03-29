@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Box, Switch, Typography, Tooltip, FormControlLabel } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
@@ -88,22 +88,52 @@ const CyberGrid = () => {
 
 const ThemeSwitcher = () => {
   const { themeMode, toggleTheme } = useContext(ThemeContext);
+  const [switchingToDark, setSwitchingToDark] = useState(false);
   
   // Function to handle theme toggle with direct music control
   const handleToggle = () => {
     const isSwitchingToDark = themeMode === 'standard';
     
+    // Set flag for switching to dark for the useEffect to catch
+    setSwitchingToDark(isSwitchingToDark);
+    
     // Toggle the theme first
     toggleTheme();
-    
-    // If switching to dark theme, directly trigger music playback
-    if (isSwitchingToDark) {
+  };
+  
+  // Use effect to handle music playback after theme toggle
+  useEffect(() => {
+    // Only trigger playback when we detect a switch to dark
+    if (switchingToDark && themeMode === 'futuristic') {
+      console.log('Switched to cyberpunk theme, attempting to play music');
+      
+      // Try multiple methods to start the music
+      
+      // Method 1: Direct DOM access to music player audio
       setTimeout(() => {
-        // Find all audio elements and try to play them
+        const musicPlayerAudio = document.getElementById('music-player-audio');
+        if (musicPlayerAudio) {
+          console.log('Found music player audio, trying to play');
+          const playPromise = musicPlayerAudio.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.error("Direct audio play failed:", error);
+            });
+          }
+        } else {
+          console.log('Music player audio element not found, trying general audio');
+        }
+        
+        // Method 2: Find all audio elements and try to play them
         const audioElements = document.querySelectorAll('audio');
+        console.log(`Found ${audioElements.length} audio elements`);
+        
         audioElements.forEach(audio => {
           if (audio) {
+            console.log('Attempting to play audio:', audio);
             const playPromise = audio.play();
+            
             if (playPromise !== undefined) {
               playPromise.catch(error => {
                 console.error("Audio play failed:", error);
@@ -112,16 +142,27 @@ const ThemeSwitcher = () => {
           }
         });
         
-        // Also try to find the specific music player audio
-        const musicPlayerAudio = document.getElementById('music-player-audio');
-        if (musicPlayerAudio) {
-          musicPlayerAudio.play().catch(err => {
-            console.error("Failed to play music:", err);
-          });
+        // Method 3: Create and dispatch a custom event for the MusicPlayer to catch
+        console.log('Dispatching playMusicEvent');
+        const playMusicEvent = new CustomEvent('playMusic', {
+          detail: { triggered: true, theme: 'futuristic' }
+        });
+        document.dispatchEvent(playMusicEvent);
+        
+        // Directly toggle starfield
+        if (window.toggleStarfield) {
+          console.log('Directly toggling starfield ON via global function');
+          window.toggleStarfield(true);
         }
-      }, 300);
+        
+        // Reset the flag
+        setSwitchingToDark(false);
+      }, 500); // Increased timeout for better reliability
+    } else if (themeMode === 'standard' && window.toggleStarfield) {
+      // Turn off starfield when switching to standard theme
+      window.toggleStarfield(false);
     }
-  };
+  }, [themeMode, switchingToDark]);
   
   const isFuturistic = themeMode === 'futuristic';
 

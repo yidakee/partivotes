@@ -16,38 +16,90 @@ export const ThemeProvider = ({ children }) => {
     return savedTheme || 'standard';
   });
 
-  // Toggle between 'standard' and 'futuristic' themes
-  const toggleTheme = () => {
-    const newTheme = themeMode === 'standard' ? 'futuristic' : 'standard';
-    setThemeMode(newTheme);
-    localStorage.setItem('partivotes-theme', newTheme);
-    
-    // Dispatch the theme change event
-    const event = new CustomEvent('themeChange', {
-      detail: { theme: newTheme }
-    });
-    document.dispatchEvent(event);
-  };
-
-  // Apply theme-specific CSS classes to the body element
+  // Direct force activation of starfield
   useEffect(() => {
-    document.body.classList.remove('standard-theme', 'futuristic-theme');
-    document.body.classList.add(`${themeMode}-theme`);
+    // Activate starfield once when the component mounts
+    const activateStarfield = () => {
+      if (typeof window.toggleStarfield === 'function') {
+        console.log('Activating starfield from ThemeContext mount');
+        window.toggleStarfield(themeMode === 'futuristic');
+      }
+    };
+
+    // Try immediately
+    activateStarfield();
     
-    // Add meta theme-color for browser UI
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute(
-        'content', 
-        themeMode === 'standard' ? '#1976d2' : '#6200ea'
-      );
-    }
+    // Also try a few times with delay in case script loads late
+    const attempts = [100, 300, 600, 1000, 2000];
+    attempts.forEach(delay => {
+      setTimeout(activateStarfield, delay);
+    });
+
+    // Set up an interval to ensure starfield stays active
+    const starfieldKeepAlive = setInterval(() => {
+      if (themeMode === 'futuristic' && typeof window.toggleStarfield === 'function') {
+        console.log('Starfield keep-alive check');
+        window.toggleStarfield(true);
+      }
+    }, 3000);
+
+    // Clean up interval on unmount
+    return () => clearInterval(starfieldKeepAlive);
   }, [themeMode]);
 
-  // Provide the theme context to children
+  // Apply theme class to body and html elements
+  useEffect(() => {
+    // Remove any existing theme classes
+    document.body.classList.remove('standard-theme', 'futuristic-theme');
+    document.documentElement.classList.remove('standard-theme', 'futuristic-theme');
+    document.getElementById('root').classList.remove('standard-theme', 'futuristic-theme');
+    
+    // Add current theme class
+    document.body.classList.add(`${themeMode}-theme`);
+    document.documentElement.classList.add(`${themeMode}-theme`);
+    document.getElementById('root').classList.add(`${themeMode}-theme`);
+    
+    // Save to localStorage
+    localStorage.setItem('partivotes-theme', themeMode);
+    
+    // Force background to be transparent with futuristic theme
+    if (themeMode === 'futuristic') {
+      document.body.style.background = 'transparent';
+      document.documentElement.style.background = 'transparent';
+    } else {
+      document.body.style.background = '';
+      document.documentElement.style.background = '';
+    }
+    
+    // Dispatch custom event to notify other components
+    themeChangeEvent.detail.theme = themeMode;
+    document.dispatchEvent(themeChangeEvent);
+  }, [themeMode]);
+
+  // Toggle between 'standard' and 'futuristic' themes
+  const toggleTheme = () => {
+    setThemeMode(prevTheme => {
+      const newTheme = prevTheme === 'standard' ? 'futuristic' : 'standard';
+      
+      // Toggle starfield if function exists
+      if (typeof window.toggleStarfield === 'function') {
+        console.log(`Toggling starfield for ${newTheme} theme`);
+        
+        // The delay helps with animation timing
+        setTimeout(() => {
+          window.toggleStarfield(newTheme === 'futuristic');
+        }, 100);
+      }
+      
+      return newTheme;
+    });
+  };
+
   return (
     <ThemeContext.Provider value={{ themeMode, toggleTheme }}>
-      {children}
+      <div className={`${themeMode}-theme`}>
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 };

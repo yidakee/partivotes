@@ -1,0 +1,79 @@
+/* StarfieldBackground.css - Contains all styles for the starfield animation */
+
+.starfield-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: transparent; /* Default background */
+  z-index: -1; /* Place behind all content */
+  perspective: 500px;
+  perspective-origin: 50% 50%;
+  transition: all 0.5s ease;
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+.starfield-container.cyberpunk {
+  background-color: rgba(5, 5, 32, 0.8);
+  perspective: 300px;
+}
+
+/* Star animations */
+@keyframes starfieldMove {
+  from { 
+    transform: translateZ(0px); 
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  to { 
+    transform: translateZ(1000px); 
+    opacity: 0;
+  }
+}
+
+/* Warp streaks animation */
+@keyframes warpEffect {
+  from { 
+    transform: translateZ(0px) scaleX(1); 
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+    transform: translateZ(1000px) scaleX(3);
+  }
+  to { 
+    transform: translateZ(2000px) scaleX(4); 
+    opacity: 0;
+  }
+}
+
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  animation-name: starfieldMove;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  box-shadow: 0 0 1px white;
+  z-index: 1; /* Increase visibility */
+}
+
+.warp-streak {
+  position: absolute;
+  background-color: white;
+  border-radius: 0;
+  animation-name: warpEffect;
+  animation-timing-function: cubic-bezier(0.1, 0, 0.9, 1);
+  animation-iteration-count: infinite;
+  z-index: 2; /* Increase visibility */
+}

@@ -4,14 +4,14 @@
   --primary-color: #00ffea;
   --secondary-color: #ff00ff;
   --accent-color: #fffc00;
-  --background-color: #050014;
+  --background-color: transparent !important;
   --card-bg: rgba(5, 5, 20, 0.9);
   --text-color: #ffffff;
   --text-shadow: 0 0 5px var(--primary-color);
   --border-glow: 0 0 8px var(--primary-color);
   --neon-shadow: 0 0 15px rgba(0, 255, 240, 0.5);
   
-  background: #050014;
+  background: transparent !important;
   color: var(--text-color);
   transition: all 0.3s ease;
   overflow-x: hidden;
@@ -20,6 +20,13 @@
   /* Reduce paint operations with hardware acceleration */
   transform: translateZ(0);
   will-change: transform;
+}
+
+/* Ensure body and html are also transparent to allow starfield to show through */
+body.futuristic-theme,
+html.futuristic-theme {
+  background: transparent !important;
+  background-color: transparent !important;
 }
 
 /* Add Montserrat font for both themes */
@@ -287,23 +294,9 @@
   animation: none;
 }
 
-/* Simplified cyber grid */
+/* Disable the cyber grid completely */
 .cyber-grid {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(rgba(0, 255, 240, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 240, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  /* Disable 3D transform and animation */
-  transform: none;
-  animation: none;
+  display: none !important;
 }
 
 /* Disable data stream effects */

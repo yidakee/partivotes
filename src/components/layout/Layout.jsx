@@ -3,25 +3,41 @@ import { Box, Container, Fab } from '@mui/material';
 import Header from './Header';
 import Footer from './Footer';
 import ThemeSwitcher from '../common/ThemeSwitcher';
-import ParticleBackground from '../common/ParticleBackground';
 import RickRollEasterEgg from '../easter-egg/RickRollEasterEgg';
 import { ThemeContext } from '../../contexts/ThemeContext';
 import WalletConnect from '../wallet/WalletConnect';
+import styled from 'styled-components';
+import { useMediaQuery } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
+// Import StarfieldBackground instead of ParticleBackground
+import StarfieldBackground from '../background/StarfieldBackground';
 
 const Layout = ({ children }) => {
   const { themeMode } = useContext(ThemeContext);
   const isFuturistic = themeMode === 'futuristic';
-  
+  const isMobile = useMediaQuery('(max-width:768px)');
+  const navigate = useNavigate();
+
+  // Use custom styles with styled-components
+  const MainContainer = styled.div`
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  `;
+
+  const Content = styled.main`
+    flex: 1;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+  `;
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
-        position: 'relative',
-        transition: 'all 0.5s ease',
-      }}
-    >
+    <MainContainer>
       <Header />
       <Box
         sx={{
@@ -41,36 +57,37 @@ const Layout = ({ children }) => {
       </Box>
       {isFuturistic && (
         <>
-          <div className="cyber-grid"></div>
-          <ParticleBackground />
+          {/* Removed cyber-grid div that was blocking the starfield */}
           <RickRollEasterEgg />
         </>
       )}
-      <Container 
-        component="main" 
-        maxWidth="lg" 
-        sx={{ 
-          mt: 4, 
-          mb: 4,
-          flexGrow: 1,
-          position: 'relative',
-          zIndex: 1,
-          '& .MuiPaper-root': {
-            transition: 'all 0.5s ease',
-          },
-          '& .poll-card': {
-            transition: 'all 0.5s ease',
-            ...(isFuturistic && {
-              animation: 'float 6s ease-in-out infinite',
-              animationDelay: (theme) => theme.transitions.duration.complex,
-            }),
-          },
-        }}
-      >
-        {children}
-      </Container>
+      <Content>
+        <Container 
+          component="main" 
+          maxWidth="lg" 
+          sx={{ 
+            mt: 4, 
+            mb: 4,
+            flexGrow: 1,
+            position: 'relative',
+            zIndex: 1,
+            '& .MuiPaper-root': {
+              transition: 'all 0.5s ease',
+            },
+            '& .poll-card': {
+              transition: 'all 0.5s ease',
+              ...(isFuturistic && {
+                animation: 'float 6s ease-in-out infinite',
+                animationDelay: (theme) => theme.transitions.duration.complex,
+              }),
+            },
+          }}
+        >
+          {children}
+        </Container>
+      </Content>
       <Footer />
-    </Box>
+    </MainContainer>
   );
 };
 

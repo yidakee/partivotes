@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -10,6 +10,7 @@ import theme from './styles/theme';
 
 // Context Providers
 import { WalletProvider } from './contexts/WalletContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Layout & Components
 import Layout from './components/layout/Layout';
@@ -28,39 +29,42 @@ import MusicPlayer from './components/music/MusicPlayer';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <WalletProvider>
-          <Router>
-            <StarfieldBackground />
-            <Layout>
-              <Routes>
-                {/* Poll Routes */}
-                <Route path="/" element={<PollList />} />
-                <Route path="/polls" element={<PollList />} />
-                <Route path="/polls/create" element={<PollCreate />} />
-                <Route path="/polls/:id" element={<PollDetail />} />
-                
-                {/* Catch-all route for 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Layout>
-            
-            {/* Add the music player as a separate component outside the layout */}
-            <div style={{
-              position: 'fixed',
-              bottom: '20px',
-              right: '20px',
-              zIndex: 9999,
-              width: '320px'
-            }}>
-              <MusicPlayer />
-            </div>
-          </Router>
-        </WalletProvider>
+        <ThemeProvider>
+          {/* StarfieldBackground outside all other components to avoid any potential conflicts */}
+          <StarfieldBackground />
+          <WalletProvider>
+            <Router>
+              <Layout>
+                <Routes>
+                  {/* Poll Routes */}
+                  <Route path="/" element={<PollList />} />
+                  <Route path="/polls" element={<PollList />} />
+                  <Route path="/polls/create" element={<PollCreate />} />
+                  <Route path="/polls/:id" element={<PollDetail />} />
+                  
+                  {/* Catch-all route for 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+              
+              {/* Add the music player as a separate component outside the layout */}
+              <div style={{
+                position: 'fixed',
+                bottom: '20px',
+                right: '20px',
+                zIndex: 9999,
+                width: '320px'
+              }}>
+                <MusicPlayer />
+              </div>
+            </Router>
+          </WalletProvider>
+        </ThemeProvider>
       </LocalizationProvider>
-    </ThemeProvider>
+    </MuiThemeProvider>
   );
 }
 
