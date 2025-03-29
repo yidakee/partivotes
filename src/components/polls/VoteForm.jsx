@@ -1,374 +1,326 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
-  RadioGroup,
+  FormControl,
   FormControlLabel,
   Radio,
+  RadioGroup,
   Checkbox,
+  FormGroup,
   Button,
-  FormControl,
-  FormLabel,
-  FormHelperText,
   Alert,
+  AlertTitle,
   Paper,
   Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon
+  Chip,
+  Fade,
+  useTheme,
+  CircularProgress
 } from '@mui/material';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import LockIcon from '@mui/icons-material/Lock';
 import PublicIcon from '@mui/icons-material/Public';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { voteWithSignature, voteWithMPC } from '../../services/pollService';
 import { WalletContext } from '../../contexts/WalletContext';
-import { voteWithMPC, voteWithSignature } from '../../services/pollService';
-import { POLL_TYPE, MPC_COST_PER_VOTE } from '../../utils/constants';
-import { playSuccessSound, playErrorSound } from '../../utils/soundEffects';
+import { POLL_TYPE } from '../../utils/constants';
 
 const VoteForm = ({ poll, setPoll }) => {
-  const { connected, balance } = useContext(WalletContext);
-  const [selectedOption, setSelectedOption] = useState('');
+  console.log('=== VoteForm RENDERING ===', {
+    poll,
+    hasVoted: poll?.hasVoted
+  });
+  
+  const { connected, balance, address } = useContext(WalletContext);
+  const theme = useTheme();
+  const navigate = useNavigate();
+  
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const [error, setError] = useState('');
+  const [voteMethod, setVoteMethod] = useState('signature');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [voteDialogOpen, setVoteDialogOpen] = useState(false);
+  const [error, setError] = useState(null);
   
   const isSingleChoice = poll.type === POLL_TYPE.SINGLE_CHOICE;
   const isMultipleChoice = poll.type === POLL_TYPE.MULTIPLE_CHOICE;
-  const isRankedChoice = poll.type === POLL_TYPE.RANKED_CHOICE;
   
-  const handleSingleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-    setError('');
+  const maxSelections = poll.maxSelections || 1;
+  
+  useEffect(() => {
+    // Reset form state when poll changes
+    setSelectedOptions([]);
+    setVoteMethod('signature');
+    setSuccess(false);
+    setError(null);
+  }, [poll.id]);
+  
+  const handleSingleChoiceChange = (event) => {
+    setSelectedOptions([event.target.value]);
   };
   
-  const handleMultipleOptionChange = (event) => {
-    const value = event.target.value;
-    const isChecked = event.target.checked;
+  const handleMultipleChoiceChange = (event) => {
+    const { value, checked } = event.target;
     
-    if (isChecked) {
-      // Add to selected options if not already selected
-      if (!selectedOptions.includes(value)) {
-        // Check if we're at the max selections
-        if (selectedOptions.length >= poll.maxSelections) {
-          setError(`You can only select up to ${poll.maxSelections} options`);
-          playErrorSound();
-          return;
-        }
-        
+    if (checked) {
+      // Add to selected options, but respect maxSelections
+      if (selectedOptions.length < maxSelections) {
         setSelectedOptions([...selectedOptions, value]);
       }
     } else {
       // Remove from selected options
       setSelectedOptions(selectedOptions.filter(option => option !== value));
     }
-    
-    setError('');
   };
   
-  const handleVoteClick = (e) => {
-    e.preventDefault();
+  const handleVoteMethodChange = (event) => {
+    setVoteMethod(event.target.value);
+  };
+  
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    
+    if (selectedOptions.length === 0) {
+      setError('Please select at least one option');
+      return;
+    }
     
     if (!connected) {
       setError('Please connect your wallet to vote');
-      playErrorSound();
+      return;
+    }
+
+    console.log('=== VoteForm SUBMITTING ===', {
+      selectedOptions,
+      voteMethod
+    });
+    
+    if (isMultipleChoice && selectedOptions.length > maxSelections) {
+      setError(`You can only select up to ${maxSelections} options`);
       return;
     }
     
-    if (isSingleChoice && !selectedOption) {
-      setError('Please select an option');
-      playErrorSound();
-      return;
-    }
-    
-    if (isMultipleChoice && selectedOptions.length === 0) {
-      setError('Please select at least one option');
-      playErrorSound();
-      return;
-    }
-    
-    if (isMultipleChoice && selectedOptions.length > poll.maxSelections) {
-      setError(`You can only select up to ${poll.maxSelections} options`);
-      playErrorSound();
-      return;
-    }
-    
-    // Open the vote method dialog
-    setVoteDialogOpen(true);
-  };
-  
-  const handleCloseVoteDialog = () => {
-    setVoteDialogOpen(false);
-  };
-  
-  const handleVoteWithSignature = async () => {
     try {
       setLoading(true);
-      setError('');
-      setVoteDialogOpen(false);
+      setError(null);
       
-      console.log(`Voting with signature in poll ${poll.id} for option ${isSingleChoice ? selectedOption : selectedOptions}`);
-      
+      // This would be a real blockchain transaction in a production app
       let updatedPoll;
       
-      if (isSingleChoice) {
-        updatedPoll = await voteWithSignature(poll.id, selectedOption);
-      } else if (isMultipleChoice) {
-        updatedPoll = await voteWithSignature(poll.id, selectedOptions);
+      if (voteMethod === 'signature') {
+        const votePayload = isSingleChoice ? selectedOptions[0] : selectedOptions;
+        updatedPoll = await voteWithSignature(
+          poll.id, 
+          votePayload, 
+          address
+        );
+      } else {
+        // MPC voting (private)
+        const votePayload = isSingleChoice ? selectedOptions[0] : selectedOptions;
+        updatedPoll = await voteWithMPC(
+          poll.id, 
+          votePayload, 
+          address
+        );
       }
       
-      console.log('Vote with signature successful:', updatedPoll);
-      
-      // Update the poll state with the returned data
-      updatedPoll.hasVoted = true; // Ensure hasVoted is set
-      setPoll(updatedPoll);
-      setSuccess(true);
-      
-      // Play success sound
-      playSuccessSound();
-      
-      // Store the vote in localStorage to persist across refreshes
-      localStorage.setItem(`voted_poll_${poll.id}`, 'true');
+      if (updatedPoll) {
+        console.log('=== VoteForm VOTE SUCCESS ===', {
+          updatedPoll,
+          hasVoted: updatedPoll.hasVoted
+        });
+        
+        // Store the original poll object for comparison
+        const originalPoll = { ...poll };
+        
+        // FIX: Update the poll with hasVoted immediately instead of using setTimeout
+        // This prevents race conditions between state updates
+        const updatedPollWithVoteStatus = {
+          ...updatedPoll,
+          hasVoted: true
+        };
+        
+        console.log('=== VoteForm SETTING POLL WITH hasVoted TRUE ===', {
+          originalPoll,
+          updatedPollWithVoteStatus
+        });
+        
+        setSuccess(true);
+        setPoll(updatedPollWithVoteStatus);
+        
+        console.log('=== VoteForm SET POLL COMPARISON ===', {
+          before: originalPoll,
+          after: updatedPollWithVoteStatus,
+          differences: Object.keys(updatedPollWithVoteStatus).filter(key => 
+            JSON.stringify(updatedPollWithVoteStatus[key]) !== JSON.stringify(originalPoll[key])
+          )
+        });
+      } else {
+        setError('Failed to submit vote. Please try again.');
+      }
     } catch (err) {
-      console.error('Error voting with signature:', err);
-      setError('Failed to submit your vote. Please try again.');
-      playErrorSound();
+      console.error('Error submitting vote:', err);
+      setError('Failed to submit vote: ' + (err.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
   };
   
-  const handleVoteWithMPC = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      setVoteDialogOpen(false);
-      
-      if (balance < MPC_COST_PER_VOTE) {
-        setError(`Insufficient balance. You need at least ${MPC_COST_PER_VOTE} tokens for a private vote.`);
-        playErrorSound();
-        return;
-      }
-      
-      console.log(`Voting with MPC in poll ${poll.id} for option ${isSingleChoice ? selectedOption : selectedOptions}`);
-      
-      let updatedPoll;
-      
-      if (isSingleChoice) {
-        updatedPoll = await voteWithMPC(poll.id, selectedOption);
-      } else if (isMultipleChoice) {
-        updatedPoll = await voteWithMPC(poll.id, selectedOptions);
-      }
-      
-      console.log('Vote with MPC successful:', updatedPoll);
-      
-      // Update the poll state with the returned data
-      updatedPoll.hasVoted = true; // Ensure hasVoted is set
-      setPoll(updatedPoll);
-      setSuccess(true);
-      
-      // Play success sound
-      playSuccessSound();
-      
-      // Store the vote in localStorage to persist across refreshes
-      localStorage.setItem(`voted_poll_${poll.id}`, 'true');
-    } catch (err) {
-      console.error('Error voting with MPC:', err);
-      setError('Failed to submit your vote. Please try again.');
-      playErrorSound();
-    } finally {
-      setLoading(false);
-    }
+  const handleViewResults = () => {
+    console.log('=== VoteForm VIEW RESULTS BUTTON CLICKED ===');
+    // Navigate to the correct poll URL using the singular "poll" path
+    navigate(`/poll/${poll.id}`);
   };
-  
-  // Check if the user has already voted when the poll changes
-  useEffect(() => {
-    if (poll && poll.hasVoted) {
-      setSuccess(true);
-    }
-  }, [poll]);
   
   if (success) {
     return (
-      <Box>
-        <Alert severity="success" sx={{ mb: 3 }}>
-          Your vote has been successfully recorded!
-        </Alert>
-        <Typography variant="h6" gutterBottom>
-          Poll Results
-        </Typography>
+      <Fade in={success}>
         <Box>
-          {poll.options.map((option) => (
-            <Box key={option.id} sx={{ mb: 2 }}>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="body1">
-                  {option.text}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {option.votes} votes
-                </Typography>
-              </Box>
-              <Box 
-                sx={{ 
-                  height: 10, 
-                  bgcolor: 'background.paper', 
-                  borderRadius: 5, 
-                  mt: 1, 
-                  position: 'relative', 
-                  overflow: 'hidden' 
-                }}
-              >
-                <Box 
-                  sx={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    height: '100%', 
-                    bgcolor: 'primary.main', 
-                    width: `${poll.totalVotes > 0 ? (option.votes / poll.totalVotes) * 100 : 0}%`, 
-                    borderRadius: 5 
-                  }} 
-                />
-              </Box>
-            </Box>
-          ))}
+          <Alert severity="success" sx={{ mb: 3 }}>
+            Your vote has been submitted successfully!
+          </Alert>
+          <Typography variant="body1" paragraph>
+            Thank you for participating in this poll. Your vote has been recorded and is now part of the results.
+          </Typography>
+          <Box textAlign="center">
+            <Button 
+              variant="contained" 
+              color="primary"
+              onClick={handleViewResults}
+            >
+              View Results
+            </Button>
+          </Box>
         </Box>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-          Total votes: {poll.totalVotes}
-        </Typography>
-      </Box>
+      </Fade>
     );
   }
   
   return (
-    <Box>
+    <Box component="form" onSubmit={handleSubmit}>
       <Typography variant="h6" gutterBottom>
+        <HowToVoteIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
         Cast Your Vote
       </Typography>
       
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
       )}
       
-      <FormControl component="fieldset" error={!!error} fullWidth>
-        <FormLabel component="legend">
-          {isSingleChoice && 'Select one option:'}
-          {isMultipleChoice && `Select up to ${poll.maxSelections} options:`}
-          {isRankedChoice && 'Rank the options in order of preference:'}
-        </FormLabel>
-        
-        {isSingleChoice && (
-          <RadioGroup value={selectedOption} onChange={handleSingleOptionChange}>
-            {poll.options.map((option) => (
-              <FormControlLabel
-                key={option.id}
-                value={option.id}
-                control={<Radio />}
-                label={option.text}
-                sx={{ mb: 1 }}
-              />
-            ))}
-          </RadioGroup>
-        )}
-        
-        {isMultipleChoice && (
-          <Box>
-            {poll.options.map((option) => (
-              <FormControlLabel
-                key={option.id}
-                control={
-                  <Checkbox
-                    checked={selectedOptions.includes(option.id)}
-                    onChange={handleMultipleOptionChange}
-                    value={option.id}
-                    disabled={!selectedOptions.includes(option.id) && selectedOptions.length >= poll.maxSelections}
-                  />
-                }
-                label={option.text}
-                sx={{ mb: 1, display: 'block' }}
-              />
-            ))}
-            <FormHelperText>
-              {selectedOptions.length} of {poll.maxSelections} options selected
-            </FormHelperText>
-          </Box>
-        )}
-        
-        {isRankedChoice && (
-          <Typography color="text.secondary" sx={{ my: 2 }}>
-            Ranked choice voting is not yet implemented
-          </Typography>
-        )}
-      </FormControl>
+      <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+        <FormControl component="fieldset" fullWidth error={!!error}>
+          {isSingleChoice && (
+            <RadioGroup
+              value={selectedOptions[0] || ''}
+              onChange={handleSingleChoiceChange}
+            >
+              {poll.options.map((option) => (
+                <FormControlLabel
+                  key={option.id}
+                  value={option.id}
+                  control={<Radio />}
+                  label={option.text}
+                />
+              ))}
+            </RadioGroup>
+          )}
+          
+          {isMultipleChoice && (
+            <FormGroup>
+              <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                Select up to {maxSelections} options
+              </Typography>
+              
+              {poll.options.map((option) => (
+                <FormControlLabel
+                  key={option.id}
+                  control={
+                    <Checkbox 
+                      checked={selectedOptions.includes(option.id)}
+                      onChange={handleMultipleChoiceChange}
+                      value={option.id}
+                      disabled={!selectedOptions.includes(option.id) && selectedOptions.length >= maxSelections}
+                    />
+                  }
+                  label={option.text}
+                />
+              ))}
+            </FormGroup>
+          )}
+        </FormControl>
+      </Paper>
       
-      <Box display="flex" justifyContent="center" mt={3}>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<HowToVoteIcon />}
-          onClick={handleVoteClick}
-          disabled={loading || !connected}
+      <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+        <Typography variant="subtitle1" gutterBottom>
+          Voting Method
+        </Typography>
+        
+        <RadioGroup
+          row
+          value={voteMethod}
+          onChange={handleVoteMethodChange}
+        >
+          <FormControlLabel 
+            value="signature" 
+            control={<Radio />} 
+            label={
+              <Box display="flex" alignItems="center">
+                <PublicIcon color="primary" fontSize="small" sx={{ mr: 0.5 }} />
+                Public Vote
+              </Box>
+            }
+          />
+          <FormControlLabel 
+            value="mpc" 
+            control={<Radio />} 
+            label={
+              <Box display="flex" alignItems="center">
+                <LockIcon color="secondary" fontSize="small" sx={{ mr: 0.5 }} />
+                Private Vote
+                <Chip 
+                  label={`${poll.mpcCost || 5} tokens`} 
+                  size="small" 
+                  color="secondary" 
+                  sx={{ ml: 1 }} 
+                />
+              </Box>
+            }
+            disabled={balance < (poll.mpcCost || 5)}
+          />
+        </RadioGroup>
+        
+        {voteMethod === 'mpc' && (
+          <Alert severity="info" sx={{ mt: 1 }}>
+            <AlertTitle>Private Voting</AlertTitle>
+            Your vote will be kept private using secure multi-party computation (MPC).
+            This requires {poll.mpcCost || 5} tokens.
+          </Alert>
+        )}
+        
+        {voteMethod === 'signature' && (
+          <Alert severity="info" sx={{ mt: 1 }}>
+            <AlertTitle>Public Voting</AlertTitle>
+            Your vote will be publicly visible on the blockchain. This method is free.
+          </Alert>
+        )}
+      </Paper>
+      
+      <Divider sx={{ mb: 3 }} />
+      
+      <Box textAlign="right">
+        <Button 
+          type="submit" 
+          variant="contained" 
+          color="primary" 
+          disabled={selectedOptions.length === 0 || loading || !connected}
+          startIcon={loading ? <CircularProgress size={20} /> : <CheckCircleOutlineIcon />}
         >
           {loading ? 'Submitting...' : 'Submit Vote'}
         </Button>
       </Box>
-      
-      {/* Vote Method Dialog */}
-      <Dialog
-        open={voteDialogOpen}
-        onClose={handleCloseVoteDialog}
-        aria-labelledby="vote-method-dialog-title"
-      >
-        <DialogTitle id="vote-method-dialog-title">
-          Choose Voting Method
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Select how you would like to cast your vote:
-          </DialogContentText>
-          <List>
-            <ListItem 
-              button 
-              onClick={handleVoteWithSignature}
-              sx={{ border: 1, borderColor: 'divider', borderRadius: 1, mb: 2 }}
-            >
-              <ListItemIcon>
-                <PublicIcon color="primary" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Public Vote (Signature)" 
-                secondary="Your vote will be publicly visible and linked to your wallet address. No token cost." 
-              />
-            </ListItem>
-            <ListItem 
-              button 
-              onClick={handleVoteWithMPC}
-              disabled={balance < MPC_COST_PER_VOTE}
-              sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}
-            >
-              <ListItemIcon>
-                <LockIcon color="secondary" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Private Vote (MPC)" 
-                secondary={`Your vote will be private and anonymous. Costs ${MPC_COST_PER_VOTE} tokens.${balance < MPC_COST_PER_VOTE ? ' Insufficient balance.' : ''}`} 
-              />
-            </ListItem>
-          </List>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseVoteDialog}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

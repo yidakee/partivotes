@@ -1,234 +1,234 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
   Paper,
   Divider,
+  List,
+  ListItem,
+  ListItemText,
   LinearProgress,
-  Tooltip,
   Chip,
   Grid,
-  Card,
-  CardContent,
-  Stack
+  CircularProgress,
+  Alert
 } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import LockIcon from '@mui/icons-material/Lock';
-import PublicIcon from '@mui/icons-material/Public';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import { POLL_STATUS } from '../../utils/constants';
+import PollIcon from '@mui/icons-material/Poll';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+
+// Define the colors outside the component to avoid recreation on each render
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#FF6B6B', '#6B66FF', '#A0FF6B'];
+
+// Define styled components outside of render method to avoid warnings
+const ResultsContainer = ({ children, ...props }) => (
+  <Box sx={{ position: 'relative', zIndex: 2 }} {...props}>
+    {children}
+  </Box>
+);
 
 const PollResults = ({ poll }) => {
-  // Sort options by votes (descending)
-  const sortedOptions = [...poll.options].sort((a, b) => b.votes - a.votes);
+  console.log('=== PollResults RENDERING ===', {
+    poll,
+    hasOptions: poll?.options?.length > 0,
+    totalVotes: poll?.totalVotes,
+    optionsStructure: poll?.options?.[0]
+  });
   
-  // Find the winning option(s)
-  const maxVotes = Math.max(...poll.options.map(option => option.votes));
-  const winningOptions = poll.options.filter(option => option.votes === maxVotes);
-  const hasWinner = poll.status === POLL_STATUS.ENDED && maxVotes > 0;
+  const [sortedOptions, setSortedOptions] = useState([]);
+  const [leadingOption, setLeadingOption] = useState(null);
+  const [pieChartData, setPieChartData] = useState([]);
+  const [error, setError] = useState(null);
   
-  // Calculate vote statistics
-  const totalVotes = poll.totalVotes || 0;
-  const publicVotes = poll.publicVotes || 0;
-  const privateVotes = poll.privateVotes || 0;
-  
-  // Check if the user has voted for this option
-  const isUserVote = (optionId) => {
-    if (!poll.hasVoted || !poll.userVote) return false;
-    
-    if (poll.userVote.optionId) {
-      return poll.userVote.optionId === optionId;
+  useEffect(() => {
+    try {
+      if (poll && poll.options && Array.isArray(poll.options)) {
+        console.log('=== PollResults PROCESSING OPTIONS ===', { 
+          pollOptions: poll.options,
+          optionsLength: poll.options.length
+        });
+        
+        // Sort options by votes (descending)
+        const sorted = [...poll.options].sort((a, b) => {
+          // Ensure we have numerical votes values to compare
+          const votesA = typeof a.votes === 'number' ? a.votes : 0;
+          const votesB = typeof b.votes === 'number' ? b.votes : 0;
+          return votesB - votesA;
+        });
+        setSortedOptions(sorted);
+        
+        // Set the leading option
+        if (sorted.length > 0) {
+          setLeadingOption(sorted[0]);
+          console.log('=== PollResults LEADING OPTION ===', sorted[0]);
+        } else {
+          console.log('=== PollResults NO OPTIONS FOUND ===');
+          setLeadingOption(null);
+        }
+        
+        // Prepare data for pie chart
+        const chartData = sorted.map(option => ({
+          name: option.text || 'Unnamed Option',
+          value: typeof option.votes === 'number' ? option.votes : 0
+        }));
+        console.log('=== PollResults CHART DATA ===', chartData);
+        setPieChartData(chartData);
+      } else {
+        console.log('=== PollResults MISSING POLL DATA ===', {
+          pollExists: !!poll,
+          optionsExist: !!poll?.options,
+          isArray: Array.isArray(poll?.options)
+        });
+        
+        // Reset states if no valid data
+        setSortedOptions([]);
+        setLeadingOption(null);
+        setPieChartData([]);
+      }
+    } catch (err) {
+      console.error('Error processing poll results:', err);
+      setError(`Error processing results: ${err.message}`);
     }
-    
-    if (poll.userVote.optionIds) {
-      return poll.userVote.optionIds.includes(optionId);
-    }
-    
-    return false;
-  };
+  }, [poll]);
   
-  const VoteStatCard = ({ icon, title, count, color, percentage }) => (
-    <Card variant="outlined" sx={{ height: '100%' }}>
-      <CardContent>
-        <Stack direction="row" spacing={1} alignItems="center" mb={1}>
-          {icon}
-          <Typography variant="subtitle2" color="text.secondary">
-            {title}
-          </Typography>
-        </Stack>
-        <Typography variant="h4" component="div" color={color} fontWeight="bold">
-          {count}
-        </Typography>
-        {percentage !== undefined && (
-          <Typography variant="body2" color="text.secondary">
-            {percentage}% of total
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
-  );
+  // Before the early return for no poll
+  if (!poll) {
+    console.log('=== PollResults EARLY RETURN - No poll data ===');
+    return (
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography sx={{ mt: 2 }}>Loading results...</Typography>
+      </Box>
+    );
+  }
+  
+  // If no options or they're not in the expected format
+  if (!poll.options || !Array.isArray(poll.options) || poll.options.length === 0) {
+    console.log('=== PollResults NO OPTIONS TO DISPLAY ===');
+    return (
+      <Alert severity="info">
+        No voting options found for this poll.
+      </Alert>
+    );
+  }
+  
+  // Show error if something went wrong
+  if (error) {
+    return (
+      <Alert severity="error">
+        {error}
+      </Alert>
+    );
+  }
   
   return (
-    <Box>
+    <ResultsContainer>
       <Typography variant="h6" gutterBottom>
+        <PollIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
         Poll Results
       </Typography>
       
-      {/* Vote Statistics Cards */}
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <VoteStatCard 
-            icon={<HowToVoteIcon color="primary" />}
-            title="Total Votes"
-            count={totalVotes}
-            color="primary.main"
-          />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <VoteStatCard 
-            icon={<PublicIcon color="info" />}
-            title="Public Votes"
-            count={publicVotes}
-            color="info.main"
-            percentage={totalVotes > 0 ? Math.round((publicVotes / totalVotes) * 100) : 0}
-          />
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <VoteStatCard 
-            icon={<LockIcon color="secondary" />}
-            title="Private Votes"
-            count={privateVotes}
-            color="secondary.main"
-            percentage={totalVotes > 0 ? Math.round((privateVotes / totalVotes) * 100) : 0}
-          />
-        </Grid>
-      </Grid>
-      
-      <Divider sx={{ my: 2 }} />
-      
-      {totalVotes === 0 ? (
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ my: 3 }}>
-          No votes have been cast yet
-        </Typography>
-      ) : (
-        <Box>
-          {sortedOptions.map((option) => {
-            const percentage = totalVotes > 0 
-              ? Math.round((option.votes / totalVotes) * 100) 
-              : 0;
-            
-            const publicPercentage = option.publicVotes && totalVotes > 0
-              ? Math.round((option.publicVotes / totalVotes) * 100)
-              : 0;
-              
-            const privatePercentage = option.privateVotes && totalVotes > 0
-              ? Math.round((option.privateVotes / totalVotes) * 100)
-              : 0;
-            
-            const isWinner = hasWinner && option.votes === maxVotes;
-            
-            return (
-              <Box key={option.id} sx={{ mb: 3 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
-                  <Box display="flex" alignItems="center">
-                    <Typography 
-                      variant="body1" 
-                      fontWeight={isWinner ? 'bold' : 'normal'}
-                      sx={{ display: 'flex', alignItems: 'center' }}
-                    >
-                      {option.text}
-                      {isUserVote(option.id) && (
-                        <Chip 
-                          label="Your Vote" 
-                          size="small" 
-                          color="primary" 
-                          variant="outlined"
-                          sx={{ ml: 1, height: 20 }}
-                        />
-                      )}
-                      {isWinner && (
-                        <Tooltip title="Winning option">
-                          <CheckCircleIcon 
-                            color="success" 
-                            fontSize="small" 
-                            sx={{ ml: 1 }} 
-                          />
-                        </Tooltip>
-                      )}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {option.votes} votes ({percentage}%)
-                  </Typography>
-                </Box>
-                
-                {/* Total votes progress bar */}
-                <Box sx={{ position: 'relative', height: 10, mb: 1 }}>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={percentage} 
-                    sx={{ 
-                      height: 10, 
-                      borderRadius: 5,
-                      backgroundColor: 'background.paper',
-                      '& .MuiLinearProgress-bar': {
-                        backgroundColor: isWinner 
-                          ? 'success.main' 
-                          : isUserVote(option.id) 
-                            ? 'primary.main' 
-                            : 'primary.light'
-                      }
-                    }} 
-                  />
-                </Box>
-                
-                {/* Vote type breakdown */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                  {option.publicVotes > 0 && (
-                    <Tooltip title={`${option.publicVotes} public votes`}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <PublicIcon fontSize="small" color="info" />
-                        <Typography variant="caption" sx={{ ml: 0.5 }}>
-                          {option.publicVotes}
-                        </Typography>
-                      </Box>
-                    </Tooltip>
-                  )}
-                  
-                  {option.privateVotes > 0 && (
-                    <Tooltip title={`${option.privateVotes} private votes`}>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <LockIcon fontSize="small" color="secondary" />
-                        <Typography variant="caption" sx={{ ml: 0.5 }}>
-                          {option.privateVotes}
-                        </Typography>
-                      </Box>
-                    </Tooltip>
-                  )}
-                </Box>
-              </Box>
-            );
-          })}
-          
-          <Divider sx={{ my: 2 }} />
-          
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="body2" color="text.secondary">
-              Total votes: {totalVotes}
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={5}>
+          <Paper variant="outlined" sx={{ p: 2, mb: 3, height: '100%' }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Vote Distribution
             </Typography>
             
-            {hasWinner && winningOptions.length > 0 && (
-              <Typography variant="body2" color="success.main" fontWeight="bold">
-                Winner: {winningOptions.length > 1 
-                  ? 'Tie between ' + winningOptions.map(o => o.text).join(' and ')
-                  : winningOptions[0].text
-                }
-              </Typography>
+            {poll.totalVotes > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => 
+                      `${name} ${(percent * 100).toFixed(0)}%`
+                    }
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [`${value} votes`, 'Votes']} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="body1">No votes yet</Typography>
+              </Box>
             )}
-          </Box>
-        </Box>
-      )}
-    </Box>
+          </Paper>
+        </Grid>
+        
+        <Grid item xs={12} md={7}>
+          <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Results Summary
+            </Typography>
+            
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="body2" color="textSecondary">
+                Total Votes: {poll.totalVotes || 0}
+              </Typography>
+              
+              {leadingOption && poll.totalVotes > 0 && (
+                <Typography variant="body2" color="textSecondary">
+                  Leading Option: {leadingOption.text} 
+                  ({Math.round((leadingOption.votes / poll.totalVotes) * 100)}%)
+                </Typography>
+              )}
+            </Box>
+            
+            <Divider sx={{ mb: 2 }} />
+            
+            <List disablePadding>
+              {sortedOptions.map((option, index) => {
+                const percentage = poll.totalVotes ? (option.votes / poll.totalVotes) * 100 : 0;
+                return (
+                  <ListItem key={option.id} disablePadding sx={{ mb: 2 }}>
+                    <ListItemText
+                      primary={
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body1">{option.text}</Typography>
+                          <Box display="flex" alignItems="center">
+                            <Typography variant="body2" color="textSecondary" sx={{ mr: 1 }}>
+                              {option.votes} votes ({percentage.toFixed(1)}%)
+                            </Typography>
+                            {index === 0 && poll.totalVotes > 0 && (
+                              <Chip size="small" color="primary" label="Leading" />
+                            )}
+                          </Box>
+                        </Box>
+                      }
+                      secondary={
+                        <Box sx={{ mt: 1 }}>
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={percentage} 
+                            sx={{ 
+                              height: 8, 
+                              borderRadius: 4,
+                              backgroundColor: '#e0e0e0',
+                              '& .MuiLinearProgress-bar': {
+                                backgroundColor: COLORS[index % COLORS.length],
+                              }
+                            }} 
+                          />
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
+    </ResultsContainer>
   );
 };
 

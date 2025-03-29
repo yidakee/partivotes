@@ -42,8 +42,9 @@ function App() {
                   {/* Poll Routes */}
                   <Route path="/" element={<PollList />} />
                   <Route path="/polls" element={<PollList />} />
-                  <Route path="/polls/create" element={<PollCreate />} />
+                  <Route path="/poll/:id" element={<PollDetail />} />
                   <Route path="/polls/:id" element={<PollDetail />} />
+                  <Route path="/polls/create" element={<PollCreate />} />
                   
                   {/* Catch-all route for 404 */}
                   <Route path="*" element={<NotFound />} />

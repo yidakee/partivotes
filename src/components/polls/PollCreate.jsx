@@ -440,7 +440,7 @@ const PollCreate = () => {
                   </FormControl>
                 </Grid>
                 
-                {pollData.type === POLL_TYPE.MULTIPLE_CHOICE && (
+                {pollData.type === POLL_TYPE.MULTIPLE_CHOICE && pollData.options.length > 1 && (
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
