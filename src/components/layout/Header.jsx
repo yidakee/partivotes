@@ -10,6 +10,7 @@ import {
 import { ThemeContext } from '../../contexts/ThemeContext';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import MusicPlayer from '../music/MusicPlayer';
+import WalletConnect from '../wallet/WalletConnect';
 
 const Header = () => {
   const { themeMode } = useContext(ThemeContext);
@@ -24,16 +25,18 @@ const Header = () => {
           boxShadow: '0 0 15px #00fff0',
         }),
         borderTop: 'none', // Remove any top border
+        position: 'relative', // Added to support absolute positioning
       }}
     >
+      {/* Title and left side content */}
       <Container maxWidth="lg" sx={{ padding: 0 }}>
         <Toolbar disableGutters sx={{ 
           display: 'flex', 
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start', // Changed from space-between
           width: '100%',
           padding: '0 16px',
-          minHeight: '64px', // Set a consistent height
-          position: 'relative', // Added for absolute positioning of music player
+          minHeight: '64px',
+          position: 'relative',
         }}>
           <Typography
             variant="h6"
@@ -81,13 +84,22 @@ const Header = () => {
               <MusicPlayer />
             </Box>
           )}
-          
-          {/* Empty box to maintain flex spacing */}
-          <Box sx={{ visibility: 'hidden' }}>
-            {isFuturistic ? 'PARTI-VOTES 3000' : 'PartiVotes'}
-          </Box>
         </Toolbar>
       </Container>
+      
+      {/* Wallet Connect - absolute positioned at the far right edge */}
+      <Box sx={{ 
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        height: '100%',
+        display: 'flex', 
+        alignItems: 'center',
+        zIndex: 1100,
+        paddingRight: '12px'
+      }}>
+        <WalletConnect />
+      </Box>
     </AppBar>
   );
 };

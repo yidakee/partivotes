@@ -5,7 +5,6 @@ import Footer from './Footer';
 import ThemeSwitcher from '../common/ThemeSwitcher';
 import RickRollEasterEgg from '../easter-egg/RickRollEasterEgg';
 import { ThemeContext } from '../../contexts/ThemeContext';
-import WalletConnect from '../wallet/WalletConnect';
 import styled from 'styled-components';
 import { useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -42,8 +41,8 @@ const Layout = ({ children }) => {
       <Box
         sx={{
           position: 'fixed',
-          top: '20px',
-          right: '20px',
+          top: '90px', 
+          right: '0px',
           zIndex: 1000,
           transition: 'all 0.5s ease',
           display: 'flex',
@@ -52,7 +51,6 @@ const Layout = ({ children }) => {
           gap: '10px'
         }}
       >
-        <WalletConnect />
         <ThemeSwitcher />
       </Box>
       {isFuturistic && (

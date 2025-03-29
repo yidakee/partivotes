@@ -10,6 +10,13 @@ const RickRollEasterEgg = () => {
     // Dispatch custom event to mute music player
     document.dispatchEvent(new CustomEvent('freeMPCClick'));
     
+    // Get the audio element and pause it
+    const audioElement = document.getElementById('music-player-audio');
+    if (audioElement) {
+      console.log('Pausing music player from Easter Egg click');
+      audioElement.pause();
+    }
+    
     // Open the dialog
     setOpen(true);
   };
@@ -25,7 +32,7 @@ const RickRollEasterEgg = () => {
           position: 'fixed',
           bottom: '20px',
           left: '20px',
-          zIndex: 1000,
+          zIndex: 1500, // Increased z-index to ensure visibility
         }}
       >
         <Button
@@ -36,35 +43,35 @@ const RickRollEasterEgg = () => {
             background: 'linear-gradient(45deg, #00ff9d, #00a3ff)',
             color: '#000',
             fontWeight: 'bold',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            animation: 'pulse 2s infinite, scale 3s infinite, sinewave-glow 4s infinite',
+            border: '2px solid rgba(255, 255, 255, 0.5)', // Thicker, more visible border
+            boxShadow: '0 0 20px rgba(0, 255, 240, 0.7)', // Permanent glow
+            animation: 'pulse 1.2s infinite ease-in-out, scale 2s infinite ease-in-out, breathe 3s infinite ease-in-out',
             '@keyframes pulse': {
-              '0%': { boxShadow: '0 0 5px rgba(0, 255, 240, 0.3)' },
-              '50%': { boxShadow: '0 0 15px rgba(0, 255, 240, 0.6)' },
-              '100%': { boxShadow: '0 0 5px rgba(0, 255, 240, 0.3)' },
+              '0%': { boxShadow: '0 0 10px rgba(0, 255, 240, 0.5)' },
+              '50%': { boxShadow: '0 0 30px rgba(0, 255, 240, 1)' },
+              '100%': { boxShadow: '0 0 10px rgba(0, 255, 240, 0.5)' },
             },
             '@keyframes scale': {
               '0%': { transform: 'scale(1)' },
-              '50%': { transform: 'scale(1.05)' },
+              '50%': { transform: 'scale(1.1)' },
               '100%': { transform: 'scale(1)' },
             },
-            '@keyframes sinewave-glow': {
-              '0%': { filter: 'brightness(1)' },
-              '25%': { filter: 'brightness(1.2)' },
-              '50%': { filter: 'brightness(1)' },
-              '75%': { filter: 'brightness(0.9)' },
-              '100%': { filter: 'brightness(1)' },
+            '@keyframes breathe': {
+              '0%': { filter: 'brightness(1) contrast(1.1)' },
+              '50%': { filter: 'brightness(1.4) contrast(1.3)' },
+              '100%': { filter: 'brightness(1) contrast(1.1)' },
             },
             '&:hover': {
               background: 'linear-gradient(45deg, #00ff9d, #00a3ff)',
-              boxShadow: '0 0 20px rgba(0, 255, 240, 0.7)',
-              transform: 'translateY(-2px)',
+              boxShadow: '0 0 35px rgba(0, 255, 240, 1)',
+              transform: 'translateY(-3px) scale(1.05)',
+              transition: 'all 0.2s ease',
             },
             fontSize: '1.1rem',
-            padding: '8px 16px',
+            padding: '10px 20px', // Larger button
             borderRadius: '24px',
             letterSpacing: '0.5px',
-            textShadow: '0 0 5px rgba(255, 255, 255, 0.5)',
+            textShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
           }}
         >
           Get Free $MPC

@@ -212,7 +212,7 @@ const ThemeSwitcher = () => {
             textShadow: isFuturistic ? '0 0 5px #00fff0' : 'none',
           }}
         >
-          {isFuturistic ? 'FUTURE MODE' : 'Standard Mode'}
+          {isFuturistic ? 'Moon Mode' : 'Standard Mode'}
         </Typography>
         <Tooltip title={isFuturistic ? "Return to reality" : "Activate futuristic mode!"}>
           <FuturisticSwitch checked={isFuturistic} onChange={handleToggle} />
