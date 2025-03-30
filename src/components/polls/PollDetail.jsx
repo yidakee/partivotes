@@ -80,21 +80,13 @@ const PollDetail = () => {
           // Always show results for ended polls
           console.log('=== SETTING showResults to TRUE because poll ended ===');
           setShowResults(true);
-        } else if (viewParam === 'vote') {
-          // If URL parameter is 'vote', show voting form regardless of other conditions
-          console.log('=== SETTING showResults to FALSE because view=vote parameter ===');
-          setShowResults(false);
         } else if (userPreference !== null) {
           // Respect user's explicit preference if they've toggled the view
           setShowResults(userPreference === 'results');
-        } else if (pollData.hasVoted) {
-          // If user has voted and no other condition applies, show results
-          console.log('=== SETTING showResults to TRUE because user has voted ===');
-          setShowResults(true);
         } else {
-          // Default to showing the voting form first
-          console.log('=== SETTING showResults to FALSE to show voting form first ===');
-          setShowResults(false);
+          // Default to showing results first for consistency
+          console.log('=== SETTING showResults to TRUE to show results first ===');
+          setShowResults(true);
         }
       } catch (err) {
         console.error('Error fetching poll:', err);
