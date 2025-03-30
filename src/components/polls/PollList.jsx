@@ -96,32 +96,36 @@ const PollList = () => {
         <Tooltip title={!connected ? "Connect your wallet to create a poll" : "Create a new poll"}>
           <span>
             <Button 
-              variant="contained" 
-              color={isFuturistic ? "inherit" : "primary"}
-              startIcon={<AddIcon />}
+              variant={isFuturistic ? "outlined" : "contained"}
+              color="primary"
+              startIcon={<AddIcon sx={{ color: isFuturistic ? '#fff' : undefined }} />}
               component={RouterLink}
               to="/polls/create"
               disabled={!connected}
               sx={{
                 ...(isFuturistic && {
                   background: 'linear-gradient(45deg, #ff00cc, #ff0055)', // Neon magenta gradient
-                  color: '#000', // Dark text
+                  color: '#ffffff !important', // Pure white with !important
                   fontWeight: 'bold',
                   border: '1px solid rgba(255, 255, 255, 0.3)',
                   boxShadow: '0 0 15px rgba(255, 0, 204, 0.5)', // Magenta glow
+                  textShadow: '0 0 2px rgba(255, 255, 255, 0.5)',
+                  '& .MuiSvgIcon-root': {
+                    color: '#ffffff !important', // Force white icon
+                  },
                   '&:hover': {
                     background: 'linear-gradient(45deg, #ff33cc, #ff3377)',
                     boxShadow: '0 0 20px rgba(255, 0, 204, 0.8)',
                     transform: 'translateY(-2px)',
                   },
-                  '&:disabled': {
+                  '&.Mui-disabled': {
                     background: 'rgba(255, 0, 204, 0.3)',
-                    color: 'rgba(0, 0, 0, 0.4)'
+                    color: 'rgba(255, 255, 255, 0.7) !important'
                   }
                 })
               }}
             >
-              Create Poll
+              <span style={{ color: isFuturistic ? '#ffffff' : undefined }}>Create Poll</span>
             </Button>
           </span>
         </Tooltip>

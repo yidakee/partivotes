@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Button, Dialog, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import { ThemeContext } from '../../contexts/ThemeContext';
 
 const RickRollEasterEgg = () => {
   const [open, setOpen] = useState(false);
+  const { themeMode } = useContext(ThemeContext);
+  const isFuturistic = themeMode === 'futuristic';
 
   const handleOpen = () => {
     // Dispatch custom event to mute music player
@@ -41,7 +44,7 @@ const RickRollEasterEgg = () => {
           onClick={handleOpen}
           sx={{
             background: 'linear-gradient(45deg, #ff00cc, #ff0055)', // Neon magenta gradient
-            color: '#000', // Dark text
+            color: isFuturistic ? '#fff' : '#000', // White text in dark mode, dark text in light mode
             fontWeight: 'bold',
             border: '2px solid rgba(255, 255, 255, 0.5)', // Thicker, more visible border
             boxShadow: '0 0 20px rgba(255, 0, 204, 0.7)', // Magenta glow
@@ -71,7 +74,7 @@ const RickRollEasterEgg = () => {
             padding: '10px 20px', // Larger button
             borderRadius: '24px',
             letterSpacing: '0.5px',
-            textShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
+            textShadow: isFuturistic ? '0 0 10px rgba(255, 0, 255, 0.8)' : '0 0 10px rgba(255, 255, 255, 0.8)',
           }}
         >
           Get Free $MPC

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Box, Container, Typography, Link } from '@mui/material';
 import { ThemeContext } from '../../contexts/ThemeContext';
+import MusicPlayer from '../music/MusicPlayer';
 
 const Footer = () => {
   const { themeMode } = useContext(ThemeContext);
@@ -28,6 +29,20 @@ const Footer = () => {
           : '1px solid rgba(0, 0, 0, 0.1) !important',
       }}
     >
+      {/* Music Player - Bottom Left */}
+      {isFuturistic && (
+        <Box sx={{ 
+          position: 'absolute',
+          left: '20px',
+          bottom: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          zIndex: 1010,
+        }}>
+          <MusicPlayer />
+        </Box>
+      )}
+      
       <Container maxWidth="lg">
         <Typography 
           variant="body2" 

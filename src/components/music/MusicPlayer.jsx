@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
@@ -343,54 +343,85 @@ const MusicPlayer = () => {
   return (
     <Box
       sx={{
-        padding: '10px',
-        backgroundColor: 'rgba(10, 10, 30, 0.85)',
-        borderRadius: '8px',
-        backdropFilter: 'blur(10px)',
-        color: '#fff',
-        boxShadow: '0 0 15px rgba(0, 200, 255, 0.4)',
-        border: 'none',
         display: 'flex',
         alignItems: 'center',
-        gap: '10px'
+        width: 'auto',
+        minWidth: '240px',
+        padding: '10px 20px',
+        background: '#7e1fff', /* Exact match to the GET FREE $MPC button */
+        color: '#fff',
+        fontWeight: 'bold',
+        border: '2px solid rgba(255, 255, 255, 0.5)',
+        borderRadius: '24px',
+        boxShadow: '0 0 20px rgba(126, 31, 255, 0.7)',
+        animation: 'pulse 1.2s infinite ease-in-out, scale 2s infinite ease-in-out, breathe 3s infinite ease-in-out',
+        '@keyframes pulse': {
+          '0%': { boxShadow: '0 0 10px rgba(126, 31, 255, 0.5)' },
+          '50%': { boxShadow: '0 0 30px rgba(126, 31, 255, 1)' },
+          '100%': { boxShadow: '0 0 10px rgba(126, 31, 255, 0.5)' },
+        },
+        '@keyframes scale': {
+          '0%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.1)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        '@keyframes breathe': {
+          '0%': { filter: 'brightness(1) contrast(1.1)' },
+          '50%': { filter: 'brightness(1.4) contrast(1.3)' },
+          '100%': { filter: 'brightness(1) contrast(1.1)' },
+        },
+        '&:hover': {
+          background: '#8f3aff',
+          boxShadow: '0 0 35px rgba(126, 31, 255, 1)',
+          transform: 'translateY(-3px) scale(1.05)',
+          transition: 'all 0.2s ease',
+        },
+        fontSize: '1rem',
+        letterSpacing: '0.5px',
+        textShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
+        gap: '15px',
       }}
     >
-      {/* Play/Pause button */}
-      <IconButton 
+      {/* Simple icon buttons with no background or borders */}
+      <PlayArrowIcon 
         onClick={handlePlayPause} 
         sx={{ 
-          color: '#00fff0',
-          backgroundColor: 'rgba(0, 255, 240, 0.1)',
+          color: '#fff',
+          cursor: 'pointer',
+          fontSize: '1.8rem',
           '&:hover': {
-            backgroundColor: 'rgba(0, 255, 240, 0.2)',
-          }
+            transform: 'scale(1.2)',
+            textShadow: '0 0 10px #fff',
+          },
+          transition: 'all 0.2s',
         }}
       >
         {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-      </IconButton>
+      </PlayArrowIcon>
       
-      {/* Next button */}
-      <IconButton 
+      <SkipNextIcon 
         onClick={handleNext}
         sx={{ 
-          color: '#00fff0',
-          backgroundColor: 'rgba(0, 255, 240, 0.1)',
+          color: '#fff',
+          cursor: 'pointer',
+          fontSize: '1.8rem',
           '&:hover': {
-            backgroundColor: 'rgba(0, 255, 240, 0.2)',
-          }
+            transform: 'scale(1.2)',
+            textShadow: '0 0 10px #fff',
+          },
+          transition: 'all 0.2s',
         }}
-      >
-        <SkipNextIcon />
-      </IconButton>
+      />
       
-      {/* Track title */}
       <Typography 
         variant="body2" 
         noWrap 
         sx={{ 
-          color: '#00fff0', 
+          color: '#fff',
           fontWeight: 'bold',
-          textShadow: '0 0 5px rgba(0, 255, 240, 0.5)'
+          textShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
+          letterSpacing: '0.5px',
+          maxWidth: '150px',
         }}
       >
         {tracks[currentTrack]?.title || 'No track selected'}
