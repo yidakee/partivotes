@@ -8,7 +8,7 @@ export const multipleChoicePolls = [
     id: '10',
     title: 'Favorite Crypto News Sources',
     description: 'Which crypto news sources do you find most reliable and informative?',
-    creator: '0x5E4D3C2B1A9F8E7D6C5B4A3F2E1D0C9B8A7F6E5',
+    creator: '14a4a4f4e4f4f9a4f4d4e4afdbf4f8c4fb4ffbf',
     createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), // 20 days ago
     startDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
@@ -34,7 +34,7 @@ export const multipleChoicePolls = [
     id: '11',
     title: 'Blockchain Use Cases',
     description: 'Which blockchain use cases do you believe will have the biggest real-world impact?',
-    creator: '0x1F2E3D4C5B6A7F8E9D0C1B2A3F4E5D6C7B8A9F0',
+    creator: '15a5a5f5e5f5f9a5f5d5e5b0dbf5f8c5fb5ffcf',
     createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(), // 25 days ago
     startDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), // 4 days ago

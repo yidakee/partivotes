@@ -14,7 +14,7 @@ export const rankedChoicePolls = [
     id: '9',
     title: 'Top Crypto Influencers',
     description: 'Rank these crypto influencers based on their knowledge, credibility, and impact.',
-    creator: '0x9D0C1B2A3F4E5D6C7B8A9F0E1D2C3B4A5F6E7D8',
+    creator: '10a0a0f0e0f0f9a0f0d0e0abdbf0f8c0fb0ff7f',
     createdAt: now.toISOString(),
     startDate: nextWeek.toISOString(),
     endDate: new Date(nextMonth.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days after next month
@@ -40,7 +40,7 @@ export const rankedChoicePolls = [
     id: '15',
     title: 'Blockchain Development Languages',
     description: 'Rank these programming languages based on their usefulness for blockchain development.',
-    creator: '0xA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9',
+    creator: '11a1a1f1e1f1f9a1f1d1e1acdbf1f8c1fb1ff8f',
     createdAt: now.toISOString(),
     startDate: tomorrow.toISOString(),
     endDate: nextMonth.toISOString(),

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Container, 
   Typography, 
@@ -34,22 +34,24 @@ const PollDetail = () => {
   
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { connected, address } = useContext(WalletContext);
+  
+  // Check if the URL has a view=vote query parameter
+  const searchParams = new URLSearchParams(location.search);
+  const viewParam = searchParams.get('view');
+  
+  console.log('=== URL PARAMETERS ===', {
+    fullUrl: location.pathname + location.search,
+    search: location.search,
+    viewParam: viewParam
+  });
   
   const [poll, setPoll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showResults, setShowResults] = useState(false);
-  const [manualToggle, setManualToggle] = useState(false);
-  
-  // This useEffect watches for changes to the poll object, particularly the hasVoted flag
-  // When hasVoted changes to true, it automatically shows results, but only if not manually toggled
-  useEffect(() => {
-    if (poll && poll.hasVoted && !showResults && !manualToggle) {
-      console.log('=== PollDetail DETECTED hasVoted change to TRUE, showing results ===');
-      setShowResults(true);
-    }
-  }, [poll, showResults, manualToggle]);
+  const [userPreference, setUserPreference] = useState(null);
   
   useEffect(() => {
     const fetchPoll = async () => {
@@ -73,14 +75,24 @@ const PollDetail = () => {
         
         setPoll(pollData);
         
-        // Only set initial view to results if the poll has ended
-        // This ensures users coming from the poll list see the voting form first
+        // Determine initial view based on URL parameter and poll status
         if (pollData.status === POLL_STATUS.ENDED) {
+          // Always show results for ended polls
           console.log('=== SETTING showResults to TRUE because poll ended ===');
           setShowResults(true);
+        } else if (viewParam === 'vote') {
+          // If URL parameter is 'vote', show voting form regardless of other conditions
+          console.log('=== SETTING showResults to FALSE because view=vote parameter ===');
+          setShowResults(false);
+        } else if (userPreference !== null) {
+          // Respect user's explicit preference if they've toggled the view
+          setShowResults(userPreference === 'results');
+        } else if (pollData.hasVoted) {
+          // If user has voted and no other condition applies, show results
+          console.log('=== SETTING showResults to TRUE because user has voted ===');
+          setShowResults(true);
         } else {
-          // Default to showing the voting form first, even if user has voted before
-          // This allows users to see the voting options first
+          // Default to showing the voting form first
           console.log('=== SETTING showResults to FALSE to show voting form first ===');
           setShowResults(false);
         }
@@ -93,7 +105,16 @@ const PollDetail = () => {
     };
     
     fetchPoll();
-  }, [id]);
+  }, [id, viewParam, userPreference]);
+  
+  // This effect runs when the poll is updated after voting
+  useEffect(() => {
+    // If the user has voted and we haven't recorded their preference yet
+    if (poll && poll.hasVoted && userPreference === null) {
+      console.log('=== User has voted, showing results ===');
+      setShowResults(true);
+    }
+  }, [poll, userPreference]);
   
   const handleBack = () => {
     navigate('/polls');
@@ -105,16 +126,18 @@ const PollDetail = () => {
       willBe: !showResults
     });
     
-    // Set the manual toggle flag to prevent auto-switching back to results
-    setManualToggle(true);
+    // Record user's explicit preference
+    setUserPreference(showResults ? 'vote' : 'results');
     setShowResults(!showResults);
   };
-  
+
   // Log before each render decision
   console.log('=== PollDetail RENDER DECISION ===', {
     showResults,
     hasVoted: poll?.hasVoted,
     status: poll?.status,
+    userPreference,
+    viewParam,
     isComponentReady: !loading && !error && poll
   });
   

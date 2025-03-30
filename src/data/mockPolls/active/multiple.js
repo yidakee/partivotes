@@ -14,7 +14,7 @@ export const multipleChoicePolls = [
     id: '21',
     title: 'Blockchain Development Priorities',
     description: 'Which aspects of blockchain technology should developers prioritize?',
-    creator: '0x3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2',
+    creator: '02d28f7d69f1d2a7a25f623535d7a045c95c9dcf9e',
     createdAt: lastWeek.toISOString(),
     startDate: lastWeek.toISOString(),
     endDate: new Date(nextWeek.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days after next week
@@ -40,7 +40,7 @@ export const multipleChoicePolls = [
     id: '22',
     title: 'DeFi Protocol Features',
     description: 'Which features do you value most in DeFi protocols?',
-    creator: '0x4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3',
+    creator: '03e39f8e7af2e3b8b36f734646e8b156da6aedf0f',
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
     startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString(), // 25 days from now

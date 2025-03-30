@@ -14,7 +14,7 @@ export const rankedChoicePolls = [
     id: '31',
     title: 'Top Privacy Coins',
     description: 'Rank these privacy-focused cryptocurrencies based on their technology and adoption.',
-    creator: '0x5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4',
+    creator: '04f4af9f8bf3f4c9c47f845757f9c267eb7beef1f',
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
     startDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(), // 20 days from now
@@ -39,7 +39,7 @@ export const rankedChoicePolls = [
     id: '32',
     title: 'Blockchain Governance Models',
     description: 'Rank these blockchain governance models based on effectiveness and fairness.',
-    creator: '0x6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5',
+    creator: '05f5bfaf9cf4f5dad58f956868fad378fc8cff2f',
     createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), // 8 days ago
     startDate: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() + 22 * 24 * 60 * 60 * 1000).toISOString(), // 22 days from now

@@ -299,7 +299,7 @@ const PollList = () => {
                   
                   <Box 
                     component={RouterLink} 
-                    to={`/poll/${poll.id}`}
+                    to={`/poll/${poll.id}?view=vote`}
                     sx={{
                       display: 'flex',
                       justifyContent: 'center',

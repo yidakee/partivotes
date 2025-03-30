@@ -12,7 +12,7 @@ export const rankedChoicePolls = [
     id: '12',
     title: 'Crypto Exchange Rankings',
     description: 'Rank the following cryptocurrency exchanges based on security, fees, and user experience.',
-    creator: '0x9A8B7C6D5E4F3G2H1I0J9K8L7M6N5O4P3Q2R1S0',
+    creator: '16a6a6f6e6f6f9a6f6d6e6b1dbf6f8c6fb6ffdf',
     createdAt: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(), // 18 days ago
     startDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
@@ -38,7 +38,7 @@ export const rankedChoicePolls = [
     id: '13',
     title: 'Smart Contract Platforms',
     description: 'Rank these smart contract platforms based on developer experience and ecosystem.',
-    creator: '0x1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0',
+    creator: '17a7a7f7e7f7f9a7f7d7e7b2dbf7f8c7fb7ffef',
     createdAt: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(), // 22 days ago
     startDate: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(), // 6 days ago
@@ -64,7 +64,7 @@ export const rankedChoicePolls = [
     id: '14',
     title: 'Blockchain Consensus Mechanisms',
     description: 'Rank these consensus mechanisms based on security, scalability, and energy efficiency.',
-    creator: '0x0F1E2D3C4B5A6F7E8D9C0B1A2F3E4D5C6B7A8F9',
+    creator: '18a8a8f8e8f8f9a8f8d8e8b3dbf8f8c8fb8ffff',
     createdAt: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(), // 28 days ago
     startDate: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago

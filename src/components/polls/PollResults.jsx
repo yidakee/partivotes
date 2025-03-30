@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import PollIcon from '@mui/icons-material/Poll';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import VoteList from './VoteList';
 
 // Define the colors outside the component to avoid recreation on each render
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#FF6B6B', '#6B66FF', '#A0FF6B'];
@@ -228,6 +229,9 @@ const PollResults = ({ poll }) => {
           </Paper>
         </Grid>
       </Grid>
+      
+      {/* Individual Votes Section */}
+      <VoteList poll={poll} />
     </ResultsContainer>
   );
 };

@@ -14,7 +14,7 @@ export const singleChoicePolls = [
     id: '5',
     title: 'Favorite DeFi Protocol',
     description: 'Which DeFi protocol do you find most innovative and useful?',
-    creator: '0xfedcba9876543210fedcba9876543210fedcba98',
+    creator: '06f6cfbfadf5f6ebe69fa67979fbe489fd9dff3f',
     createdAt: now.toISOString(),
     startDate: nextWeek.toISOString(),
     endDate: nextMonth.toISOString(),
@@ -39,7 +39,7 @@ export const singleChoicePolls = [
     id: '6',
     title: 'Most Important Crypto Feature',
     description: 'What feature do you value most in a cryptocurrency?',
-    creator: '0x0123456789abcdef0123456789abcdef01234567',
+    creator: '07f7dfcfbef6f7fcf7afb78a8afcf59afe9eff4f',
     createdAt: now.toISOString(),
     startDate: tomorrow.toISOString(),
     endDate: new Date(nextMonth.getTime() + 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days after next month

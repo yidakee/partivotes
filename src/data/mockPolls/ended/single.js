@@ -16,7 +16,7 @@ export const singleChoicePolls = [
     id: '3',
     title: 'Best NFT Marketplace',
     description: 'Which NFT marketplace provides the best overall experience for creators and collectors?',
-    creator: '0x7cB57B5A97eAbe94205C07890BE4c1aD31E486A8',
+    creator: '12a2a2f2e2f2f9a2f2d2e2addbf2f8c2fb2ff9f',
     createdAt: lastWeek.toISOString(),
     startDate: lastWeek.toISOString(),
     endDate: yesterday.toISOString(),
@@ -42,7 +42,7 @@ export const singleChoicePolls = [
     id: '4',
     title: 'Crypto Wallet Preference',
     description: 'Which cryptocurrency wallet do you use most frequently?',
-    creator: '0x912cE8c60d10f32Bc54A479C42a48970aF86727D',
+    creator: '13a3a3f3e3f3f9a3f3d3e3aedbf3f8c3fb3ffaf',
     createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     endDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago

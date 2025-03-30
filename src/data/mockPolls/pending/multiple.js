@@ -14,7 +14,7 @@ export const multipleChoicePolls = [
     id: '7',
     title: 'Blockchain Use Cases',
     description: 'Which blockchain use cases do you believe will gain the most adoption in the next 5 years?',
-    creator: '0x7F8E9D0C1B2A3F4E5D6C7B8A9F0E1D2C3B4A5F6',
+    creator: '08f8efdfcff7f8fdf8bfc89b9bfdf6aff9fff5f',
     createdAt: now.toISOString(),
     startDate: nextWeek.toISOString(),
     endDate: new Date(nextMonth.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days after next month
@@ -40,7 +40,7 @@ export const multipleChoicePolls = [
     id: '8',
     title: 'Crypto Investment Strategies',
     description: 'Which crypto investment strategies do you currently employ?',
-    creator: '0x8E9D0C1B2A3F4E5D6C7B8A9F0E1D2C3B4A5F6E7',
+    creator: '09f9ffefdfff8f9fef9cfd9acafef7bffafff6f',
     createdAt: now.toISOString(),
     startDate: tomorrow.toISOString(),
     endDate: nextMonth.toISOString(),
