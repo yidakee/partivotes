@@ -37,9 +37,15 @@ const statusColors = {
 };
 
 const pollTypeLabels = {
-  [POLL_TYPE.SINGLE_CHOICE]: 'Standard',
-  [POLL_TYPE.MULTIPLE_CHOICE]: 'Multiple',
-  [POLL_TYPE.RANKED_CHOICE]: 'Ranked'
+  [POLL_TYPE.SINGLE_CHOICE]: 'Simple Choice',
+  [POLL_TYPE.MULTIPLE_CHOICE]: 'Multiple Choice',
+  [POLL_TYPE.RANKED_CHOICE]: 'Ranked Choice'
+};
+
+const pollTypeColors = {
+  [POLL_TYPE.SINGLE_CHOICE]: '#3f51b5', // Indigo blue
+  [POLL_TYPE.MULTIPLE_CHOICE]: '#9c27b0', // Purple
+  [POLL_TYPE.RANKED_CHOICE]: '#00bcd4'  // Cyan (changed from pink to avoid overlap with error/ended)
 };
 
 const PollList = () => {
@@ -179,7 +185,7 @@ const PollList = () => {
                       <Box
                         sx={{
                           display: 'inline-flex',
-                          backgroundColor: poll.status === 'active' ? '#4caf50' : poll.status === 'ended' ? '#f44336' : '#ff9800',
+                          backgroundColor: pollTypeColors[poll.type],
                           color: 'white',
                           borderRadius: '16px',
                           px: 1.5,
@@ -187,22 +193,6 @@ const PollList = () => {
                           fontSize: '0.75rem',
                           fontWeight: 'bold',
                           textTransform: 'capitalize',
-                        }}
-                      >
-                        {poll.status}
-                      </Box>
-                      <Box
-                        sx={{
-                          display: 'inline-flex',
-                          backgroundColor: poll.type === POLL_TYPE.SINGLE_CHOICE ? '#556cd6' : poll.type === POLL_TYPE.MULTIPLE_CHOICE ? '#9c27b0' : '#e91e63',
-                          color: 'white',
-                          borderRadius: '16px',
-                          px: 1.5,
-                          py: 0.5,
-                          fontSize: '0.75rem',
-                          fontWeight: 'bold',
-                          textTransform: 'capitalize',
-                          ml: 1,
                         }}
                       >
                         {pollTypeLabels[poll.type]}
