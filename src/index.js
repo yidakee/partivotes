@@ -10,9 +10,11 @@ import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import theme from './styles/theme';
 
-// Import theme styles including our fixes
-import './styles/fixes.css'; // Add our emergency fixes CSS
-import './styles/z-final-critical-overrides.css'; // Critical overrides - MUST be last import
+// Import theme styles including our fixes - ORDER MATTERS
+import './styles/standard-theme.css'; // Light theme first
+import './styles/futuristic-theme.css'; // Dark theme second
+import './styles/fixes.css'; // Fixes third
+import './styles/z-final-critical-overrides.css'; // FINAL overrides last
 
 // Add basic styling to ensure content is visible
 const styleElement = document.createElement('style');
@@ -26,6 +28,9 @@ styleElement.textContent = `
     /* position: relative creates a stacking context that breaks fixed positioning */
     /* z-index values only create stacking contexts when position is not static */
     z-index: 10; 
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Starfield behind content */

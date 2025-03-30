@@ -1,375 +1,183 @@
-/* Cyberpunk Theme CSS - Ultra Futuristic Edition - Optimized for Performance */
+/* 
+ * FUTURISTIC THEME - SIMPLIFIED IMPLEMENTATION
+ * Focused on stability and consistency with light mode
+ */
 
+/* Base theme variables */
 .futuristic-theme {
   --primary-color: #00ffea;
   --secondary-color: #ff00ff;
   --accent-color: #fffc00;
-  --background-color: transparent !important;
-  --card-bg: rgba(5, 5, 20, 0.9);
   --text-color: #ffffff;
+  --background-dark: #050518;
+  --card-bg: rgba(5, 5, 20, 0.9);
   --text-shadow: 0 0 5px var(--primary-color);
   --border-glow: 0 0 8px var(--primary-color);
-  --neon-shadow: 0 0 15px rgba(0, 255, 240, 0.5);
   
-  background: transparent !important;
+  /* Set basic styles for entire theme */
   color: var(--text-color);
-  transition: all 0.3s ease;
-  overflow-x: hidden;
-  font-family: 'Montserrat', sans-serif;
-  letter-spacing: 0.5px;
-  /* Reduce paint operations with hardware acceleration */
-  transform: translateZ(0);
-  will-change: transform;
+  background-color: var(--background-dark);
 }
 
-/* Ensure body and html are also transparent to allow starfield to show through */
+/* CRITICAL: Ensure starfield background shows through */
 body.futuristic-theme,
-html.futuristic-theme {
-  background: transparent !important;
-  background-color: transparent !important;
+html.futuristic-theme,
+#root.futuristic-theme {
+  background-color: var(--background-dark);
 }
 
-/* Add Montserrat font for both themes */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+/* 
+ * FIXED ELEMENTS - Header & Footer
+ * Keep exact same behavior as light mode but with dark styling
+ */
 
-/* Futuristic scrollbar - simplified */
-.futuristic-theme::-webkit-scrollbar {
-  width: 8px;
-}
-
-.futuristic-theme::-webkit-scrollbar-track {
-  background: rgba(5, 5, 20, 0.9);
-}
-
-.futuristic-theme::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
-  border-radius: 4px;
-}
-
-/* Holographic effect for cards - optimized */
-.futuristic-theme .MuiPaper-root {
-  background: var(--card-bg) !important;
-  border: 1px solid rgba(0, 255, 240, 0.3) !important;
-  box-shadow: var(--border-glow) !important;
-  transition: all 0.3s ease !important;
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-}
-
-/* Remove expensive scanline animation */
-.futuristic-theme .MuiPaper-root::before {
-  content: none;
-}
-
-/* Simplified hover effect */
-.futuristic-theme .MuiPaper-root:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 15px rgba(0, 255, 240, 0.5) !important;
-}
-
-/* Improved text readability - reduced shadows */
-.futuristic-theme .MuiTypography-root {
-  color: var(--text-color) !important;
-  letter-spacing: 0.5px;
-}
-
-.futuristic-theme .MuiTypography-body1,
-.futuristic-theme .MuiTypography-body2 {
-  color: #e0f7fa !important;
-  font-weight: 400;
-}
-
-/* Glowing buttons - optimized */
-.futuristic-theme .MuiButton-contained {
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #000 !important;
-  font-weight: bold !important;
-  box-shadow: 0 0 5px rgba(0, 255, 240, 0.5) !important;
-  position: relative;
-  z-index: 1;
-  transition: all 0.3s ease;
-  letter-spacing: 1px;
-}
-
-/* Remove expensive sheen animation */
-.futuristic-theme .MuiButton-contained::before {
-  content: none;
-}
-
-.futuristic-theme .MuiButton-contained:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 10px var(--primary-color) !important;
-}
-
-/* Enhanced neon text - reduced shadow intensity */
-.futuristic-theme .MuiTypography-h4,
-.futuristic-theme .MuiTypography-h5,
-.futuristic-theme .MuiTypography-h6 {
-  color: var(--primary-color) !important;
-  text-shadow: 0 0 5px var(--primary-color);
-  letter-spacing: 2px;
-  font-weight: 700;
-}
-
-/* Animated background for app bar - simplified */
+/* Header - Fixed at top */
 .futuristic-theme .MuiAppBar-root {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   width: 100% !important;
   z-index: 1100 !important;
-  background-color: rgba(2, 0, 36, 0.8) !important;
+  background-color: rgba(5, 5, 20, 0.8) !important;
   backdrop-filter: blur(10px) !important;
-  box-shadow: 0 0 15px rgba(0, 255, 240, 0.5) !important;
-  border-bottom: 1px solid rgba(0, 255, 240, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 240, 0.5);
+  border-bottom: 1px solid rgba(0, 255, 240, 0.3);
 }
 
-/* Remove expensive gradient animation */
-.futuristic-theme .MuiAppBar-root::before {
-  content: none;
-}
-
-.futuristic-theme .MuiToolbar-root {
-  position: relative;
-  z-index: 1;
-}
-
-/* Futuristic form controls - simplified */
-.futuristic-theme .MuiOutlinedInput-root {
-  background: rgba(5, 5, 20, 0.8) !important;
-  border: 1px solid var(--primary-color) !important;
-  color: var(--text-color) !important;
-  transition: all 0.3s ease;
-}
-
-.futuristic-theme .MuiOutlinedInput-root.Mui-focused {
-  box-shadow: 0 0 5px rgba(0, 255, 240, 0.5);
-  border-color: var(--primary-color) !important;
-}
-
-.futuristic-theme .MuiOutlinedInput-notchedOutline {
-  border-color: var(--primary-color) !important;
-}
-
-.futuristic-theme .MuiInputLabel-root {
-  color: var(--primary-color) !important;
-}
-
-/* Progress indicators - simplified */
-.futuristic-theme .MuiLinearProgress-root {
-  background: rgba(0, 255, 240, 0.2) !important;
-  height: 8px !important;
-  border-radius: 4px !important;
-  overflow: hidden;
-}
-
-.futuristic-theme .MuiLinearProgress-bar {
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)) !important;
-}
-
-/* Remove pulse animation */
-@keyframes pulse-progress {
-  0%, 100% { opacity: 1; }
-}
-
-/* Blade Runner style header - optimized */
-.futuristic-theme .MuiAppBar-root .MuiTypography-h6 {
-  font-size: 1.8rem;
-  letter-spacing: 3px;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 5px rgba(0, 255, 240, 0.5));
-}
-
-/* Remove flicker animation */
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-}
-
-/* Remove dark overlay */
-.futuristic-theme::before {
-  content: none;
-}
-
-/* Override container background */
-.futuristic-theme .MuiContainer-root {
-  background: transparent !important;
-}
-
-/* Neon dividers - simplified */
-.futuristic-theme .MuiDivider-root {
-  border-color: var(--primary-color) !important;
-  opacity: 0.5;
-}
-
-/* Cyberpunk style cards - optimized */
-.futuristic-theme .poll-card {
-  background: rgba(5, 5, 20, 0.9) !important;
-  border: 1px solid var(--primary-color) !important;
-  box-shadow: 0 0 8px rgba(0, 255, 240, 0.3) !important;
-}
-
-/* Remove shine animation */
-.futuristic-theme .poll-card::after {
-  content: none;
-}
-
-/* Dark mode form fields */
-.futuristic-theme .MuiTextField-root,
-.futuristic-theme .MuiSelect-root,
-.futuristic-theme .MuiInputBase-root {
-  background-color: rgba(5, 5, 20, 0.7) !important;
-  color: var(--text-color) !important;
-  border-radius: 4px;
-}
-
-.futuristic-theme .MuiInputBase-input {
-  color: var(--text-color) !important;
-}
-
-.futuristic-theme .MuiFormLabel-root {
-  color: var(--primary-color) !important;
-}
-
-/* Neon checkboxes and radio buttons - simplified */
-.futuristic-theme .MuiCheckbox-root,
-.futuristic-theme .MuiRadio-root {
-  color: var(--primary-color) !important;
-}
-
-.futuristic-theme .MuiCheckbox-root.Mui-checked,
-.futuristic-theme .MuiRadio-root.Mui-checked {
-  color: var(--primary-color) !important;
-}
-
-/* Blade Runner style footer - simplified */
+/* Footer - Fixed at bottom */
 .futuristic-theme .MuiBox-root[component="footer"] {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   width: 100% !important;
   z-index: 1000 !important;
-  background-color: rgba(2, 0, 36, 0.8) !important;
-  backdrop-filter: blur(10px) !important;
-  box-shadow: 0 0 15px rgba(0, 255, 240, 0.5) !important;
-  border-top: 1px solid rgba(0, 255, 240, 0.3) !important;
-}
-
-/* Cyberpunk style alerts - simplified */
-.futuristic-theme .MuiAlert-root {
   background-color: rgba(5, 5, 20, 0.8) !important;
-  border: 1px solid var(--primary-color) !important;
-  color: var(--text-color) !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 240, 0.5);
+  border-top: 1px solid rgba(0, 255, 240, 0.3);
 }
 
-.futuristic-theme .MuiAlert-standardSuccess {
-  border-color: #00ff9d !important;
+/* 
+ * CONTENT STYLES
+ */
+
+/* Content area - ensure it scrolls under header/footer */
+.futuristic-theme main {
+  padding-top: 84px !important; /* Match light mode + header height */
+  padding-bottom: 70px !important; /* Match light mode + footer height */
 }
 
-.futuristic-theme .MuiAlert-standardError {
-  border-color: #ff0050 !important;
+/* Cards & Containers - Neon styling */
+.futuristic-theme .MuiPaper-root,
+.futuristic-theme .MuiCard-root {
+  background-color: var(--card-bg);
+  border: 1px solid rgba(0, 255, 240, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 240, 0.2);
 }
 
-.futuristic-theme .MuiAlert-standardWarning {
-  border-color: #fffc00 !important;
+/* Typography - Futuristic styling */
+.futuristic-theme .MuiTypography-root {
+  color: var(--text-color);
 }
 
-.futuristic-theme .MuiAlert-standardInfo {
-  border-color: #00a3ff !important;
+.futuristic-theme .MuiTypography-h1,
+.futuristic-theme .MuiTypography-h2,
+.futuristic-theme .MuiTypography-h3,
+.futuristic-theme .MuiTypography-h4,
+.futuristic-theme .MuiTypography-h5,
+.futuristic-theme .MuiTypography-h6 {
+  text-shadow: var(--text-shadow);
+  letter-spacing: 1px;
 }
 
-/* Disable particles background for performance */
-.futuristic-theme .particles-container {
-  display: none;
-}
-
-/* Disable floating animation */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-}
-
-/* Disable glitch effect for headings */
-.futuristic-theme h1:hover,
-.futuristic-theme h2:hover,
-.futuristic-theme h3:hover,
-.futuristic-theme .MuiTypography-h4:hover,
-.futuristic-theme .MuiTypography-h5:hover,
-.futuristic-theme .MuiTypography-h6:hover {
-  animation: none;
-}
-
-/* Disable the cyber grid completely */
-.cyber-grid {
-  display: none !important;
-}
-
-/* Disable data stream effects */
-.data-stream {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  width: 0 !important;
-  opacity: 0 !important;
-  position: absolute !important;
-  pointer-events: none !important;
-}
-
-/* Remove any green lines at the bottom */
-.futuristic-theme::after,
-.futuristic-theme *::after,
-.futuristic-theme footer::after,
-.futuristic-theme footer::before,
-.futuristic-theme footer *::after,
-.futuristic-theme footer *::before,
-.futuristic-theme .MuiBox-root::after,
-.futuristic-theme .MuiBox-root::before,
-.futuristic-theme #root::after,
-.futuristic-theme #root::before {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  width: 0 !important;
-  opacity: 0 !important;
-  content: none !important;
-  border: none !important;
-  background: none !important;
-}
-
-/* Ensure footer has no green elements */
-.futuristic-theme footer,
-.futuristic-theme .MuiBox-root[component="footer"] {
-  border: none !important;
-  border-top: none !important;
-  border-bottom: none !important;
-  background-color: transparent !important;
-}
-
-/* Sound effects toggle button - simplified */
-.futuristic-theme .sound-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
-  background: rgba(5, 5, 20, 0.7);
-  border: 1px solid var(--primary-color);
-  color: var(--primary-color);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 255, 240, 0.3);
+/* Buttons - Neon styling */
+.futuristic-theme .MuiButton-root {
+  text-transform: uppercase;
+  letter-spacing: 1px;
   transition: all 0.3s ease;
 }
 
-.futuristic-theme .sound-toggle:hover {
+.futuristic-theme .MuiButton-contained {
+  background: linear-gradient(45deg, #0a0a2a 30%, #1a1a4a 90%);
+  border: 1px solid var(--primary-color);
+  box-shadow: var(--border-glow);
+}
+
+.futuristic-theme .MuiButton-contained:hover {
+  background: linear-gradient(45deg, #1a1a4a 30%, #2a2a6a 90%);
   transform: scale(1.05);
+  box-shadow: 0 0 15px var(--primary-color);
+}
+
+/* Custom App Title */
+.futuristic-theme .MuiToolbar-root .MuiTypography-h6 {
+  display: flex;
+  align-items: center;
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+/* Links and Interactive Elements */
+.futuristic-theme a {
+  color: var(--primary-color);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.futuristic-theme a:hover {
+  color: var(--accent-color);
+  text-shadow: 0 0 8px var(--accent-color);
+}
+
+/* Special elements - Music Player, Free MPC Button */
+.futuristic-theme .music-player-container {
+  display: block !important; /* Only show in futuristic theme */
+}
+
+.futuristic-theme .get-free-mpc-button {
+  display: flex !important; /* Only show in futuristic theme */
+}
+
+/* Theme Switch styling */
+.futuristic-theme .theme-switch {
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+/* 
+ * FORM ELEMENTS 
+ */
+.futuristic-theme .MuiTextField-root,
+.futuristic-theme .MuiSelect-root,
+.futuristic-theme .MuiInput-root {
+  border-radius: 4px;
+  background-color: rgba(5, 5, 20, 0.7);
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
+}
+
+.futuristic-theme .MuiInputLabel-root {
+  color: var(--primary-color);
+}
+
+/* Ensure non-styled elements still get theme colors */
+.futuristic-theme input,
+.futuristic-theme select,
+.futuristic-theme textarea {
+  background-color: rgba(5, 5, 20, 0.7);
+  color: var(--text-color);
+  border: 1px solid var(--primary-color);
+}
+
+/* 
+ * ANIMATION KEYFRAMES
+ * Simple and performant animations
+ */
+@keyframes glow {
+  0% { box-shadow: 0 0 5px var(--primary-color); }
+  50% { box-shadow: 0 0 15px var(--primary-color); }
+  100% { box-shadow: 0 0 5px var(--primary-color); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
 }

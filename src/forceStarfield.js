@@ -16,13 +16,14 @@
     canvas.style.width = '100vw'; // Use vw/vh for viewport units
     canvas.style.height = '100vh';
     canvas.style.zIndex = '-1'; // Ensure it's behind everything
+    canvas.style.pointerEvents = 'none';
     canvas.style.display = 'none'; // Start hidden
     canvas.style.opacity = '0'; // Start transparent
     canvas.style.transition = 'opacity 0.5s ease'; // Smooth fade
     canvas.style.backgroundColor = '#000'; // Ensure background is black
 
-    // Add to beginning of body
-    document.body.insertBefore(canvas, document.body.firstChild);
+    // Append to body first so it's at the bottom of the stack
+    document.body.prepend(canvas);
     
     // Set dimensions (redundant with 100vw/vh but keep for context compatibility)
     canvas.width = window.innerWidth;

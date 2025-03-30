@@ -27,6 +27,7 @@ import { getPolls } from '../../services/pollService';
 import { formatDate } from '../../utils/dateUtils';
 import { POLL_STATUS, POLL_TYPE } from '../../utils/constants';
 import { WalletContext } from '../../contexts/WalletContext';
+import { ThemeContext } from '../../contexts/ThemeContext';
 
 const statusColors = {
   [POLL_STATUS.ACTIVE]: 'success',
@@ -43,6 +44,8 @@ const pollTypeLabels = {
 
 const PollList = () => {
   const { connected } = useContext(WalletContext);
+  const { themeMode } = useContext(ThemeContext);
+  const isFuturistic = themeMode === 'futuristic';
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -94,11 +97,29 @@ const PollList = () => {
           <span>
             <Button 
               variant="contained" 
-              color="primary" 
+              color={isFuturistic ? "inherit" : "primary"}
               startIcon={<AddIcon />}
               component={RouterLink}
               to="/polls/create"
               disabled={!connected}
+              sx={{
+                ...(isFuturistic && {
+                  background: 'linear-gradient(45deg, #ff00cc, #ff0055)', // Neon magenta gradient
+                  color: '#000', // Dark text
+                  fontWeight: 'bold',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: '0 0 15px rgba(255, 0, 204, 0.5)', // Magenta glow
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #ff33cc, #ff3377)',
+                    boxShadow: '0 0 20px rgba(255, 0, 204, 0.8)',
+                    transform: 'translateY(-2px)',
+                  },
+                  '&:disabled': {
+                    background: 'rgba(255, 0, 204, 0.3)',
+                    color: 'rgba(0, 0, 0, 0.4)'
+                  }
+                })
+              }}
             >
               Create Poll
             </Button>

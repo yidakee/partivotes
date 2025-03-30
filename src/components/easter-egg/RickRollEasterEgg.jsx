@@ -40,16 +40,16 @@ const RickRollEasterEgg = () => {
           startIcon={<LocalAtmIcon />}
           onClick={handleOpen}
           sx={{
-            background: 'linear-gradient(45deg, #00ff9d, #00a3ff)',
-            color: '#000',
+            background: 'linear-gradient(45deg, #ff00cc, #ff0055)', // Neon magenta gradient
+            color: '#000', // Dark text
             fontWeight: 'bold',
             border: '2px solid rgba(255, 255, 255, 0.5)', // Thicker, more visible border
-            boxShadow: '0 0 20px rgba(0, 255, 240, 0.7)', // Permanent glow
+            boxShadow: '0 0 20px rgba(255, 0, 204, 0.7)', // Magenta glow
             animation: 'pulse 1.2s infinite ease-in-out, scale 2s infinite ease-in-out, breathe 3s infinite ease-in-out',
             '@keyframes pulse': {
-              '0%': { boxShadow: '0 0 10px rgba(0, 255, 240, 0.5)' },
-              '50%': { boxShadow: '0 0 30px rgba(0, 255, 240, 1)' },
-              '100%': { boxShadow: '0 0 10px rgba(0, 255, 240, 0.5)' },
+              '0%': { boxShadow: '0 0 10px rgba(255, 0, 204, 0.5)' },
+              '50%': { boxShadow: '0 0 30px rgba(255, 0, 204, 1)' },
+              '100%': { boxShadow: '0 0 10px rgba(255, 0, 204, 0.5)' },
             },
             '@keyframes scale': {
               '0%': { transform: 'scale(1)' },
@@ -62,8 +62,8 @@ const RickRollEasterEgg = () => {
               '100%': { filter: 'brightness(1) contrast(1.1)' },
             },
             '&:hover': {
-              background: 'linear-gradient(45deg, #00ff9d, #00a3ff)',
-              boxShadow: '0 0 35px rgba(0, 255, 240, 1)',
+              background: 'linear-gradient(45deg, #ff00cc, #ff0055)',
+              boxShadow: '0 0 35px rgba(255, 0, 204, 1)',
               transform: 'translateY(-3px) scale(1.05)',
               transition: 'all 0.2s ease',
             },
