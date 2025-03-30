@@ -2,27 +2,29 @@
 (function() {
   // Create the starfield
   function createStarfield() {
-    // Create canvas
-    const canvas = document.createElement('canvas');
+    // Get existing canvas or create a new one
+    let canvas = document.getElementById('space-travel-effect');
+    if (canvas) return canvas; // Return existing if found
+
+    canvas = document.createElement('canvas');
     canvas.id = 'space-travel-effect';
     
-    // Style canvas to cover everything but stay behind content
-    Object.assign(canvas.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100vw',
-      height: '100vh',
-      zIndex: '-1',  // Always behind content
-      pointerEvents: 'none',
-      opacity: '1',  // Make fully visible
-      background: 'black' // Black background to ensure stars are visible
-    });
-    
+    // CRITICAL STYLING FOR FIXED BACKGROUND
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100vw'; // Use vw/vh for viewport units
+    canvas.style.height = '100vh';
+    canvas.style.zIndex = '-1'; // Ensure it's behind everything
+    canvas.style.display = 'none'; // Start hidden
+    canvas.style.opacity = '0'; // Start transparent
+    canvas.style.transition = 'opacity 0.5s ease'; // Smooth fade
+    canvas.style.backgroundColor = '#000'; // Ensure background is black
+
     // Add to beginning of body
     document.body.insertBefore(canvas, document.body.firstChild);
     
-    // Set dimensions
+    // Set dimensions (redundant with 100vw/vh but keep for context compatibility)
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
@@ -116,20 +118,11 @@
     }
   };
   
-  // Initialize and activate for futuristic theme
+  // Initialize canvas creation on load, but DO NOT toggle based on theme here.
+  // ThemeContext will handle calling toggleStarfield based on the theme state.
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      createStarfield();
-      // Check for futuristic theme
-      if (localStorage.getItem('partivotes-theme') === 'futuristic') {
-        window.toggleStarfield(true);
-      }
-    });
+    document.addEventListener('DOMContentLoaded', createStarfield);
   } else {
-    createStarfield();
-    // Check for futuristic theme
-    if (localStorage.getItem('partivotes-theme') === 'futuristic') {
-      window.toggleStarfield(true);
-    }
+    createStarfield(); // Create canvas immediately if DOM is already loaded
   }
 })();

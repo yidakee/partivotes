@@ -39,3 +39,6 @@ Thumbs.db
 
 # Local system files
 .systemd/
+
+# Documentation files
+/a_docs
