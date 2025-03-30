@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { 
   Container, 
   Typography, 
@@ -53,8 +53,16 @@ const PollList = () => {
   const { themeMode } = useContext(ThemeContext);
   const isFuturistic = themeMode === 'futuristic';
   const [polls, setPolls] = useState([]);
+  const [filteredPolls, setFilteredPolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const location = useLocation();
+
+  // Get current filter from URL
+  const getCurrentFilter = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get('status') || POLL_STATUS.ACTIVE;
+  };
 
   useEffect(() => {
     const fetchPolls = async () => {
@@ -75,6 +83,13 @@ const PollList = () => {
     fetchPolls();
   }, []);
 
+  // Filter polls based on the status in the URL
+  useEffect(() => {
+    const currentFilter = getCurrentFilter();
+    const filtered = polls.filter(poll => poll.status === currentFilter);
+    setFilteredPolls(filtered);
+  }, [polls, location.search]);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -93,11 +108,18 @@ const PollList = () => {
     );
   }
 
+  const currentFilter = getCurrentFilter();
+  const statusTitles = {
+    [POLL_STATUS.ACTIVE]: 'Active Polls',
+    [POLL_STATUS.PENDING]: 'Pending Polls',
+    [POLL_STATUS.ENDED]: 'Finished Polls'
+  };
+
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1">
-          Active Polls
+          {statusTitles[currentFilter]}
         </Typography>
         <Tooltip title={!connected ? "Connect your wallet to create a poll" : "Create a new poll"}>
           <span>
@@ -137,18 +159,20 @@ const PollList = () => {
         </Tooltip>
       </Box>
 
-      {polls.length === 0 ? (
+      {filteredPolls.length === 0 ? (
         <Box textAlign="center" py={4}>
           <Typography variant="h6" color="textSecondary" gutterBottom>
-            No polls available
+            No {currentFilter.toLowerCase()} polls available
           </Typography>
           <Typography variant="body1" color="textSecondary">
-            Be the first to create a poll!
+            {currentFilter === POLL_STATUS.ACTIVE && "Be the first to create an active poll!"}
+            {currentFilter === POLL_STATUS.PENDING && "No pending polls at the moment."}
+            {currentFilter === POLL_STATUS.ENDED && "No finished polls yet."}
           </Typography>
         </Box>
       ) : (
         <Grid container spacing={3}>
-          {polls.map((poll) => {
+          {filteredPolls.map((poll) => {
             // Get top 3 options by votes for mini chart
             const topOptions = [...poll.options]
               .sort((a, b) => b.votes - a.votes)

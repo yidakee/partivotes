@@ -1,21 +1,38 @@
 import React, { useContext } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
   Typography,
   Box,
   Button,
+  ButtonGroup,
 } from '@mui/material';
 import { ThemeContext } from '../../contexts/ThemeContext';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import HomeIcon from '@mui/icons-material/Home';
 import WalletConnect from '../wallet/WalletConnect';
 import TutorialMenu from '../tutorial/TutorialMenu';
+import { POLL_STATUS } from '../../utils/constants';
 
 const Header = () => {
   const { themeMode } = useContext(ThemeContext);
   const isFuturistic = themeMode === 'futuristic';
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Handle filter button click
+  const handleFilterClick = (status) => {
+    navigate(`/?status=${status}`);
+  };
+  
+  // Get current filter from URL
+  const getCurrentFilter = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get('status') || POLL_STATUS.ACTIVE;
+  };
+  
+  const currentFilter = getCurrentFilter();
 
   return (
     <AppBar 
@@ -131,6 +148,91 @@ const Header = () => {
           )}
           {isFuturistic ? 'PARTI-VOTES 3000' : 'PartiVotes'}
         </Typography>
+        
+        {/* Poll Filter Buttons - Centered in the navbar */}
+        <Box sx={{ 
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <ButtonGroup 
+            variant={isFuturistic ? "outlined" : "contained"} 
+            aria-label="poll filter button group"
+            sx={{
+              ...(isFuturistic && {
+                background: 'rgba(0, 0, 0, 0.3)',
+                borderRadius: '20px',
+                padding: '3px',
+                border: '1px solid rgba(0, 255, 240, 0.3)',
+                boxShadow: '0 0 10px rgba(0, 255, 240, 0.2)',
+              }),
+            }}
+          >
+            <Button 
+              onClick={() => handleFilterClick(POLL_STATUS.ACTIVE)}
+              sx={{
+                ...(isFuturistic && {
+                  color: currentFilter === POLL_STATUS.ACTIVE ? '#00fff0' : 'white',
+                  backgroundColor: currentFilter === POLL_STATUS.ACTIVE ? 'rgba(0, 255, 240, 0.2)' : 'transparent',
+                  borderColor: 'rgba(0, 255, 240, 0.5)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 255, 240, 0.3)',
+                    borderColor: '#00fff0',
+                  },
+                }),
+                ...(currentFilter === POLL_STATUS.ACTIVE && !isFuturistic && {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                }),
+              }}
+            >
+              Active
+            </Button>
+            <Button 
+              onClick={() => handleFilterClick(POLL_STATUS.PENDING)}
+              sx={{
+                ...(isFuturistic && {
+                  color: currentFilter === POLL_STATUS.PENDING ? '#00fff0' : 'white',
+                  backgroundColor: currentFilter === POLL_STATUS.PENDING ? 'rgba(0, 255, 240, 0.2)' : 'transparent',
+                  borderColor: 'rgba(0, 255, 240, 0.5)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 255, 240, 0.3)',
+                    borderColor: '#00fff0',
+                  },
+                }),
+                ...(currentFilter === POLL_STATUS.PENDING && !isFuturistic && {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                }),
+              }}
+            >
+              Pending
+            </Button>
+            <Button 
+              onClick={() => handleFilterClick(POLL_STATUS.ENDED)}
+              sx={{
+                ...(isFuturistic && {
+                  color: currentFilter === POLL_STATUS.ENDED ? '#00fff0' : 'white',
+                  backgroundColor: currentFilter === POLL_STATUS.ENDED ? 'rgba(0, 255, 240, 0.2)' : 'transparent',
+                  borderColor: 'rgba(0, 255, 240, 0.5)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 255, 240, 0.3)',
+                    borderColor: '#00fff0',
+                  },
+                }),
+                ...(currentFilter === POLL_STATUS.ENDED && !isFuturistic && {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                }),
+              }}
+            >
+              Finished
+            </Button>
+          </ButtonGroup>
+        </Box>
       </Toolbar>
       
       {/* Wallet Connect - absolute positioned at the far right edge */}
