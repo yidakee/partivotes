@@ -10,14 +10,24 @@ const RickRollEasterEgg = () => {
   const isFuturistic = themeMode === 'futuristic';
 
   const handleOpen = () => {
-    // Dispatch custom event to mute music player
-    document.dispatchEvent(new CustomEvent('freeMPCClick'));
+    // Toggle a class on the container to trigger the stars animation
+    const container = document.getElementById('app-container');
+    if (container) {
+      container.classList.add('animate-stars');
+      
+      // Remove the class after a delay
+      setTimeout(() => {
+        container.classList.remove('animate-stars');
+      }, 1000);
+    }
     
-    // Get the audio element and pause it
-    const audioElement = document.getElementById('music-player-audio');
-    if (audioElement) {
-      console.log('Pausing music player from Easter Egg click');
-      audioElement.pause();
+    // Pause music playback when opening the dialog if in futuristic mode
+    if (isFuturistic) {
+      const audioElement = document.getElementById('music-player-audio');
+      if (audioElement && !audioElement.paused) {
+        console.log('Pausing music player for Easter Egg video');
+        audioElement.pause();
+      }
     }
     
     // Open the dialog
@@ -25,7 +35,30 @@ const RickRollEasterEgg = () => {
   };
 
   const handleClose = () => {
+    // Close the dialog
     setOpen(false);
+    
+    // Resume music playback when closing the dialog if in futuristic mode
+    if (isFuturistic) {
+      // Get the audio element
+      const audioElement = document.getElementById('music-player-audio');
+      if (audioElement) {
+        console.log('Resuming music player from Easter Egg close');
+        
+        // Small delay to ensure dialog closing animation completes
+        setTimeout(() => {
+          audioElement.play()
+            .then(() => {
+              console.log('Music resumed successfully after closing popup');
+              // Dispatch an event to notify the music player component
+              document.dispatchEvent(new CustomEvent('resumeMusicPlayback'));
+            })
+            .catch(err => {
+              console.error('Failed to resume music playback:', err);
+            });
+        }, 300);
+      }
+    }
   };
 
   return (

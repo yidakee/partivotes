@@ -217,8 +217,17 @@ const MusicPlayer = () => {
       }
     };
     
+    // Add listener for resume music event (fired when Rick Roll popup is closed)
+    const handleResumeMusicPlayback = () => {
+      console.log('Resume music playback event received');
+      if (themeMode === 'futuristic' && audioRef.current) {
+        setIsPlaying(true);
+      }
+    };
+    
     document.addEventListener('themeChange', handleThemeChange);
     document.addEventListener('playMusic', handlePlayMusic);
+    document.addEventListener('resumeMusicPlayback', handleResumeMusicPlayback);
     
     // Load initial track
     if (audioRef.current) {
@@ -234,6 +243,7 @@ const MusicPlayer = () => {
       }
       document.removeEventListener('themeChange', handleThemeChange);
       document.removeEventListener('playMusic', handlePlayMusic);
+      document.removeEventListener('resumeMusicPlayback', handleResumeMusicPlayback);
     };
   }, []);
   
