@@ -357,6 +357,7 @@ const MusicPlayer = () => {
         alignItems: 'center',
         width: 'auto',
         minWidth: '240px',
+        maxWidth: '90vw', // Add maximum width to prevent overflow on small screens
         padding: '10px 20px',
         background: '#7e1fff', /* Exact match to the GET FREE $MPC button */
         color: '#fff',
@@ -399,6 +400,7 @@ const MusicPlayer = () => {
           color: '#fff',
           cursor: 'pointer',
           fontSize: '1.8rem',
+          flexShrink: 0, // Prevent icon from shrinking
           '&:hover': {
             transform: 'scale(1.2)',
             textShadow: '0 0 10px #fff',
@@ -415,6 +417,7 @@ const MusicPlayer = () => {
           color: '#fff',
           cursor: 'pointer',
           fontSize: '1.8rem',
+          flexShrink: 0, // Prevent icon from shrinking
           '&:hover': {
             transform: 'scale(1.2)',
             textShadow: '0 0 10px #fff',
@@ -431,7 +434,12 @@ const MusicPlayer = () => {
           fontWeight: 'bold',
           textShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
           letterSpacing: '0.5px',
-          maxWidth: '150px',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          flexGrow: 1, // Allow text to take available space
+          minWidth: '50px', // Minimum width for very short titles
+          maxWidth: 'calc(100% - 80px)', // Ensure there's space for the buttons
         }}
       >
         {tracks[currentTrack]?.title || 'No track selected'}
