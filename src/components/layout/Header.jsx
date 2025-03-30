@@ -14,6 +14,9 @@ import HomeIcon from '@mui/icons-material/Home';
 import WalletConnect from '../wallet/WalletConnect';
 import TutorialMenu from '../tutorial/TutorialMenu';
 import { POLL_STATUS } from '../../utils/constants';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 
 const Header = () => {
   const { themeMode } = useContext(ThemeContext);
@@ -173,6 +176,7 @@ const Header = () => {
           >
             <Button 
               onClick={() => handleFilterClick(POLL_STATUS.ACTIVE)}
+              startIcon={<CheckCircleOutlineIcon />}
               sx={{
                 ...(isFuturistic && {
                   color: currentFilter === POLL_STATUS.ACTIVE ? '#00fff0' : 'white',
@@ -193,6 +197,7 @@ const Header = () => {
             </Button>
             <Button 
               onClick={() => handleFilterClick(POLL_STATUS.PENDING)}
+              startIcon={<HourglassEmptyIcon />}
               sx={{
                 ...(isFuturistic && {
                   color: currentFilter === POLL_STATUS.PENDING ? '#00fff0' : 'white',
@@ -213,6 +218,7 @@ const Header = () => {
             </Button>
             <Button 
               onClick={() => handleFilterClick(POLL_STATUS.ENDED)}
+              startIcon={<AssignmentTurnedInIcon />}
               sx={{
                 ...(isFuturistic && {
                   color: currentFilter === POLL_STATUS.ENDED ? '#00fff0' : 'white',
