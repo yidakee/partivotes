@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="PartiVotes Wallet Test" />
+    <title>PartiVotes Wallet Test</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        #root {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            min-height: 100vh;
+        }
+        .app-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            background-color: #f7f7f7;
+        }
+        .log {
+            background-color: #f7f7f7;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="app-header">
+            <h1>PartiVotes Wallet Test App</h1>
+            <p>This page is structured like the main React app to test wallet detection</p>
+        </div>
+        
+        <div class="status" id="status-container">
+            <h2>Wallet Status</h2>
+            <p>Detection: <span id="detection-status">Checking...</span></p>
+            <p>Connection: <span id="connection-status">Not connected</span></p>
+            <p>Address: <span id="wallet-address">None</span></p>
+        </div>
+        
+        <div>
+            <button id="check-btn">Check Wallet</button>
+            <button id="connect-btn">Connect Wallet</button>
+            <button id="disconnect-btn">Disconnect Wallet</button>
+        </div>
+        
+        <div class="log">
+            <h3>Connection Log</h3>
+            <pre id="log"></pre>
+        </div>
+    </div>
+    
+    <script>
+        // Wait for DOM content loaded - similar to React's initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize app after a delay to mimic React's mounting process
+            setTimeout(initializeApp, 500);
+        });
+        
+        // Elements
+        const detectionStatus = document.getElementById('detection-status');
+        const connectionStatus = document.getElementById('connection-status');
+        const walletAddress = document.getElementById('wallet-address');
+        const logElement = document.getElementById('log');
+        
+        // Flag for connection status
+        let isConnected = false;
+        
+        // Log function
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            logElement.textContent += `[${time}] ${message}\n`;
+            // Auto-scroll
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        // Initialize app - similar to React's componentDidMount
+        function initializeApp() {
+            log('App initialized, checking for wallet...');
+            checkWalletAvailability();
+            
+            // Add event listeners for buttons
+            document.getElementById('check-btn').addEventListener('click', checkWalletAvailability);
+            document.getElementById('connect-btn').addEventListener('click', connectWallet);
+            document.getElementById('disconnect-btn').addEventListener('click', disconnectWallet);
+            
+            // Check connection status after a short delay - similar to React's useEffect
+            setTimeout(checkConnectionStatus, 1000);
+        }
+        
+        // Check if wallet is available
+        function checkWalletAvailability() {
+            log('Checking wallet availability...');
+            
+            if (typeof window.partisiawallet !== 'undefined') {
+                detectionStatus.textContent = 'Available';
+                detectionStatus.className = 'success';
+                log('✅ Partisia Wallet detected');
+                return true;
+            } else {
+                detectionStatus.textContent = 'Not Available';
+                detectionStatus.className = 'error';
+                log('❌ Partisia Wallet not detected');
+                
+                // Log global object properties
+                log('Checking window for wallet-related properties:');
+                ['partisiawallet', 'ethereum', 'web3', 'partisia'].forEach(prop => {
+                    log(`- window.${prop}: ${window[prop] ? 'exists' : 'does not exist'}`);
+                });
+                
+                return false;
+            }
+        }
+        
+        // Check connection status
+        async function checkConnectionStatus() {
+            log('Checking connection status...');
+            
+            if (typeof window.partisiawallet === 'undefined') {
+                connectionStatus.textContent = 'Wallet not available';
+                connectionStatus.className = 'error';
+                log('❌ Wallet not available, cannot check connection');
+                return false;
+            }
+            
+            try {
+                // Try to get address as a way to check connection
+                const address = await window.partisiawallet.getAddress();
+                if (address) {
+                    isConnected = true;
+                    connectionStatus.textContent = 'Connected';
+                    connectionStatus.className = 'success';
+                    walletAddress.textContent = address;
+                    log(`✅ Already connected to address: ${address}`);
+                    return true;
+                }
+            } catch (error) {
+                isConnected = false;
+                connectionStatus.textContent = 'Not connected';
+                log('Not currently connected to wallet');
+            }
+            
+            return isConnected;
+        }
+        
+        // Connect wallet - USING EXACT SAME CODE as in walletService.js
+        async function connectWallet() {
+            log('Attempting to connect wallet...');
+            
+            if (typeof window.partisiawallet === 'undefined') {
+                log('❌ Partisia Wallet Browser Extension not detected');
+                return false;
+            }
+            
+            try {
+                // Connect to the Partisia Wallet using the EXACT same parameters
+                // as in the main application
+                log('Calling window.partisiawallet.connect()...');
+                await window.partisiawallet.connect({
+                    name: 'PartiVotes',
+                    description: 'Decentralized voting application on Partisia Blockchain',
+                    url: window.location.origin,
+                });
+                
+                isConnected = true;
+                connectionStatus.textContent = 'Connected';
+                connectionStatus.className = 'success';
+                
+                // Get address
+                try {
+                    const address = await window.partisiawallet.getAddress();
+                    walletAddress.textContent = address;
+                    log(`✅ Connected to wallet address: ${address}`);
+                } catch (e) {
+                    log(`❌ Failed to get address: ${e.message}`);
+                }
+                
+                log('✅ Wallet connected successfully');
+                return true;
+            } catch (error) {
+                log(`❌ Connection failed: ${error.message}`);
+                connectionStatus.textContent = 'Connection failed';
+                connectionStatus.className = 'error';
+                return false;
+            }
+        }
+        
+        // Disconnect wallet
+        async function disconnectWallet() {
+            log('Attempting to disconnect wallet...');
+            
+            if (typeof window.partisiawallet === 'undefined') {
+                log('❌ Wallet not available');
+                return false;
+            }
+            
+            try {
+                await window.partisiawallet.disconnect();
+                isConnected = false;
+                connectionStatus.textContent = 'Disconnected';
+                walletAddress.textContent = 'None';
+                log('✅ Wallet disconnected successfully');
+                return true;
+            } catch (error) {
+                log(`❌ Disconnect failed: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Log startup
+        log(`Test app initialized at ${new Date().toLocaleString()}`);
+        log(`Page URL: ${window.location.href}`);
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minimal Wallet Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Partisia Wallet Test</h1>
+    
+    <div class="result" id="status"></div>
+    
+    <button onclick="checkWallet()">Check Wallet</button>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    
+    <script>
+        // Check wallet on page load after a delay
+        setTimeout(checkWallet, 1000);
+        
+        function checkWallet() {
+            const status = document.getElementById('status');
+            status.innerHTML = '';
+            
+            // Test 1: Direct partisiawallet check
+            const line1 = document.createElement('div');
+            if (window.partisiawallet) {
+                line1.innerHTML = '✅ window.partisiawallet exists';
+            } else {
+                line1.innerHTML = '❌ window.partisiawallet does not exist';
+            }
+            status.appendChild(line1);
+            
+            // Test 2: Ethereum check
+            const line2 = document.createElement('div');
+            if (window.ethereum) {
+                line2.innerHTML = '✅ window.ethereum exists';
+                
+                const line2a = document.createElement('div');
+                if (window.ethereum.isPartisia) {
+                    line2a.innerHTML = '✅ window.ethereum.isPartisia is true';
+                } else {
+                    line2a.innerHTML = '❌ window.ethereum.isPartisia is false or undefined';
+                }
+                status.appendChild(line2a);
+            } else {
+                line2.innerHTML = '❌ window.ethereum does not exist';
+            }
+            status.appendChild(line2);
+        }
+        
+        async function connectWallet() {
+            const status = document.getElementById('status');
+            
+            try {
+                if (window.partisiawallet) {
+                    status.innerHTML += '<div>Attempting to connect...</div>';
+                    await window.partisiawallet.connect({
+                        name: 'MinimalTest',
+                        description: 'Simple test page',
+                        url: window.location.origin
+                    });
+                    status.innerHTML += '<div>✅ Connected!</div>';
+                    
+                    // Try to get address
+                    const address = await window.partisiawallet.getAddress();
+                    status.innerHTML += `<div>Address: ${address}</div>`;
+                } else if (window.ethereum && window.ethereum.isPartisia) {
+                    status.innerHTML += '<div>Attempting to connect via ethereum...</div>';
+                    // Try connecting through ethereum interface
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    status.innerHTML += '<div>✅ Connected via ethereum!</div>';
+                } else {
+                    status.innerHTML += '<div>❌ Wallet not found</div>';
+                }
+            } catch (error) {
+                status.innerHTML += `<div>❌ Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -32,10 +32,15 @@ export const checkWalletConnection = async () => {
   }
   
   try {
-    // In a real implementation, this would check the connection status with the Partisia Wallet
-    // This would involve checking if an MPC session is active
-    // return await PartisiaBlockchain.isConnected();
-    return false;
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      console.warn('Partisia Wallet Browser Extension not detected');
+      return false;
+    }
+    
+    // Check if the wallet is connected
+    const isConnected = await window.partisiawallet.isConnected();
+    return isConnected;
   } catch (error) {
     console.error('Failed to check Partisia wallet connection:', error);
     return false;
@@ -50,9 +55,18 @@ export const connectWallet = async () => {
   }
   
   try {
-    // In a real implementation, this would connect to the Partisia Wallet
-    // This would involve initiating an MPC session and handling the challenge-response
-    // await PartisiaBlockchain.connect();
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      throw new Error('Partisia Wallet Browser Extension not detected. Please install the extension from the Chrome Web Store.');
+    }
+    
+    // Connect to the Partisia Wallet
+    await window.partisiawallet.connect({
+      name: 'PartiVotes',
+      description: 'Decentralized voting application on Partisia Blockchain',
+      url: window.location.origin,
+    });
+    
     console.log('Partisia Wallet connected');
     return true;
   } catch (error) {
@@ -69,9 +83,14 @@ export const disconnectWallet = async () => {
   }
   
   try {
-    // In a real implementation, this would disconnect from the Partisia Wallet
-    // This would involve closing the MPC session
-    // await PartisiaBlockchain.disconnect();
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      console.warn('Partisia Wallet Browser Extension not detected');
+      return true;
+    }
+    
+    // Disconnect from the Partisia Wallet
+    await window.partisiawallet.disconnect();
     console.log('Partisia Wallet disconnected');
     return true;
   } catch (error) {
@@ -87,10 +106,15 @@ export const getWalletAddress = async () => {
   }
   
   try {
-    // In a real implementation, this would get the address from the Partisia Wallet
-    // Partisia addresses are 21 bytes (42 hex characters) without 0x prefix
-    // return await PartisiaBlockchain.getAddress();
-    return '';
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      console.warn('Partisia Wallet Browser Extension not detected');
+      return '';
+    }
+    
+    // Get the address from the Partisia Wallet
+    const address = await window.partisiawallet.getAddress();
+    return address;
   } catch (error) {
     console.error('Failed to get Partisia wallet address:', error);
     throw error;
@@ -104,10 +128,23 @@ export const getWalletBalance = async () => {
   }
   
   try {
-    // In a real implementation, this would get the TEST_COIN balance from the Partisia Wallet
-    // This would involve querying the blockchain for the account's balance
-    // return await PartisiaBlockchain.getBalance();
-    return 0;
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      console.warn('Partisia Wallet Browser Extension not detected');
+      return 0;
+    }
+    
+    // Get the wallet address
+    const address = await getWalletAddress();
+    if (!address) {
+      return 0;
+    }
+    
+    // Get the balance from the Partisia Wallet
+    // Note: This is a simplified implementation. In a real-world scenario,
+    // you would need to query the blockchain for the account balance.
+    const balance = await window.partisiawallet.getBalance();
+    return balance;
   } catch (error) {
     console.error('Failed to get Partisia wallet balance:', error);
     throw error;
@@ -123,10 +160,14 @@ export const signTransaction = async (transaction) => {
   }
   
   try {
-    // In a real implementation, this would sign a transaction with the Partisia Wallet
-    // This would involve the MPC protocol for secure multi-party computation
-    // return await PartisiaBlockchain.signTransaction(transaction);
-    return null;
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      throw new Error('Partisia Wallet Browser Extension not detected');
+    }
+    
+    // Sign the transaction with the Partisia Wallet
+    const result = await window.partisiawallet.signTransaction(transaction);
+    return result;
   } catch (error) {
     console.error('Failed to sign Partisia transaction:', error);
     throw error;
@@ -141,10 +182,14 @@ export const signMessage = async (message) => {
   }
   
   try {
-    // In a real implementation, this would sign a message with the Partisia Wallet
-    // This would use the Partisia Blockchain's signature scheme
-    // return await PartisiaBlockchain.signMessage(message);
-    return null;
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      throw new Error('Partisia Wallet Browser Extension not detected');
+    }
+    
+    // Sign the message with the Partisia Wallet
+    const signature = await window.partisiawallet.signMessage(message);
+    return { signature };
   } catch (error) {
     console.error('Failed to sign message with Partisia wallet:', error);
     throw error;
@@ -159,10 +204,14 @@ export const verifySignature = async (message, signature, address) => {
   }
   
   try {
-    // In a real implementation, this would verify a signature with the Partisia Blockchain SDK
-    // This would use Partisia's cryptographic verification methods
-    // return await PartisiaBlockchain.verifySignature(message, signature, address);
-    return false;
+    // Check if the Partisia Wallet Browser Extension is installed
+    if (typeof window.partisiawallet === 'undefined') {
+      throw new Error('Partisia Wallet Browser Extension not detected');
+    }
+    
+    // Verify the signature with the Partisia Wallet
+    const isValid = await window.partisiawallet.verifySignature(message, signature, address);
+    return isValid;
   } catch (error) {
     console.error('Failed to verify Partisia signature:', error);
     throw error;

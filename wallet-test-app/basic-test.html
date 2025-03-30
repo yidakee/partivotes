@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Basic Partisia Wallet Test</title>
+</head>
+<body>
+  <h1>Basic Partisia Wallet Test</h1>
+  <div id="status">Loading...</div>
+  <button onclick="connect()">Connect Wallet</button>
+  
+  <script>
+    // Check for wallet and try to connect
+    function connect() {
+      const status = document.getElementById('status');
+      status.innerHTML = 'Trying to connect...';
+      
+      try {
+        window.partisiawallet.connect({
+          name: 'PartiVotes',
+          description: 'Decentralized voting application on Partisia Blockchain',
+          url: window.location.origin,
+        })
+        .then(function() {
+          status.innerHTML = 'Connected! Getting address...';
+          return window.partisiawallet.getAddress();
+        })
+        .then(function(address) {
+          status.innerHTML = 'Connected to address: ' + address;
+        })
+        .catch(function(error) {
+          status.innerHTML = 'Error: ' + error.message;
+        });
+      } catch (error) {
+        status.innerHTML = 'Error: ' + error.message;
+      }
+    }
+    
+    // Check if wallet is available
+    window.onload = function() {
+      const status = document.getElementById('status');
+      
+      if (typeof window.partisiawallet !== 'undefined') {
+        status.innerHTML = 'Wallet is available! Click the button to connect.';
+      } else {
+        status.innerHTML = 'Wallet is not available.';
+      }
+    };
+  </script>
+</body>
+</html>

@@ -48,6 +48,53 @@ if (sdk.isConnected) {
 }
 ```
 
+#### IMPORTANT: Documentation vs. Actual Implementation Discrepancy
+
+> **Note**: There is a significant discrepancy between the official documentation and the actual implementation required for browser-based wallet integration. This section explains the issue and the correct approach.
+
+The documentation above suggests using the `partisia-sdk` npm package for wallet integration. However, attempting to implement this approach leads to a critical error:
+
+```
+ERROR: Cannot find module 'crypto'
+```
+
+This occurs because the `partisia-sdk` package relies on Node.js built-in modules that are not available in browser environments. 
+
+**Correct Browser-Based Implementation:**
+
+Instead of using the npm package, the proper way to integrate with the Partisia Wallet in a browser environment is to interact directly with the wallet browser extension through the global `window.partisiawallet` object that the extension injects into the page:
+
+```javascript
+// Check if the Partisia Wallet Browser Extension is installed
+if (typeof window.partisiawallet === 'undefined') {
+  console.warn('Partisia Wallet Browser Extension not detected');
+  return false;
+}
+
+// Connect to the Partisia Wallet
+await window.partisiawallet.connect({
+  name: 'PartiVotes',
+  description: 'Decentralized voting application on Partisia Blockchain',
+  url: window.location.origin,
+});
+
+// Get the address from the Partisia Wallet
+const address = await window.partisiawallet.getAddress();
+
+// Sign a transaction with the Partisia Wallet
+const result = await window.partisiawallet.signTransaction(transaction);
+```
+
+This approach:
+1. Works directly with the browser extension API
+2. Avoids Node.js compatibility issues
+3. Is consistent with how other blockchain wallet integrations work in browser environments
+4. Does not require additional npm packages
+
+For reference, you can examine working implementations in the [Partisia Blockchain Browser](https://browser.partisiablockchain.com/) to see this pattern in action.
+
+> **Note to PartiVotes developers**: The official documentation isn't necessarily wrong, but it's incomplete and potentially misleading for browser-based applications. The documentation appears to be written primarily for Node.js environments or server-side applications, where the `partisia-sdk` npm package would work correctly. For browser-based applications (like PartiVotes), the documentation doesn't clearly distinguish between server-side and client-side integration approaches. The browser extension approach (using `window.partisiawallet`) is the standard pattern for wallet integrations in web applications, similar to how MetaMask and other blockchain wallets work.
+
 #### Transaction Signing
 
 ```javascript
@@ -159,7 +206,7 @@ For a voting platform like PartiVotes, several key components can be leveraged:
 
 #### Authentication Flow
 
-1. **User Connection**: Implement `sdk.connect()` to establish wallet connection
+1. **User Connection**: Implement `window.partisiawallet.connect()` to establish wallet connection
 2. **Identity Verification**: Use wallet address as unique identifier
 3. **Transaction Signing**: Enable vote submission through signed transactions
 

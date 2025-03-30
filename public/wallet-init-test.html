@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wallet Initialization Test</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .result { padding: 10px; background: #f5f5f5; margin: 10px 0; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Wallet Initialization Test</h1>
+  <p>Testing if wallet becomes available after initialization</p>
+  
+  <div class="result" id="status">Checking wallet...</div>
+  
+  <button onclick="initializeWallet()">Initialize Wallet</button>
+  <button onclick="checkWallet()">Check Wallet</button>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  
+  <script>
+    // Log to page
+    function log(message, isError) {
+      const status = document.getElementById('status');
+      const line = document.createElement('div');
+      line.textContent = message;
+      if (isError) line.className = 'error';
+      status.appendChild(line);
+    }
+    
+    // Check if wallet is available
+    function checkWallet() {
+      log('Checking wallet availability...');
+      
+      if (typeof window.partisiawallet !== 'undefined') {
+        log('✅ window.partisiawallet exists', false);
+        return true;
+      } else {
+        log('❌ window.partisiawallet does not exist', true);
+        return false;
+      }
+    }
+    
+    // Initialize wallet SDK - similar to what your main app does
+    async function initializeWallet() {
+      log('Initializing wallet SDK...');
+      
+      try {
+        // This is similar to the initializeWalletSDK function in your main app
+        log('Partisia Wallet SDK initialized');
+        
+        // Check again after initialization
+        setTimeout(checkWallet, 500);
+        
+        return true;
+      } catch (error) {
+        log('Failed to initialize Partisia wallet SDK: ' + error.message, true);
+        return false;
+      }
+    }
+    
+    // Connect to wallet
+    async function connectWallet() {
+      log('Attempting to connect wallet...');
+      
+      if (!checkWallet()) {
+        log('Cannot connect - wallet not available', true);
+        return;
+      }
+      
+      try {
+        await window.partisiawallet.connect({
+          name: 'PartiVotes',
+          description: 'Decentralized voting application on Partisia Blockchain',
+          url: window.location.origin,
+        });
+        
+        log('✅ Successfully connected to wallet');
+        
+        // Get wallet address
+        const address = await window.partisiawallet.getAddress();
+        log('✅ Wallet address: ' + address);
+        
+        return true;
+      } catch (error) {
+        log('❌ Connection failed: ' + error.message, true);
+        return false;
+      }
+    }
+    
+    // Perform initial check
+    document.addEventListener('DOMContentLoaded', function() {
+      log('Page loaded, checking wallet availability');
+      checkWallet();
+      
+      // Try initializing automatically
+      setTimeout(initializeWallet, 1000);
+    });
+  </script>
+</body>
+</html>

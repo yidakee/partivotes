@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Root Path Wallet Test</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .result { padding: 10px; background: #f5f5f5; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>Root Path Wallet Test</h1>
+  <p>Testing if wallet is available at root path</p>
+  
+  <div class="result" id="result">Checking...</div>
+  
+  <script>
+    // Simple wallet check
+    function checkWallet() {
+      const result = document.getElementById('result');
+      
+      // Check direct method
+      if (typeof window.partisiawallet !== 'undefined') {
+        result.innerHTML = 'FOUND: window.partisiawallet exists!';
+      } else {
+        result.innerHTML = 'NOT FOUND: window.partisiawallet does not exist';
+      }
+      
+      // Add path info
+      result.innerHTML += '<br>Current path: ' + window.location.pathname;
+      result.innerHTML += '<br>Check time: ' + new Date().toLocaleTimeString();
+    }
+    
+    // Check on load and after delay
+    checkWallet();
+    setTimeout(checkWallet, 1000);
+  </script>
+</body>
+</html>
