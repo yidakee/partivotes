@@ -37,9 +37,9 @@ const statusColors = {
 };
 
 const pollTypeLabels = {
-  [POLL_TYPE.SINGLE_CHOICE]: 'Single Choice',
-  [POLL_TYPE.MULTIPLE_CHOICE]: 'Multiple Choice',
-  [POLL_TYPE.RANKED_CHOICE]: 'Ranked Choice'
+  [POLL_TYPE.SINGLE_CHOICE]: 'Standard',
+  [POLL_TYPE.MULTIPLE_CHOICE]: 'Multiple',
+  [POLL_TYPE.RANKED_CHOICE]: 'Ranked'
 };
 
 const PollList = () => {
@@ -173,6 +173,40 @@ const PollList = () => {
                         color={statusColors[poll.status]} 
                         size="small" 
                       />
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'inline-flex',
+                          backgroundColor: poll.status === 'active' ? '#4caf50' : poll.status === 'ended' ? '#f44336' : '#ff9800',
+                          color: 'white',
+                          borderRadius: '16px',
+                          px: 1.5,
+                          py: 0.5,
+                          fontSize: '0.75rem',
+                          fontWeight: 'bold',
+                          textTransform: 'capitalize',
+                        }}
+                      >
+                        {poll.status}
+                      </Box>
+                      <Box
+                        sx={{
+                          display: 'inline-flex',
+                          backgroundColor: poll.type === POLL_TYPE.SINGLE_CHOICE ? '#556cd6' : poll.type === POLL_TYPE.MULTIPLE_CHOICE ? '#9c27b0' : '#e91e63',
+                          color: 'white',
+                          borderRadius: '16px',
+                          px: 1.5,
+                          py: 0.5,
+                          fontSize: '0.75rem',
+                          fontWeight: 'bold',
+                          textTransform: 'capitalize',
+                          ml: 1,
+                        }}
+                      >
+                        {pollTypeLabels[poll.type]}
+                      </Box>
                     </Box>
                     
                     <Typography 
