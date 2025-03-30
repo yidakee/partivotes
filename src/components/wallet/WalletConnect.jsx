@@ -21,6 +21,7 @@ const WalletConnect = () => {
   const open = Boolean(anchorEl);
 
   // Format address for display (first 6 and last 4 characters)
+  // Partisia addresses are 42 characters (21 bytes) in hex format without 0x prefix
   const formatAddress = (addr) => {
     if (!addr) return '';
     return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
@@ -92,7 +93,7 @@ const WalletConnect = () => {
               {formatAddress(address)}
             </Typography>
             <Typography variant="body2" color={isFuturistic ? "#00ffea" : "primary.main"} fontWeight="bold">
-              {balance} MPC
+              {balance} TEST_COIN
             </Typography>
           </Box>
         ) : (

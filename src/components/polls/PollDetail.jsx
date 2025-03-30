@@ -40,15 +40,16 @@ const PollDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [manualToggle, setManualToggle] = useState(false);
   
   // This useEffect watches for changes to the poll object, particularly the hasVoted flag
-  // When hasVoted changes to true, it automatically shows results
+  // When hasVoted changes to true, it automatically shows results, but only if not manually toggled
   useEffect(() => {
-    if (poll && poll.hasVoted && !showResults) {
+    if (poll && poll.hasVoted && !showResults && !manualToggle) {
       console.log('=== PollDetail DETECTED hasVoted change to TRUE, showing results ===');
       setShowResults(true);
     }
-  }, [poll, showResults]);
+  }, [poll, showResults, manualToggle]);
   
   useEffect(() => {
     const fetchPoll = async () => {
@@ -72,10 +73,16 @@ const PollDetail = () => {
         
         setPoll(pollData);
         
-        // Set initial view to results if already voted or if poll has ended
-        if (pollData.hasVoted || pollData.status === POLL_STATUS.ENDED) {
-          console.log('=== SETTING showResults to TRUE because hasVoted or poll ended ===');
+        // Only set initial view to results if the poll has ended
+        // This ensures users coming from the poll list see the voting form first
+        if (pollData.status === POLL_STATUS.ENDED) {
+          console.log('=== SETTING showResults to TRUE because poll ended ===');
           setShowResults(true);
+        } else {
+          // Default to showing the voting form first, even if user has voted before
+          // This allows users to see the voting options first
+          console.log('=== SETTING showResults to FALSE to show voting form first ===');
+          setShowResults(false);
         }
       } catch (err) {
         console.error('Error fetching poll:', err);
@@ -97,9 +104,12 @@ const PollDetail = () => {
       currentShowResults: showResults,
       willBe: !showResults
     });
+    
+    // Set the manual toggle flag to prevent auto-switching back to results
+    setManualToggle(true);
     setShowResults(!showResults);
   };
-
+  
   // Log before each render decision
   console.log('=== PollDetail RENDER DECISION ===', {
     showResults,

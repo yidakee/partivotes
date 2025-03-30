@@ -16,6 +16,7 @@ const WalletStatus = ({ address, balance }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   // Format address for display (first 6 and last 4 characters)
+  // Partisia addresses are 42 characters (21 bytes) in hex format without 0x prefix
   const formatAddress = (addr) => {
     if (!addr) return '';
     return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
@@ -29,8 +30,8 @@ const WalletStatus = ({ address, balance }) => {
 
   // Open address in explorer
   const openInExplorer = () => {
-    // This would be a real explorer URL in production
-    const explorerUrl = `https://explorer.partisiablockchain.com/address/${address}`;
+    // Partisia Blockchain testnet explorer URL
+    const explorerUrl = `https://browser.testnet.partisiablockchain.com/account/${address}`;
     window.open(explorerUrl, '_blank');
   };
 
@@ -67,7 +68,7 @@ const WalletStatus = ({ address, balance }) => {
           Balance
         </Typography>
         <Typography variant="body1">
-          {balance} MPC
+          {balance} TEST_COIN
         </Typography>
       </Box>
       
