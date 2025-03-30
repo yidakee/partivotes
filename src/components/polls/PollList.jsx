@@ -151,11 +151,21 @@ const PollList = () => {
             const totalVotes = poll.totalVotes || 0;
             
             return (
-              <Grid item xs={12} key={poll.id}>
-                <Card className="poll-card" sx={{ overflow: 'visible' }}>
-                  <CardContent>
+              <Grid item xs={12} sm={6} key={poll.id}>
+                <Card className="poll-card" sx={{ 
+                  overflow: 'visible', 
+                  height: '100%', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  transition: 'transform 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: (theme) => `0 8px 16px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.1)'}`
+                  }
+                }}>
+                  <CardContent sx={{ flexGrow: 1 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                      <Typography variant="h6" component="h2" gutterBottom>
+                      <Typography variant="h6" component="h2" gutterBottom noWrap sx={{ maxWidth: '70%' }}>
                         {poll.title}
                       </Typography>
                       <Chip 
@@ -165,101 +175,103 @@ const PollList = () => {
                       />
                     </Box>
                     
-                    <Typography variant="body2" color="textSecondary" paragraph>
+                    <Typography 
+                      variant="body2" 
+                      color="textSecondary" 
+                      paragraph 
+                      sx={{ 
+                        mb: 1,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        height: '40px'
+                      }}
+                    >
                       {poll.description}
                     </Typography>
                     
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                      <Grid item xs={12} md={6}>
-                        <Stack spacing={1}>
-                          <Box display="flex" alignItems="center">
-                            <PersonIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                            <Typography variant="body2" color="textSecondary">
-                              Creator: {poll.creator.substring(0, 6)}...{poll.creator.substring(poll.creator.length - 4)}
-                            </Typography>
-                          </Box>
-                          
-                          <Box display="flex" alignItems="center">
-                            <FormatListBulletedIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                            <Typography variant="body2" color="textSecondary">
-                              Type: {pollTypeLabels[poll.type]}
-                              {poll.maxSelections > 1 && ` (Select up to ${poll.maxSelections})`}
-                            </Typography>
-                          </Box>
-                          
-                          <Box display="flex" alignItems="center">
-                            <CalendarTodayIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                            <Typography variant="body2" color="textSecondary">
-                              Created: {formatDate(poll.createdAt)}
-                            </Typography>
-                          </Box>
-                          
-                          <Box display="flex" alignItems="center">
-                            <EventIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                            <Typography variant="body2" color="textSecondary">
-                              Ends: {formatDate(poll.endDate)}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </Grid>
+                    <Box sx={{ mt: 1, mb: 1 }}>
+                      <Box display="flex" alignItems="center">
+                        <CalendarTodayIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="textSecondary">
+                          Started: {formatDate(poll.startDate)}
+                        </Typography>
+                      </Box>
                       
-                      <Grid item xs={12} md={6}>
-                        <Box display="flex" alignItems="center" mb={1}>
-                          <BarChartIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
-                          <Typography variant="body2" color="textSecondary">
-                            Total votes: {totalVotes}
-                          </Typography>
-                        </Box>
-                        
-                        {totalVotes > 0 ? (
-                          <Box sx={{ mt: 1 }}>
-                            {topOptions.map((option) => {
-                              const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
-                              return (
-                                <Box key={option.id} sx={{ mb: 1 }}>
-                                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                                    <Typography variant="caption" color="textSecondary" noWrap sx={{ maxWidth: '70%' }}>
-                                      {option.text}
-                                    </Typography>
-                                    <Typography variant="caption" color="textSecondary">
-                                      {option.votes} ({Math.round(percentage)}%)
-                                    </Typography>
-                                  </Box>
-                                  <LinearProgress 
-                                    variant="determinate" 
-                                    value={percentage} 
-                                    sx={{ 
-                                      height: 6, 
-                                      borderRadius: 3,
-                                      mt: 0.5
-                                    }} 
-                                  />
-                                </Box>
-                              );
-                            })}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic', mt: 2 }}>
-                            No votes yet
-                          </Typography>
-                        )}
-                      </Grid>
-                    </Grid>
+                      <Box display="flex" alignItems="center" mt={1}>
+                        <EventIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="textSecondary">
+                          Ends: {formatDate(poll.endDate)}
+                        </Typography>
+                      </Box>
+                      
+                      <Box display="flex" alignItems="center" mt={1}>
+                        <BarChartIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+                        <Typography variant="body2" color="textSecondary">
+                          Total votes: {totalVotes}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    
+                    {totalVotes > 0 && topOptions.length > 0 ? (
+                      <Box sx={{ mt: 1 }}>
+                        {topOptions.slice(0, 2).map((option) => {
+                          const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
+                          return (
+                            <Box key={option.id} sx={{ mb: 1 }}>
+                              <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant="caption" color="textSecondary" noWrap sx={{ maxWidth: '70%' }}>
+                                  {option.text}
+                                </Typography>
+                                <Typography variant="caption" color="textSecondary">
+                                  {option.votes} ({Math.round(percentage)}%)
+                                </Typography>
+                              </Box>
+                              <LinearProgress 
+                                variant="determinate" 
+                                value={percentage} 
+                                sx={{ 
+                                  height: 6, 
+                                  borderRadius: 3,
+                                  mt: 0.5
+                                }} 
+                              />
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    ) : (
+                      <Typography variant="body2" color="textSecondary" sx={{ fontStyle: 'italic', mt: 1, mb: 1 }}>
+                        No votes yet
+                      </Typography>
+                    )}
                   </CardContent>
                   
-                  <Divider />
-                  
-                  <CardActions>
-                    <Button 
-                      size="small" 
-                      color="primary" 
-                      startIcon={<HowToVoteIcon />}
-                      component={RouterLink}
-                      to={`/poll/${poll.id}`}
-                    >
-                      {poll.hasVoted ? 'View Results' : 'Vote Now'}
-                    </Button>
-                  </CardActions>
+                  <Box 
+                    component={RouterLink} 
+                    to={`/poll/${poll.id}`}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      mt: 'auto',
+                      backgroundColor: '#556cd6',
+                      color: 'white',
+                      padding: '10px 0',
+                      textDecoration: 'none',
+                      borderRadius: '0 0 20px 20px',
+                      transition: 'background-color 0.3s',
+                      '&:hover': {
+                        backgroundColor: '#4559b5',
+                      }
+                    }}
+                  >
+                    <Typography variant="button" sx={{ fontWeight: 'bold' }}>
+                      View Details
+                    </Typography>
+                  </Box>
                 </Card>
               </Grid>
             );

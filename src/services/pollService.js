@@ -46,8 +46,15 @@ export const getMockPolls = () => {
   
   const lastWeek = new Date(now);
   lastWeek.setDate(lastWeek.getDate() - 7);
+
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  const nextMonth = new Date(now);
+  nextMonth.setDate(nextMonth.getDate() + 30);
   
   return [
+    // ACTIVE POLLS
     {
       id: '1',
       title: 'Favorite Programming Language',
@@ -97,78 +104,109 @@ export const getMockPolls = () => {
       yourVote: null,
       yourVoteTimestamp: null
     },
+    
+    // ENDED POLLS
     {
       id: '3',
-      title: 'Consensus Mechanism Preference',
-      description: 'Which consensus mechanism do you believe is most secure and efficient?',
-      creator: '0x3A5bd1E37b099aE3386D13947b6a90d97675e5e3',
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString(), // 21 days from now
-      status: POLL_STATUS.ACTIVE,
-      type: POLL_TYPE.RANKED_CHOICE,
-      maxSelections: 1,
-      options: [
-        { id: '3a', text: 'Proof of Work (PoW)', votes: 31, publicVotes: 20, privateVotes: 11 },
-        { id: '3b', text: 'Proof of Stake (PoS)', votes: 58, publicVotes: 35, privateVotes: 23 },
-        { id: '3c', text: 'Delegated Proof of Stake (DPoS)', votes: 27, publicVotes: 15, privateVotes: 12 },
-        { id: '3d', text: 'Practical Byzantine Fault Tolerance (PBFT)', votes: 19, publicVotes: 10, privateVotes: 9 },
-        { id: '3e', text: 'Proof of Authority (PoA)', votes: 25, publicVotes: 15, privateVotes: 10 }
-      ],
-      totalVotes: 160,
-      publicVotes: 95,
-      privateVotes: 65,
-      hasVoted: false,
-      yourVote: null,
-      yourVoteTimestamp: null
-    },
-    {
-      id: '4',
-      title: 'Privacy Features in Blockchain',
-      description: 'Which privacy feature do you consider most important for blockchain applications?',
-      creator: '0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF',
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-      startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days from now
-      status: POLL_STATUS.ACTIVE,
+      title: 'Best NFT Marketplace',
+      description: 'Which NFT marketplace provides the best overall experience for creators and collectors?',
+      creator: '0x7cB57B5A97eAbe94205C07890BE4c1aD31E486A8',
+      createdAt: lastWeek.toISOString(),
+      startDate: lastWeek.toISOString(),
+      endDate: yesterday.toISOString(),
+      status: POLL_STATUS.ENDED,
       type: POLL_TYPE.SINGLE_CHOICE,
       maxSelections: 1,
       options: [
-        { id: '4a', text: 'Zero-Knowledge Proofs', votes: 87, publicVotes: 50, privateVotes: 37 },
-        { id: '4b', text: 'Secure Multi-Party Computation (MPC)', votes: 73, publicVotes: 40, privateVotes: 33 },
-        { id: '4c', text: 'Ring Signatures', votes: 42, publicVotes: 25, privateVotes: 17 },
-        { id: '4d', text: 'Stealth Addresses', votes: 38, publicVotes: 20, privateVotes: 18 },
-        { id: '4e', text: 'Confidential Transactions', votes: 56, publicVotes: 30, privateVotes: 26 }
+        { id: '3a', text: 'OpenSea', votes: 134, publicVotes: 80, privateVotes: 54 },
+        { id: '3b', text: 'Rarible', votes: 87, publicVotes: 50, privateVotes: 37 },
+        { id: '3c', text: 'SuperRare', votes: 62, publicVotes: 35, privateVotes: 27 },
+        { id: '3d', text: 'Foundation', votes: 91, publicVotes: 55, privateVotes: 36 },
+        { id: '3e', text: 'Partisia NFT Market', votes: 112, publicVotes: 70, privateVotes: 42 }
       ],
-      totalVotes: 296,
-      publicVotes: 165,
-      privateVotes: 131,
+      totalVotes: 486,
+      publicVotes: 290,
+      privateVotes: 196,
+      hasVoted: false,
+      yourVote: null,
+      yourVoteTimestamp: null,
+      winner: 'OpenSea'
+    },
+    {
+      id: '4',
+      title: 'Crypto Wallet Preference',
+      description: 'Which cryptocurrency wallet do you use most frequently?',
+      creator: '0x912cE8c60d10f32Bc54A479C42a48970aF86727D',
+      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago
+      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      endDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+      status: POLL_STATUS.ENDED,
+      type: POLL_TYPE.SINGLE_CHOICE,
+      maxSelections: 1,
+      options: [
+        { id: '4a', text: 'MetaMask', votes: 187, publicVotes: 110, privateVotes: 77 },
+        { id: '4b', text: 'Trust Wallet', votes: 112, publicVotes: 70, privateVotes: 42 },
+        { id: '4c', text: 'Ledger Live', votes: 93, publicVotes: 55, privateVotes: 38 },
+        { id: '4d', text: 'Partisia Wallet', votes: 145, publicVotes: 85, privateVotes: 60 },
+        { id: '4e', text: 'Exodus', votes: 78, publicVotes: 45, privateVotes: 33 },
+        { id: '4f', text: 'Trezor Suite', votes: 65, publicVotes: 40, privateVotes: 25 }
+      ],
+      totalVotes: 680,
+      publicVotes: 405,
+      privateVotes: 275,
+      hasVoted: false,
+      yourVote: null,
+      yourVoteTimestamp: null,
+      winner: 'MetaMask'
+    },
+    
+    // PENDING POLLS
+    {
+      id: '5',
+      title: 'Future of DAO Governance',
+      description: 'What governance model do you think will be most effective for DAOs in the future?',
+      creator: '0x631B32E15b7A4b6108385985Bb2C723F0B448E42',
+      createdAt: now.toISOString(),
+      startDate: nextWeek.toISOString(), // Starts next week
+      endDate: nextMonth.toISOString(), // Ends in a month
+      status: POLL_STATUS.PENDING,
+      type: POLL_TYPE.SINGLE_CHOICE,
+      maxSelections: 1,
+      options: [
+        { id: '5a', text: 'Token-weighted Voting', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '5b', text: 'Quadratic Voting', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '5c', text: 'Conviction Voting', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '5d', text: 'Holacracy', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '5e', text: 'Liquid Democracy', votes: 0, publicVotes: 0, privateVotes: 0 }
+      ],
+      totalVotes: 0,
+      publicVotes: 0,
+      privateVotes: 0,
       hasVoted: false,
       yourVote: null,
       yourVoteTimestamp: null
     },
     {
-      id: '5',
-      title: 'Future of DeFi',
-      description: 'Which DeFi application do you think will see the most growth in the next year?',
-      creator: '0x6Bc8FE27D0c7cEF686c9Db7D7CFBcFB56b919805',
-      createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
-      startDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-      endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
-      status: POLL_STATUS.ACTIVE,
+      id: '6',
+      title: 'Metaverse Platform Preference',
+      description: 'Which metaverse platform do you believe has the best potential for growth?',
+      creator: '0x8aD3eC2ed9a488B8882e09aa592DEeF25b5b78cE',
+      createdAt: now.toISOString(),
+      startDate: tomorrow.toISOString(), // Starts tomorrow
+      endDate: nextMonth.toISOString(), // Ends in a month
+      status: POLL_STATUS.PENDING,
       type: POLL_TYPE.MULTIPLE_CHOICE,
-      maxSelections: 3,
+      maxSelections: 2,
       options: [
-        { id: '5a', text: 'Decentralized Exchanges (DEX)', votes: 112, publicVotes: 70, privateVotes: 42 },
-        { id: '5b', text: 'Lending Platforms', votes: 89, publicVotes: 55, privateVotes: 34 },
-        { id: '5c', text: 'Yield Farming', votes: 76, publicVotes: 45, privateVotes: 31 },
-        { id: '5d', text: 'Insurance Protocols', votes: 53, publicVotes: 30, privateVotes: 23 },
-        { id: '5e', text: 'Synthetic Assets', votes: 67, publicVotes: 40, privateVotes: 27 },
-        { id: '5f', text: 'Cross-Chain Bridges', votes: 94, publicVotes: 60, privateVotes: 34 }
+        { id: '6a', text: 'Decentraland', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '6b', text: 'The Sandbox', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '6c', text: 'Horizon Worlds', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '6d', text: 'Roblox', votes: 0, publicVotes: 0, privateVotes: 0 },
+        { id: '6e', text: 'Partisia Metaverse', votes: 0, publicVotes: 0, privateVotes: 0 }
       ],
-      totalVotes: 491,
-      publicVotes: 300,
-      privateVotes: 191,
+      totalVotes: 0,
+      publicVotes: 0,
+      privateVotes: 0,
       hasVoted: false,
       yourVote: null,
       yourVoteTimestamp: null
