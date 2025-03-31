@@ -1,32 +1,39 @@
 /**
  * Poll creation functions
  */
-import { POLL_STATUS } from '../../utils/constants';
 import { createPoll as apiCreatePoll } from '../apiService';
 
 /**
- * Create a new poll
- * @param {Object} pollData - Poll data
- * @returns {Promise<Object>} Promise resolving to created poll object
+ * Creates a new poll
+ * @param {Object} pollData - Data for the new poll
+ * @returns {Promise<Object>} - The created poll
  */
 export const createPoll = async (pollData) => {
-  console.log('Creating poll with data:', pollData);
-  
   try {
-    // Prepare poll data
-    const poll = {
-      ...pollData,
-      status: POLL_STATUS.ACTIVE.toUpperCase(), // API expects uppercase status
-      createdAt: new Date().toISOString(),
+    console.log('Creation Service: Creating poll with data:', pollData);
+    
+    // Format poll data for API
+    const formattedPoll = {
+      title: pollData.title,
+      description: pollData.description || '',
+      options: pollData.options || [],
+      startDate: pollData.startDate || new Date(),
+      endDate: pollData.endDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      type: pollData.type || 'single',
+      status: (pollData.status || 'ACTIVE').toUpperCase(),
+      creator: pollData.creator || 'anonymous',
+      network: pollData.network || 'testnet'
     };
     
+    console.log('Creation Service: Formatted poll data:', formattedPoll);
+    
     // Create poll via API
-    const createdPoll = await apiCreatePoll(poll);
-    console.log('Poll created successfully:', createdPoll);
+    const createdPoll = await apiCreatePoll(formattedPoll);
+    console.log('Creation Service: Poll created successfully:', createdPoll);
     
     return createdPoll;
   } catch (error) {
-    console.error('Error creating poll:', error);
+    console.error('Creation Service Error:', error);
     throw error;
   }
 };

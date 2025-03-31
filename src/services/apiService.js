@@ -5,8 +5,10 @@
 
 // API base URL - automatically detects production vs development
 const API_BASE_URL = window.location.hostname.includes('partivotes.xyz') 
-  ? 'https://www.partivotes.xyz/api' 
+  ? '/api' // Use relative URL in production to avoid mixed content issues
   : 'http://localhost:4000/api';
+
+console.log('API Service initialized with base URL:', API_BASE_URL);
 
 /**
  * Get all polls with optional filtering
@@ -30,6 +32,8 @@ export const getPolls = async (options = {}) => {
     const response = await fetch(url);
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API error: ${response.status} ${response.statusText}`, errorText);
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     
@@ -57,15 +61,13 @@ export const getPoll = async (id) => {
     const response = await fetch(url);
     
     if (!response.ok) {
-      if (response.status === 404) {
-        console.log(`API Service: Poll with ID ${id} not found`);
-        return null;
-      }
+      const errorText = await response.text();
+      console.error(`API error: ${response.status} ${response.statusText}`, errorText);
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     
     const poll = await response.json();
-    console.log('API Service: Received poll:', poll.title);
+    console.log('API Service: Poll retrieved successfully:', poll);
     return poll;
   } catch (error) {
     console.error('API Service Error:', error);
@@ -75,8 +77,8 @@ export const getPoll = async (id) => {
 
 /**
  * Create a new poll
- * @param {Object} pollData - Poll data
- * @returns {Promise<Object>} Promise resolving to created poll object
+ * @param {Object} pollData - Data for the new poll
+ * @returns {Promise<Object>} Created poll
  */
 export const createPoll = async (pollData) => {
   try {
@@ -88,12 +90,14 @@ export const createPoll = async (pollData) => {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(pollData),
+      body: JSON.stringify(pollData)
     });
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API error: ${response.status} ${response.statusText}`, errorText);
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     
@@ -107,7 +111,7 @@ export const createPoll = async (pollData) => {
 };
 
 /**
- * Vote on a poll
+ * Add a vote to a poll
  * @param {Object} voteData - Vote data
  * @returns {Promise<Object>} Promise resolving to updated poll object
  */
@@ -127,6 +131,8 @@ export const addVote = async (voteData) => {
     });
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API error: ${response.status} ${response.statusText}`, errorText);
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
     

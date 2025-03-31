@@ -233,49 +233,137 @@ After thorough testing, we've identified several potential issues:
 3. Test API endpoints directly to confirm data retrieval
 4. Update frontend code to use real API once confirmed working
 
-## 19. Final Implementation (March 31)
+## 19. API Integration Fixes (March 31, 2025)
 
-- [x] Confirmed API server is running and accessible on port 4000
-- [x] Verified API endpoints are returning correct data from MongoDB
-- [x] Updated frontend code to use the real API in production environment
-- [x] Added fallback to mock data for development or when API fails
-- [x] Implemented comprehensive error handling for API connections
-- [x] Added debug panel to show API connection status
+### Issues Identified
+- Frontend was unable to communicate with the API server
+- 404 errors when trying to create a poll
+- Nginx configuration wasn't properly routing API requests
 
-**Current Status:** The application is connecting to MongoDB, but we're encountering issues with poll details. When creating a new poll, it initially shows the details but then fails with a SyntaxError when parsing the JSON response. This indicates a potential issue with how the MongoDB ObjectId is being handled or how the API is returning the poll data.
+### Solutions Implemented
+1. **API Service Configuration**
+   - Updated `apiService.js` to use a relative URL path (`/api`) for API requests in production
+   - Enhanced error logging to provide more detailed information about API errors
+   - Added proper error handling for all API requests
 
-## 20. Database Issues and Solutions
+2. **API Server Enhancements**
+   - Added comprehensive request logging to track all incoming requests
+   - Enhanced CORS configuration to allow cross-origin requests
+   - Configured the API server to listen on all interfaces (0.0.0.0)
+   - Added explicit CORS headers to all responses
 
-After testing, we've identified the following issues:
+3. **Nginx Configuration**
+   - Updated Nginx configuration to properly route API requests to the API server
+   - Added proper CORS headers to the Nginx configuration
+   - Ensured all API requests go through Nginx for security
 
-1. **Poll Detail Retrieval Issues:**
-   - When viewing a poll detail, we get "Poll not found" errors
-   - API is returning data but the frontend is having trouble parsing it
-   - MongoDB ObjectId format may be causing compatibility issues
+### Results
+- API requests are now correctly routed through Nginx
+- Frontend can now communicate with the API server
+- Poll creation process should now work correctly
 
-2. **Database Management Issues:**
-   - Difficulty clearing the database for a fresh start
-   - Process management issues with the API server
+### Security Considerations
+- All API requests go through Nginx, which provides:
+  - SSL termination (HTTPS)
+  - Security filtering
+  - Proper routing
+- The API server is protected behind Nginx rather than being directly exposed
 
-## 21. Next Steps for Database Fix
+### Next Steps
+- Monitor API server logs for any errors
+- Test the poll creation process thoroughly
+- Consider implementing rate limiting and additional security measures
 
-Instead of implementing frontend workarounds, we need to focus on fixing the core database issues:
+## 20. MongoDB Schema Validation Issues (March 31, 2025)
 
-1. **Fix API Server Management:**
-   - Create a proper daemon process for the API server
-   - Implement proper logging and error handling
+### Issues Identified
+- Poll creation was failing with a "Document failed validation" error
+- MongoDB had strict JSON schema validation rules that weren't being satisfied
+- The frontend was sending data in a format that didn't match the required MongoDB schema
 
-2. **Fix Database Schema and Validation:**
-   - Ensure consistent data format between frontend and backend
-   - Add proper schema validation to prevent invalid data
+### Schema Validation Requirements
+The MongoDB collection had the following validation requirements:
+- Required fields: title, description, creator, options, startDate, endDate, type, status, network
+- Type field must be one of: 'SINGLE_CHOICE', 'MULTIPLE_CHOICE', 'RANKED_CHOICE'
+- Status field must be one of: 'ACTIVE', 'PENDING', 'ENDED', 'CANCELLED'
+- Network field must be one of: 'mainnet', 'testnet'
+- Date fields must be actual Date objects, not strings
 
-3. **Implement Database Administration Tools:**
-   - Create proper admin endpoints for database management
-   - Add proper authentication for admin operations
+### Solutions Implemented
+1. **API Server Enhancements**
+   - Updated the poll creation endpoint to format data according to MongoDB schema requirements
+   - Added field mapping to convert frontend values to MongoDB-compatible values
+   - Enhanced error logging to provide more details about validation failures
+   - Added default values for required fields
 
-4. **Improve Error Handling:**
-   - Add detailed error logging in the API server
-   - Implement proper error responses with actionable information
+2. **Frontend Service Updates**
+   - Updated the poll creation service to format data correctly before sending to API
+   - Added proper error handling for API responses
+   - Enhanced logging to track the poll creation process
+
+### Results
+- Poll creation now works correctly
+- Data is properly formatted to meet MongoDB schema validation requirements
+- The API server successfully creates polls in the database
+- The frontend can retrieve polls from the database
+
+### Next Steps
+- Add more comprehensive validation on the frontend
+- Create a schema documentation for future reference
+- Consider implementing a more flexible schema validation approach for development
+
+## 21. Nginx Configuration Fix (March 31, 2025)
+
+### Issue Identified
+- The frontend was unable to communicate with the API server through the Nginx proxy
+- 404 errors were occurring when trying to access API endpoints
+- Nginx was not configured to route `/api` requests to the API server
+
+### Solution Implemented
+1. **Updated Nginx Configuration**
+   - Added a dedicated location block for `/api` routes
+   - Configured Nginx to proxy API requests to the local API server on port 4000
+   - Added proper CORS headers to allow cross-origin requests
+   - Configured handling for OPTIONS preflight requests
+
+2. **Configuration Details**
+   ```nginx
+   location /api {
+       proxy_pass http://localhost:4000;
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection 'upgrade';
+       proxy_set_header Host $host;
+       proxy_cache_bypass $http_upgrade;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+       proxy_set_header X-Forwarded-Proto $scheme;
+       
+       # Add CORS headers
+       add_header 'Access-Control-Allow-Origin' '*' always;
+       add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+       add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization' always;
+   }
+   ```
+
+### Results
+- API requests are now properly routed through Nginx
+- The frontend can successfully communicate with the API server
+- Poll creation and retrieval now work correctly
+- The application is fully functional with real MongoDB data
+
+### Security Benefits
+- All API traffic goes through Nginx, which provides:
+  - SSL termination (HTTPS)
+  - Request filtering
+  - Rate limiting capability (if needed in the future)
+- The API server is not directly exposed to the internet
+- CORS headers are properly configured for security
+
+### Next Steps
+- Monitor Nginx logs for any API-related errors
+- Consider implementing rate limiting for API endpoints
+- Add more comprehensive error handling for API requests
 
 ## 22. Implementation Plan (April 1)
 
