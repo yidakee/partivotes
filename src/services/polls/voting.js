@@ -43,11 +43,44 @@ export const voteWithSignature = async (pollId, optionId, signature) => {
     // Extract voter address from signature (in a real app, this would verify the signature)
     const voterAddress = signature.split(':')[0] || 'anonymous';
     
+    // Process option objects to extract text values for the API
+    // ENHANCED: More robust option processing to handle all possible formats
+    const processedOptions = optionIds.map(option => {
+      // If option is an object with text property, use that
+      if (option && typeof option === 'object') {
+        if (option.text) {
+          return option.text;
+        } else if (option.value) {
+          return option.value;
+        } else if (option.label) {
+          return option.label;
+        }
+      }
+      
+      // If option is already a string, use it directly
+      if (typeof option === 'string') {
+        return option;
+      }
+      
+      // If option is a number, try to get the corresponding option text from the poll
+      if (typeof option === 'number' || !isNaN(parseInt(option, 10))) {
+        const index = parseInt(option, 10);
+        if (dbPoll.options && dbPoll.options[index] && dbPoll.options[index].text) {
+          return dbPoll.options[index].text;
+        }
+      }
+      
+      // Last resort: stringify the option
+      return String(option);
+    });
+    
+    console.log('Processed options for API:', processedOptions);
+    
     // Create vote object
     const voteData = {
       pollId: dbPoll._id,
       voter: voterAddress,
-      options: optionIds,
+      options: processedOptions,
       voteMethod: 'signature',
       timestamp: new Date()
     };
@@ -112,74 +145,13 @@ export const voteWithSignature = async (pollId, optionId, signature) => {
 };
 
 /**
- * Fallback function for voting with signature using local storage
- * @param {string} pollId - ID of the poll to vote on
- * @param {string|Array} optionId - ID of the option to vote for, or array of option IDs for multiple choice
- * @param {string} signature - Signature from the wallet
- * @returns {Promise<Object>} Promise resolving to updated poll object
- */
-async function voteWithSignatureLocal(pollId, optionId, signature) {
-  console.log(`Falling back to local storage for voting on poll ${pollId}`);
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Get the poll from local storage
-  const poll = await getPoll(pollId);
-  
-  if (!poll) {
-    throw new Error('Poll not found');
-  }
-  
-  if (poll.status !== POLL_STATUS.ACTIVE) {
-    throw new Error('Poll is not active');
-  }
-  
-  // For multiple choice polls
-  const optionIds = Array.isArray(optionId) ? optionId : [optionId];
-  
-  // Update the poll
-  const updatedPoll = { ...poll };
-  
-  // Mark as voted
-  updatedPoll.hasVoted = true;
-  
-  // Store user's vote
-  updatedPoll.userVote = {
-    optionId: Array.isArray(optionId) ? null : optionId,
-    optionIds: Array.isArray(optionId) ? optionId : null,
-    voteMethod: 'signature'
-  };
-  
-  // Update vote counts
-  optionIds.forEach(id => {
-    const option = updatedPoll.options.find(o => o.id === id);
-    if (option) {
-      option.votes += 1;
-      option.publicVotes += 1;
-    }
-  });
-  
-  // Update total votes
-  updatedPoll.totalVotes += 1;
-  updatedPoll.publicVotes += 1;
-  
-  // Update in local storage
-  updateCreatedPoll(updatedPoll);
-  
-  console.log('Updated poll in local storage:', updatedPoll);
-  
-  return updatedPoll;
-}
-
-/**
  * Vote on a poll with MPC (private voting)
  * @param {string} pollId - ID of the poll to vote on
  * @param {string|Array} optionId - ID of the option to vote for, or array of option IDs for multiple choice
  * @returns {Promise<Object>} Promise resolving to updated poll object
  */
 export const voteWithMPC = async (pollId, optionId) => {
-  console.log(`Voting on poll ${pollId} with option ${JSON.stringify(optionId)} using MPC`);
+  console.log(`Voting on poll ${pollId} with MPC and option ${JSON.stringify(optionId)}`);
   
   try {
     // Get the poll from MongoDB
@@ -203,18 +175,54 @@ export const voteWithMPC = async (pollId, optionId) => {
       throw new Error(`Maximum ${dbPoll.maxSelections} selections allowed`);
     }
     
-    // Create vote object (anonymous for MPC)
+    // Extract voter address from signature (in a real app, this would verify the signature)
+    const voterAddress = 'anonymous'; // MPC voting is always anonymous
+    
+    // Process option objects to extract text values for the API
+    // ENHANCED: More robust option processing to handle all possible formats
+    const processedOptions = optionIds.map(option => {
+      // If option is an object with text property, use that
+      if (option && typeof option === 'object') {
+        if (option.text) {
+          return option.text;
+        } else if (option.value) {
+          return option.value;
+        } else if (option.label) {
+          return option.label;
+        }
+      }
+      
+      // If option is already a string, use it directly
+      if (typeof option === 'string') {
+        return option;
+      }
+      
+      // If option is a number, try to get the corresponding option text from the poll
+      if (typeof option === 'number' || !isNaN(parseInt(option, 10))) {
+        const index = parseInt(option, 10);
+        if (dbPoll.options && dbPoll.options[index] && dbPoll.options[index].text) {
+          return dbPoll.options[index].text;
+        }
+      }
+      
+      // Last resort: stringify the option
+      return String(option);
+    });
+    
+    console.log('Processed options for API:', processedOptions);
+    
+    // Create vote object
     const voteData = {
       pollId: dbPoll._id,
-      voter: 'anonymous', // MPC votes are anonymous
-      options: optionIds,
+      voter: voterAddress,
+      options: processedOptions,
       voteMethod: 'mpc',
       timestamp: new Date()
     };
     
     // Submit vote via API
     const result = await apiAddVote(voteData);
-    console.log('MPC Vote recorded successfully:', result);
+    console.log('Vote recorded successfully:', result);
     
     // Get updated poll after voting
     const updatedDbPoll = await Poll.findById(pollId);
@@ -272,72 +280,165 @@ export const voteWithMPC = async (pollId, optionId) => {
 };
 
 /**
- * Fallback function for voting with MPC using local storage
- * @param {string} pollId - ID of the poll to vote on
- * @param {string|Array} optionId - ID of the option to vote for, or array of option IDs for multiple choice
- * @returns {Promise<Object>} Promise resolving to updated poll object
+ * Local fallback for signature voting
  */
-async function voteWithMPCLocal(pollId, optionId) {
-  console.log(`Falling back to local storage for MPC voting on poll ${pollId}`);
+const voteWithSignatureLocal = async (pollId, optionId, signature) => {
+  console.log(`Voting on poll ${pollId} with signature locally`);
   
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Get the poll from local storage
-  const poll = await getPoll(pollId);
-  
-  if (!poll) {
-    throw new Error('Poll not found');
-  }
-  
-  if (poll.status !== POLL_STATUS.ACTIVE) {
-    throw new Error('Poll is not active');
-  }
-  
-  // For multiple choice polls
-  const optionIds = Array.isArray(optionId) ? optionId : [optionId];
-  
-  // Update the poll
-  const updatedPoll = { ...poll };
-  
-  // Mark as voted
-  updatedPoll.hasVoted = true;
-  
-  // Store user's vote
-  updatedPoll.userVote = {
-    optionId: Array.isArray(optionId) ? null : optionId,
-    optionIds: Array.isArray(optionId) ? optionId : null,
-    voteMethod: 'mpc'
-  };
-  
-  // Update vote counts
-  optionIds.forEach(id => {
-    const option = updatedPoll.options.find(o => o.id === id);
-    if (option) {
-      option.votes += 1;
-      option.privateVotes += 1;
+  try {
+    // Get the poll from local storage
+    const poll = await getPoll(pollId);
+    
+    if (!poll) {
+      throw new Error('Poll not found');
     }
-  });
-  
-  // Update total votes
-  updatedPoll.totalVotes += 1;
-  updatedPoll.privateVotes += 1;
-  
-  // Update in local storage
-  updateCreatedPoll(updatedPoll);
-  
-  console.log('Updated poll in local storage:', updatedPoll);
-  
-  return updatedPoll;
-}
+    
+    if (poll.status !== POLL_STATUS.ACTIVE) {
+      throw new Error('Poll is not active');
+    }
+    
+    // For multiple choice polls
+    const optionIds = Array.isArray(optionId) ? optionId : [optionId];
+    
+    // Process options to ensure they are in the correct format
+    const processedOptionIds = optionIds.map(option => {
+      if (option && typeof option === 'object' && option.text) {
+        return option.text;
+      }
+      return option;
+    });
+    
+    // Update the poll
+    const updatedPoll = { ...poll };
+    
+    // Mark as voted
+    updatedPoll.hasVoted = true;
+    
+    // Store user's vote
+    updatedPoll.userVote = {
+      optionId: Array.isArray(optionId) ? null : optionId,
+      optionIds: Array.isArray(optionId) ? optionId : null,
+      voteMethod: 'signature'
+    };
+    
+    // Update vote counts
+    let updatedAnyOption = false;
+    
+    for (const option of processedOptionIds) {
+      // Find the option in the poll
+      const optionIndex = updatedPoll.options.findIndex(o => 
+        o.text === option || 
+        o.id === option || 
+        o._id === option
+      );
+      
+      if (optionIndex !== -1) {
+        // Increment votes for this option
+        if (!updatedPoll.options[optionIndex].votes) {
+          updatedPoll.options[optionIndex].votes = 0;
+        }
+        updatedPoll.options[optionIndex].votes += 1;
+        updatedAnyOption = true;
+      }
+    }
+    
+    // Only increment total votes once per submission
+    if (updatedAnyOption) {
+      // Increment total votes
+      if (!updatedPoll.totalVotes) {
+        updatedPoll.totalVotes = 0;
+      }
+      updatedPoll.totalVotes += 1;
+    }
+    
+    // Update local storage
+    updateCreatedPoll(updatedPoll);
+    
+    return updatedPoll;
+  } catch (error) {
+    console.error('Error voting with signature locally:', error);
+    throw error;
+  }
+};
 
 /**
- * Get the cost of voting with MPC
- * @returns {Promise<number>} Promise resolving to the cost in tokens
+ * Local fallback for MPC voting
  */
-export const getMPCVoteCost = async () => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+const voteWithMPCLocal = async (pollId, optionId) => {
+  console.log(`Voting on poll ${pollId} with MPC locally`);
   
-  return 5; // Fixed cost for now
+  try {
+    // Get the poll from local storage
+    const poll = await getPoll(pollId);
+    
+    if (!poll) {
+      throw new Error('Poll not found');
+    }
+    
+    if (poll.status !== POLL_STATUS.ACTIVE) {
+      throw new Error('Poll is not active');
+    }
+    
+    // For multiple choice polls
+    const optionIds = Array.isArray(optionId) ? optionId : [optionId];
+    
+    // Process options to ensure they are in the correct format
+    const processedOptionIds = optionIds.map(option => {
+      if (option && typeof option === 'object' && option.text) {
+        return option.text;
+      }
+      return option;
+    });
+    
+    // Update the poll
+    const updatedPoll = { ...poll };
+    
+    // Mark as voted
+    updatedPoll.hasVoted = true;
+    
+    // Store user's vote
+    updatedPoll.userVote = {
+      optionId: Array.isArray(optionId) ? null : optionId,
+      optionIds: Array.isArray(optionId) ? optionId : null,
+      voteMethod: 'mpc'
+    };
+    
+    // Update vote counts
+    let updatedAnyOption = false;
+    
+    for (const option of processedOptionIds) {
+      // Find the option in the poll
+      const optionIndex = updatedPoll.options.findIndex(o => 
+        o.text === option || 
+        o.id === option || 
+        o._id === option
+      );
+      
+      if (optionIndex !== -1) {
+        // Increment votes for this option
+        if (!updatedPoll.options[optionIndex].votes) {
+          updatedPoll.options[optionIndex].votes = 0;
+        }
+        updatedPoll.options[optionIndex].votes += 1;
+        updatedAnyOption = true;
+      }
+    }
+    
+    // Only increment total votes once per submission
+    if (updatedAnyOption) {
+      // Increment total votes
+      if (!updatedPoll.totalVotes) {
+        updatedPoll.totalVotes = 0;
+      }
+      updatedPoll.totalVotes += 1;
+    }
+    
+    // Update local storage
+    updateCreatedPoll(updatedPoll);
+    
+    return updatedPoll;
+  } catch (error) {
+    console.error('Error voting with MPC locally:', error);
+    throw error;
+  }
 };
