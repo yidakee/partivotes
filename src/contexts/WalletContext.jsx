@@ -1,10 +1,11 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { 
-  connectWallet, 
-  disconnectWallet, 
-  getWalletAddress, 
-  getWalletBalance,
-  checkWalletConnection
+import React, { createContext, useState, useEffect } from 'react';
+import {
+  initializeWalletSDK,
+  isWalletConnected,
+  connectWallet,
+  disconnectWallet,
+  getWalletAddress,
+  getWalletBalance
 } from '../services/walletService';
 
 // Create the context
@@ -14,99 +15,91 @@ export const WalletProvider = ({ children }) => {
   // State variables
   const [connected, setConnected] = useState(false);
   const [address, setAddress] = useState('');
-  const [balance, setBalance] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [balance, setBalance] = useState({ balance: 0, token: 'MPC' });
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Function to connect wallet
-  const connect = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // This will be implemented in walletService.js
-      await connectWallet();
-      
-      const walletAddress = await getWalletAddress();
-      const walletBalance = await getWalletBalance();
-      
-      setAddress(walletAddress);
-      setBalance(walletBalance);
-      setConnected(true);
-    } catch (err) {
-      console.error('Error connecting wallet:', err);
-      setError('Failed to connect wallet. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Function to disconnect wallet
-  const disconnect = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      // This will be implemented in walletService.js
-      await disconnectWallet();
-      
-      setAddress('');
-      setBalance(0);
-      setConnected(false);
-    } catch (err) {
-      console.error('Error disconnecting wallet:', err);
-      setError('Failed to disconnect wallet. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Function to refresh balance
-  const refreshBalance = useCallback(async () => {
-    if (!connected) return;
-    
-    try {
-      const walletBalance = await getWalletBalance();
-      setBalance(walletBalance);
-    } catch (err) {
-      console.error('Error refreshing balance:', err);
-      // Don't set error state here to avoid disrupting the UI
-    }
-  }, [connected]);
-
-  // Check initial connection status
+  // Initialize wallet on component mount
   useEffect(() => {
-    const checkConnection = async () => {
+    const init = async () => {
       try {
-        setLoading(true);
-        const isConnected = await checkWalletConnection();
-        
-        if (isConnected) {
-          const walletAddress = await getWalletAddress();
-          const walletBalance = await getWalletBalance();
-          
-          setAddress(walletAddress);
-          setBalance(walletBalance);
+        await initializeWalletSDK();
+        // Check if already connected
+        const connected = await isWalletConnected();
+        if (connected) {
           setConnected(true);
+          updateWalletInfo();
         }
       } catch (err) {
-        console.error('Error checking wallet connection:', err);
-        // Don't set error state here to avoid disrupting initial load
-      } finally {
-        setLoading(false);
+        console.error('Error initializing wallet:', err);
       }
     };
     
-    checkConnection();
+    init();
   }, []);
 
-  // Periodically refresh balance when connected
-  useEffect(() => {
-    if (!connected) return;
+  // Update wallet info (address and balance)
+  const updateWalletInfo = async () => {
+    try {
+      // Get wallet address
+      const walletAddress = await getWalletAddress();
+      if (walletAddress) {
+        setAddress(walletAddress);
+        
+        // Get wallet balance
+        const walletBalance = await getWalletBalance();
+        if (walletBalance) {
+          setBalance(walletBalance);
+        }
+      }
+    } catch (err) {
+      console.error('Error updating wallet info:', err);
+      setError('Failed to get wallet information');
+    }
+  };
+
+  // Connect wallet
+  const connect = async () => {
+    setLoading(true);
+    setError(null);
     
-    const intervalId = setInterval(refreshBalance, 30000); // Every 30 seconds
+    try {
+      console.log('WalletContext: Connecting wallet...');
+      const success = await connectWallet();
+      
+      if (success) {
+        setConnected(true);
+        await updateWalletInfo();
+        console.log('WalletContext: Wallet connected successfully');
+      } else {
+        setError('Failed to connect wallet');
+      }
+    } catch (err) {
+      console.error('WalletContext: Error connecting wallet:', err);
+      setError(err.message || 'Failed to connect wallet');
+      setConnected(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Disconnect wallet
+  const disconnect = async () => {
+    setLoading(true);
+    setError(null);
     
-    return () => clearInterval(intervalId);
-  }, [connected, refreshBalance]);
+    try {
+      await disconnectWallet();
+      setConnected(false);
+      setAddress('');
+      setBalance({ balance: 0, token: 'MPC' });
+    } catch (err) {
+      console.error('Error disconnecting wallet:', err);
+      setError(err.message || 'Failed to disconnect wallet');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Context value
   const value = {
@@ -116,8 +109,7 @@ export const WalletProvider = ({ children }) => {
     loading,
     error,
     connect,
-    disconnect,
-    refreshBalance,
+    disconnect
   };
 
   return (

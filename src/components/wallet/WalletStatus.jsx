@@ -30,8 +30,8 @@ const WalletStatus = ({ address, balance }) => {
 
   // Open address in explorer
   const openInExplorer = () => {
-    // Partisia Blockchain testnet explorer URL
-    const explorerUrl = `https://browser.testnet.partisiablockchain.com/account/${address}`;
+    // Partisia Blockchain explorer URL - works for both mainnet and testnet
+    const explorerUrl = `https://browser.partisiablockchain.com/account/${address}`;
     window.open(explorerUrl, '_blank');
   };
 
@@ -68,8 +68,13 @@ const WalletStatus = ({ address, balance }) => {
           Balance
         </Typography>
         <Typography variant="body1">
-          {balance} TEST_COIN
+          {balance?.balance || 0} {balance?.token || 'MPC'}
         </Typography>
+        {balance?.isMainnet && (
+          <Typography variant="caption" color="success.main">
+            Connected to Mainnet
+          </Typography>
+        )}
       </Box>
       
       <Snackbar

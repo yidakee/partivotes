@@ -1,5 +1,4 @@
-// Force load the starfield script first, before any React code
-import './forceStarfield';
+// Import React and other dependencies
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -15,6 +14,33 @@ import './styles/standard-theme.css'; // Light theme first
 import './styles/futuristic-theme.css'; // Dark theme second
 import './styles/fixes.css'; // Fixes third
 import './styles/z-final-critical-overrides.css'; // FINAL overrides last
+
+// Force load the starfield script first, before any React code
+import './forceStarfield';
+
+// Add comprehensive polyfills for Partisia SDK
+// These need to be defined before any SDK code runs
+if (typeof window !== 'undefined') {
+  // Buffer polyfill
+  window.Buffer = window.Buffer || require('buffer').Buffer;
+  
+  // Process polyfill
+  window.process = window.process || { 
+    env: {}, 
+    version: '',
+    nextTick: function(cb) { setTimeout(cb, 0); }
+  };
+  
+  // Handle crypto module (use native Web Crypto API when available)
+  if (!window.crypto) {
+    console.warn('Web Crypto API not available, using polyfill');
+    try {
+      window.crypto = require('crypto-browserify');
+    } catch (e) {
+      console.error('Failed to load crypto polyfill:', e);
+    }
+  }
+}
 
 // Add basic styling to ensure content is visible
 const styleElement = document.createElement('style');

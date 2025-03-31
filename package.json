@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "serve": "serve -s build -l 3000"
   },
@@ -15,14 +15,20 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
     "@mui/x-date-pickers": "^6.2.1",
+    "assert": "^2.1.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "date-fns": "^2.30.0",
     "partisia-sdk": "^0.1.1",
+    "process": "^0.11.10",
     "react": "^18.2.0",
+    "react-app-rewired": "^2.2.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0",
     "react-scripts": "^5.0.1",
     "recharts": "^2.15.1",
+    "stream-browserify": "^3.0.0",
     "styled-components": "^6.1.16",
     "three": "^0.175.0"
   },
@@ -44,6 +50,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "serve": "^14.2.4"
   }
 }

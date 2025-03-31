@@ -2,12 +2,12 @@
 import PartisiaSdk from 'partisia-sdk';
 
 // Flag to use mock wallet data for development
-const USE_MOCK_WALLET = false; // Force real wallet connection regardless of env setting
+const USE_MOCK_WALLET = false;
 
-// Mock data for development - Using Partisia Blockchain address format
+// Mock data for development
 let mockConnected = false;
-const mockAddress = '00b06f5b47f9b085803f401313b58823a73a7bae7c'; // Partisia addresses are 42 characters (21 bytes) in hex format
-let mockBalance = 1000; // Example balance in TEST_COIN tokens
+const mockAddress = '00b06f5b47f9b085803f401313b58823a73a7bae7c';
+let mockBalance = 1000;
 
 // SDK instance
 let partisiaSdk = null;
@@ -56,11 +56,7 @@ export const isWalletConnected = async () => {
 export const connectWallet = async () => {
   if (USE_MOCK_WALLET) {
     mockConnected = true;
-    return {
-      success: true,
-      address: mockAddress,
-      error: null
-    };
+    return true;
   }
   
   try {
@@ -84,18 +80,10 @@ export const connectWallet = async () => {
     }
     
     console.log('Successfully connected to Partisia Wallet');
-    return {
-      success: true,
-      address: partisiaSdk.connection.account.address,
-      error: null
-    };
+    return true;
   } catch (error) {
     console.error('Error connecting to wallet:', error);
-    return {
-      success: false,
-      address: null,
-      error: error.message || 'Failed to connect to wallet'
-    };
+    throw error;
   }
 };
 
@@ -103,197 +91,122 @@ export const connectWallet = async () => {
 export const disconnectWallet = async () => {
   if (USE_MOCK_WALLET) {
     mockConnected = false;
-    return {
-      success: true,
-      error: null
-    };
+    return true;
   }
   
   try {
     // Check if SDK is initialized
     if (!partisiaSdk) {
-      return {
-        success: true,
-        error: null
-      }; // Nothing to disconnect
+      return true; // Nothing to disconnect
     }
     
     // Disconnect from wallet
     await partisiaSdk.disconnect();
     console.log('Disconnected from Partisia Wallet');
-    return {
-      success: true,
-      error: null
-    };
+    return true;
   } catch (error) {
     console.error('Error disconnecting from wallet:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to disconnect from wallet'
-    };
+    throw error;
   }
 };
 
 // Get wallet address
 export const getWalletAddress = async () => {
   if (USE_MOCK_WALLET) {
-    return {
-      success: mockConnected,
-      address: mockConnected ? mockAddress : null,
-      error: null
-    };
+    return mockConnected ? mockAddress : null;
   }
   
   try {
     // Check if SDK is initialized and connected
     if (!partisiaSdk || !partisiaSdk.connection?.account) {
-      return {
-        success: false,
-        address: null,
-        error: 'Wallet not connected'
-      };
+      return null;
     }
     
-    return {
-      success: true,
-      address: partisiaSdk.connection.account.address,
-      error: null
-    };
+    return partisiaSdk.connection.account.address;
   } catch (error) {
     console.error('Error getting wallet address:', error);
-    return {
-      success: false,
-      address: null,
-      error: error.message || 'Failed to get wallet address'
-    };
+    return null;
   }
 };
 
 // Get wallet balance
 export const getWalletBalance = async () => {
   if (USE_MOCK_WALLET) {
-    return {
-      success: mockConnected,
-      balance: mockConnected ? mockBalance : 0,
-      error: null
-    };
+    return mockConnected ? mockBalance : 0;
   }
   
   try {
     // Check if SDK is initialized and connected
     if (!partisiaSdk || !partisiaSdk.connection?.account) {
-      return {
-        success: false,
-        balance: 0,
-        error: 'Wallet not connected'
-      };
+      return 0;
     }
     
-    // The SDK doesn't have a direct getBalance method
-    // We need to use the connection object to get the balance
-    // This is a simplified implementation that matches the format of the original
-    const address = partisiaSdk.connection.account.address;
-    
-    // If we have a valid address, we can try to get the balance
-    // For now, returning a placeholder that matches the expected format
-    return {
-      success: true,
-      balance: 0, // This needs to be updated with actual balance retrieval
-      error: null
-    };
+    // Get balance using the SDK
+    // Note: The SDK doesn't have a direct getBalance method, so we'd need to
+    // implement this using the blockchain API client
+    // For now, returning a placeholder
+    return 0; // This needs to be implemented with the proper API call
   } catch (error) {
     console.error('Error getting wallet balance:', error);
-    return {
-      success: false,
-      balance: 0,
-      error: error.message || 'Failed to get wallet balance'
-    };
+    return 0;
   }
 };
 
 // Sign a transaction
 export const signTransaction = async (transaction) => {
   if (USE_MOCK_WALLET) {
-    return {
-      success: mockConnected,
-      signature: mockConnected ? 'mock_signature' : null,
-      error: null
-    };
+    return { signature: 'mock_signature' };
   }
   
   try {
     // Check if SDK is initialized and connected
     if (!partisiaSdk || !partisiaSdk.connection?.account) {
-      return {
-        success: false,
-        signature: null,
-        error: 'Wallet not connected'
-      };
+      throw new Error('Wallet not connected');
     }
     
     // Sign transaction using the SDK
-    const result = await partisiaSdk.signMessage({
+    return await partisiaSdk.signMessage({
       payload: transaction,
       payloadType: "hex",
       dontBroadcast: false,
     });
-    
-    return {
-      success: true,
-      signature: result.signature,
-      error: null
-    };
   } catch (error) {
     console.error('Error signing transaction:', error);
-    return {
-      success: false,
-      signature: null,
-      error: error.message || 'Failed to sign transaction'
-    };
+    throw error;
   }
 };
 
 // Sign a message
 export const signMessage = async (message) => {
   if (USE_MOCK_WALLET) {
-    return {
-      success: mockConnected,
-      signature: mockConnected ? 'mock_signature' : null,
-      error: null
-    };
+    return { signature: 'mock_signature' };
   }
   
   try {
     // Check if SDK is initialized and connected
     if (!partisiaSdk || !partisiaSdk.connection?.account) {
-      return {
-        success: false,
-        signature: null,
-        error: 'Wallet not connected'
-      };
+      throw new Error('Wallet not connected');
     }
     
     // Sign message using the SDK
-    const result = await partisiaSdk.signMessage({
+    return await partisiaSdk.signMessage({
       payload: message,
       payloadType: "utf8",
       dontBroadcast: true,
     });
-    
-    return {
-      success: true,
-      signature: result.signature,
-      error: null
-    };
   } catch (error) {
     console.error('Error signing message:', error);
-    return {
-      success: false,
-      signature: null,
-      error: error.message || 'Failed to sign message'
-    };
+    throw error;
   }
 };
 
-// Initialize the wallet when the service is imported
-initializeWalletSDK();
+// Export a simple test function to verify SDK is working
+export const testSDK = () => {
+  try {
+    const sdk = new PartisiaSdk();
+    return !!sdk;
+  } catch (error) {
+    console.error('Error testing SDK:', error);
+    return false;
+  }
+};

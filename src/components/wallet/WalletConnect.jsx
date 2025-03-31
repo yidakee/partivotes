@@ -42,6 +42,7 @@ const WalletConnect = () => {
   // Handle connecting the wallet
   const handleConnect = async () => {
     try {
+      console.log('WalletConnect: Connect button clicked');
       await connect();
     } catch (err) {
       console.error('Error in handleConnect:', err);
@@ -93,7 +94,7 @@ const WalletConnect = () => {
               {formatAddress(address)}
             </Typography>
             <Typography variant="body2" color={isFuturistic ? "#00ffea" : "primary.main"} fontWeight="bold">
-              {balance} TEST_COIN
+              {balance?.balance || balance || 0} TEST_COIN
             </Typography>
           </Box>
         ) : (
