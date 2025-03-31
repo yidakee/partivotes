@@ -9,6 +9,7 @@ import {
   Divider,
   Switch,
   FormControlLabel,
+  Chip
 } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { WalletContext } from '../../contexts/WalletContext';
@@ -70,14 +71,12 @@ const WalletConnect = () => {
 
   // Handle network toggle
   const handleNetworkToggle = () => {
-    toggleNetwork();
-    if (connected) {
-      // Reconnect to apply network change
-      disconnect().then(() => {
-        setTimeout(() => {
-          connect();
-        }, 500);
-      });
+    // Only allow network switching when not connected
+    if (!connected) {
+      toggleNetwork();
+    } else {
+      console.log('Cannot switch networks while wallet is connected. Please disconnect first.');
+      // You could add a notification here if you want to inform the user
     }
   };
 
@@ -91,6 +90,7 @@ const WalletConnect = () => {
               onChange={handleNetworkToggle}
               size="small"
               color="primary"
+              disabled={connected}
             />
           }
           label={
@@ -100,6 +100,15 @@ const WalletConnect = () => {
           }
           sx={{ mr: 1, '.MuiFormControlLabel-label': { fontSize: '0.7rem' } }}
         />
+        {connected && (
+          <Chip 
+            size="small" 
+            label="Disconnect wallet to switch networks" 
+            color="warning" 
+            variant="outlined" 
+            sx={{ ml: 2, display: connected ? 'flex' : 'none' }}
+          />
+        )}
         <Button
           variant={connected ? "outlined" : "contained"}
           color={connected ? "secondary" : "primary"}

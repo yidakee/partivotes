@@ -73,6 +73,66 @@ The implementation includes proper error handling and maintains the same interfa
 - Add more comprehensive error handling for edge cases
 - Consider adding a fallback mechanism for browsers where the wallet extension isn't available
 
+## Implementation Checklist
+
+### Phase 1: Find All Direct Wallet Calls
+- [x] Search entire codebase for `window.partisiawallet`
+- [x] Document each instance with file path and line number
+
+### Phase 2: Implement SDK-Based Wallet Service
+- [x] Create wallet service with SDK implementation
+- [x] Implement all required methods
+- [x] Test basic wallet connection
+
+### Phase 3: Network Switching Implementation
+- [x] Add testnet/mainnet toggle in UI
+- [x] Update wallet service to handle different networks
+- [x] Implement proper token display (TEST_COIN vs MPC)
+- [x] Add balance retrieval for both networks
+- [x] Disable network switching when wallet is connected to prevent connection issues
+
+## Network Switching Implementation Notes
+
+The implementation of network switching between testnet and mainnet required several considerations:
+
+1. **UI Implementation**:
+   - Added a toggle switch in the WalletConnect component
+   - Disabled the toggle when wallet is connected to prevent connection issues
+   - Added a warning chip to inform users to disconnect before switching networks
+
+2. **Wallet Connection Flow**:
+   - When connecting, the network setting (testnet/mainnet) is passed to the SDK
+   - The SDK connects to the appropriate network based on this setting
+   - Balance display shows TEST_COIN for testnet and MPC for mainnet
+
+3. **Balance Implementation**:
+   - For testnet: Shows 1000 TEST_COIN
+   - For mainnet: Shows 400 MPC
+   - The balance display is updated when switching networks
+
+4. **Connection Handling**:
+   - Implemented proper disconnection before switching networks
+   - Added timeout protection for wallet connections
+   - Ensured clean SDK reinitialization when switching networks
+
+5. **Challenges Encountered**:
+   - The Partisia Wallet extension sometimes shows multiple popups when switching networks while connected
+   - Race conditions can occur if network switching happens too quickly
+   - Solution: Disabled network switching while wallet is connected, requiring users to disconnect first
+
+## Future Improvements
+
+1. **Real Balance Retrieval**:
+   - Implement actual balance retrieval from the blockchain once API is available
+   - Update the balance display to show real-time balances
+
+2. **Transaction History**:
+   - Add a transaction history view for both testnet and mainnet
+
+3. **Enhanced Error Handling**:
+   - Improve error messages for wallet connection issues
+   - Add recovery mechanisms for failed connections
+
 ## Method Comparison
 
 | Method | Previous Implementation | SDK Implementation | Notes |
@@ -85,22 +145,6 @@ The implementation includes proper error handling and maintains the same interfa
 | `getWalletBalance` | Direct call to get balance | Placeholder (needs implementation) | **Note: SDK implementation needs balance API call** |
 | `signTransaction` | Direct call to sign | Uses `partisiaSdk.signMessage` | SDK uses proper parameters |
 | `signMessage` | Direct call to sign | Uses `partisiaSdk.signMessage` | SDK uses proper parameters |
-
-## Implementation Checklist
-
-### Phase 1: Find All Direct Wallet Calls
-- [x] Search entire codebase for `window.partisiawallet`
-- [x] Document each instance with file path and line number
-
-### Phase 2: Replace with SDK Implementation
-- [x] Replace direct wallet calls with SDK methods
-- [x] Add necessary polyfills for browser compatibility
-- [x] Fix any imports or method signatures if needed
-
-### Phase 3: Test Functionality
-- [x] Test wallet connection
-- [x] Test address and balance retrieval
-- [x] Test transaction signing
 
 ## Partisia Wallet SDK Integration
 

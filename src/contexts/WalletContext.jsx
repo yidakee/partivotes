@@ -63,8 +63,72 @@ export const WalletProvider = ({ children }) => {
   };
 
   // Toggle between testnet and mainnet
-  const toggleNetwork = () => {
-    setIsTestnet(prev => !prev);
+  const toggleNetwork = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Toggle the network state
+      const newIsTestnet = !isTestnet;
+      console.log(`Switching to ${newIsTestnet ? 'testnet' : 'mainnet'}`);
+      
+      // Always disconnect first, regardless of current connection state
+      try {
+        console.log('Disconnecting wallet before network switch');
+        await disconnectWallet();
+        setConnected(false);
+        setAddress(null);
+        setBalance(null);
+      } catch (disconnectError) {
+        console.warn('Error during disconnect:', disconnectError);
+        // Continue with the network switch even if disconnect fails
+      }
+      
+      // Update the state after disconnection
+      setIsTestnet(newIsTestnet);
+      
+      // Wait a moment to ensure disconnection is complete
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Only reconnect if we were previously connected
+      if (connected) {
+        console.log(`Reconnecting to ${newIsTestnet ? 'testnet' : 'mainnet'}`);
+        
+        try {
+          // Connect with new network
+          const result = await connectWallet(newIsTestnet);
+          
+          if (result && result.success) {
+            setConnected(true);
+            setAddress(result.address);
+            
+            // Get wallet balance
+            const balanceResult = await getWalletBalance();
+            if (balanceResult && balanceResult.success) {
+              setBalance(balanceResult.balance || { 
+                balance: 0, 
+                token: newIsTestnet ? 'TEST_COIN' : 'MPC' 
+              });
+            }
+            
+            console.log(`Successfully reconnected to ${newIsTestnet ? 'testnet' : 'mainnet'}`);
+          } else {
+            console.error('Failed to reconnect after network switch:', result?.error);
+            setError(result?.error || `Failed to connect to ${newIsTestnet ? 'testnet' : 'mainnet'}`);
+          }
+        } catch (connectError) {
+          console.error('Error reconnecting after network switch:', connectError);
+          setError(connectError.message || 'Failed to reconnect after network switch');
+        }
+      } else {
+        console.log(`Network switched to ${newIsTestnet ? 'testnet' : 'mainnet'}, not reconnecting (was not connected)`);
+      }
+    } catch (err) {
+      console.error('Error toggling network:', err);
+      setError(err.message || 'Failed to switch network');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Connect wallet
