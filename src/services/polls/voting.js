@@ -4,9 +4,9 @@
 import { POLL_STATUS } from '../../utils/constants';
 import { getPoll } from './retrieval';
 import { updateCreatedPoll } from './storage';
+import { addVote as apiAddVote } from '../apiService';
 import Poll from '../../db/models/Poll';
 import Vote from '../../db/models/Vote';
-import { connectDB } from '../../db/connection';
 
 /**
  * Vote on a poll with a signature (public voting)
@@ -19,9 +19,6 @@ export const voteWithSignature = async (pollId, optionId, signature) => {
   console.log(`Voting on poll ${pollId} with option ${JSON.stringify(optionId)} and signature ${signature}`);
   
   try {
-    // Connect to database
-    await connectDB();
-    
     // Get the poll from MongoDB
     const dbPoll = await Poll.findById(pollId);
     
@@ -55,11 +52,11 @@ export const voteWithSignature = async (pollId, optionId, signature) => {
       timestamp: new Date()
     };
     
-    // Save vote to database
-    const savedVote = await Vote.create(voteData);
-    console.log('Vote saved to database:', savedVote);
+    // Submit vote via API
+    const result = await apiAddVote(voteData);
+    console.log('Vote recorded successfully:', result);
     
-    // Get updated poll with vote counts
+    // Get updated poll after voting
     const updatedDbPoll = await Poll.findById(pollId);
     
     // Also update local storage for compatibility
@@ -185,9 +182,6 @@ export const voteWithMPC = async (pollId, optionId) => {
   console.log(`Voting on poll ${pollId} with option ${JSON.stringify(optionId)} using MPC`);
   
   try {
-    // Connect to database
-    await connectDB();
-    
     // Get the poll from MongoDB
     const dbPoll = await Poll.findById(pollId);
     
@@ -218,11 +212,11 @@ export const voteWithMPC = async (pollId, optionId) => {
       timestamp: new Date()
     };
     
-    // Save vote to database
-    const savedVote = await Vote.create(voteData);
-    console.log('MPC Vote saved to database:', savedVote);
+    // Submit vote via API
+    const result = await apiAddVote(voteData);
+    console.log('MPC Vote recorded successfully:', result);
     
-    // Get updated poll with vote counts
+    // Get updated poll after voting
     const updatedDbPoll = await Poll.findById(pollId);
     
     // Also update local storage for compatibility

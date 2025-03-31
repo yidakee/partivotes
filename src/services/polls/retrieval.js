@@ -2,8 +2,7 @@
  * Poll retrieval functions
  */
 import { POLL_STATUS } from '../../utils/constants';
-import Poll from '../../db/models/Poll';
-import { connectDB } from '../../db/connection';
+import { getPolls as apiGetPolls, getPoll as apiGetPoll } from '../apiService';
 
 // Helper to check if we're in a browser environment
 const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
@@ -17,47 +16,18 @@ export const getPolls = async (options = {}) => {
   console.log('Getting polls with options:', options);
   
   try {
-    // Build filter
-    const filter = {};
-    
-    // Filter by status
-    if (options.status) {
-      // Convert status to uppercase to match MongoDB values
-      // MongoDB stores status in uppercase, while our constants are lowercase
-      filter.status = options.status.toUpperCase();
-      console.log(`Filtering polls by status: ${options.status} (converted to ${filter.status} for MongoDB)`);
-    }
-    
-    // Filter by creator
-    if (options.creator) {
-      filter.creator = options.creator;
-      console.log(`Filtering polls by creator: ${options.creator}`);
-    }
-    
-    // Filter by poll type
-    if (options.type) {
-      filter.type = options.type;
-      console.log(`Filtering polls by type: ${options.type}`);
-    }
-    
-    // Connect to database
-    await connectDB();
-    
-    // Get polls from database
-    const polls = await Poll.find(filter);
-    console.log(`Found ${polls.length} polls matching filter:`, filter);
+    // Get polls from API
+    const polls = await apiGetPolls(options);
+    console.log(`Found ${polls.length} polls matching filter:`, options);
     
     if (polls.length === 0) {
-      console.log('No polls found matching the criteria');
-      return [];
+      console.log('No polls found, returning empty array');
     }
     
-    // Map polls to expected format (formatPoll will convert statuses to lowercase)
-    const formattedPolls = polls.map(poll => formatPoll(poll));
-    console.log(`Returning ${formattedPolls.length} formatted polls`);
-    return formattedPolls;
+    return polls;
   } catch (error) {
-    console.error('Error fetching polls:', error);
+    console.error('Error getting polls:', error);
+    // Return empty array on error
     return [];
   }
 };
@@ -71,21 +41,18 @@ export const getPoll = async (id) => {
   console.log(`Getting poll with ID: ${id}`);
   
   try {
-    // Connect to database
-    await connectDB();
-    
-    // Get poll from database
-    const poll = await Poll.findById(id);
+    // Get poll from API
+    const poll = await apiGetPoll(id);
     
     if (poll) {
       console.log('Found poll:', poll.title);
-      return formatPoll(poll);
+      return poll;
+    } else {
+      console.log(`Poll with ID ${id} not found`);
+      return null;
     }
-    
-    console.log('Poll not found');
-    return null;
   } catch (error) {
-    console.error(`Error fetching poll ${id}:`, error);
+    console.error(`Error getting poll with ID ${id}:`, error);
     return null;
   }
 };
@@ -95,54 +62,20 @@ export const getPoll = async (id) => {
  * @param {Object} poll - Poll from database
  * @returns {Object} Formatted poll
  */
-const formatPoll = (poll) => {
-  // If it's already in the expected format, return as is
-  if (poll.options && poll.options.length > 0 && typeof poll.options[0] === 'object' && poll.options[0].id) {
-    return poll;
+export const formatPoll = (poll) => {
+  if (!poll) return null;
+  
+  // Clone the poll to avoid modifying the original
+  const formattedPoll = { ...poll };
+  
+  // Format dates if they exist
+  if (formattedPoll.startDate) {
+    formattedPoll.startDate = new Date(formattedPoll.startDate);
   }
   
-  // MongoDB ObjectId to string if needed
-  const pollId = poll._id ? poll._id.toString() : poll.id;
-  
-  // Normalize status to lowercase to match our constants
-  let normalizedStatus = poll.status;
-  if (normalizedStatus && typeof normalizedStatus === 'string') {
-    // Convert uppercase status (from MongoDB) to lowercase (for our app)
-    normalizedStatus = normalizedStatus.toLowerCase();
+  if (formattedPoll.endDate) {
+    formattedPoll.endDate = new Date(formattedPoll.endDate);
   }
   
-  return {
-    id: pollId,
-    title: poll.title,
-    description: poll.description,
-    creator: poll.creator,
-    options: Array.isArray(poll.options) 
-      ? poll.options.map((option, index) => {
-          // Handle both formats of options (object or string)
-          if (typeof option === 'object') {
-            return {
-              id: `${pollId}-${index}`,
-              text: option.text,
-              votes: option.votes || 0
-            };
-          } else {
-            return {
-              id: `${pollId}-${index}`,
-              text: option,
-              votes: 0
-            };
-          }
-        })
-      : [],
-    startDate: poll.startDate,
-    endDate: poll.endDate,
-    createdAt: poll.createdAt || new Date().toISOString(),
-    status: normalizedStatus,
-    type: poll.type,
-    maxSelections: poll.maxSelections || 1,
-    totalVotes: poll.totalVotes || 0,
-    network: poll.network || 'mainnet',
-    hasVoted: false,
-    isCreator: false
-  };
+  return formattedPoll;
 };
