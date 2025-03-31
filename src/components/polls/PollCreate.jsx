@@ -31,7 +31,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { WalletContext } from '../../contexts/WalletContext';
 import { ThemeContext } from '../../contexts/ThemeContext';
-import { createPoll } from '../../services/pollService';
+import { createPoll } from '../../services/polls/creation';
 import { POLL_TYPE, MPC_COST_PER_OPTION } from '../../utils/constants';
 import { playSuccessSound, playErrorSound, playSound } from '../../utils/soundEffects';
 

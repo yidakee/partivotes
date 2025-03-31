@@ -17,7 +17,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EventIcon from '@mui/icons-material/Event';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import { getPolls } from '../../services/pollService';
+import { getPolls } from '../../services/polls/retrieval';
 import { formatDate } from '../../utils/dateUtils';
 import { POLL_STATUS, POLL_TYPE } from '../../utils/constants';
 import { WalletContext } from '../../contexts/WalletContext';

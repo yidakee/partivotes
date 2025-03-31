@@ -2,7 +2,8 @@
  * Poll retrieval functions
  */
 import { POLL_STATUS } from '../../utils/constants';
-import { pollService } from '../dbService';
+import Poll from '../../db/models/Poll';
+import { connectDB } from '../../db/connection';
 
 // Helper to check if we're in a browser environment
 const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
@@ -39,8 +40,11 @@ export const getPolls = async (options = {}) => {
       console.log(`Filtering polls by type: ${options.type}`);
     }
     
-    // Get polls from database or localStorage (handled by pollService)
-    const polls = await pollService.getPolls(filter);
+    // Connect to database
+    await connectDB();
+    
+    // Get polls from database
+    const polls = await Poll.find(filter);
     console.log(`Found ${polls.length} polls matching filter:`, filter);
     
     if (polls.length === 0) {
@@ -67,8 +71,11 @@ export const getPoll = async (id) => {
   console.log(`Getting poll with ID: ${id}`);
   
   try {
-    // Get poll from database or localStorage (handled by pollService)
-    const poll = await pollService.getPoll(id);
+    // Connect to database
+    await connectDB();
+    
+    // Get poll from database
+    const poll = await Poll.findById(id);
     
     if (poll) {
       console.log('Found poll:', poll.title);

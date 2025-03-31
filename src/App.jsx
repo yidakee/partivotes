@@ -14,7 +14,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 
 // Layout & Components
 import Layout from './components/layout/Layout';
-import NotFound from './components/error/NotFound';
+import NotFound from './components/common/NotFound';
 
 // Poll Components
 import PollList from './components/polls/PollList';

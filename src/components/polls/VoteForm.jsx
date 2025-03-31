@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
+import { 
+  Box, 
   Typography,
   FormControl,
   FormControlLabel,
@@ -23,7 +23,7 @@ import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import LockIcon from '@mui/icons-material/Lock';
 import PublicIcon from '@mui/icons-material/Public';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { voteWithSignature, voteWithMPC } from '../../services/pollService';
+import { voteWithSignature, voteWithMPC } from '../../services/polls/voting';
 import { WalletContext } from '../../contexts/WalletContext';
 import { POLL_TYPE } from '../../utils/constants';
 

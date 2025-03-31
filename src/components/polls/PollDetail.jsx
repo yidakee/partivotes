@@ -19,7 +19,7 @@ import { formatDate } from '../../utils/dateUtils';
 import { POLL_STATUS } from '../../utils/constants';
 import VoteForm from './VoteForm';
 import PollResults from './PollResults';
-import { getPoll } from '../../services/pollService';
+import { getPoll } from '../../services/polls/retrieval';
 import { WalletContext } from '../../contexts/WalletContext';
 
 const statusColors = {

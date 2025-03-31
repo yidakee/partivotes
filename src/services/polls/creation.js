@@ -3,7 +3,8 @@
  */
 import { POLL_STATUS, POLL_TYPE } from '../../utils/constants';
 import { addCreatedPoll } from './storage';
-import { pollService } from '../dbService';
+import Poll from '../../db/models/Poll';
+import { connectDB } from '../../db/connection';
 
 /**
  * Create a new poll
@@ -45,7 +46,8 @@ export const createPoll = async (pollData) => {
     // Save to MongoDB
     try {
       console.log('Attempting to save poll to MongoDB:', newPoll);
-      const savedPoll = await pollService.createPoll(newPoll);
+      await connectDB();
+      const savedPoll = await Poll.create(newPoll);
       console.log('Poll saved to database successfully:', savedPoll);
       
       if (!savedPoll || !savedPoll._id) {

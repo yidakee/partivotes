@@ -148,18 +148,112 @@ const pollService = {
   getPolls: async (filter = {}) => {
     console.log('pollService: Getting polls with filter:', filter);
     
-    // Always show mock data for now until API is fully working
-    console.log('TEMPORARY: Using mock polls while API is being fixed');
-    return getMockPolls(filter);
+    try {
+      const isProduction = window.location.hostname === 'partivotes.xyz' || 
+                          window.location.hostname === 'www.partivotes.xyz';
+      
+      if (isProduction) {
+        console.log('Using API to fetch polls in production');
+        try {
+          // Build query string for filters
+          const queryParams = new URLSearchParams();
+          if (filter.status) queryParams.append('status', filter.status);
+          if (filter.creator) queryParams.append('creator', filter.creator);
+          if (filter.type) queryParams.append('type', filter.type);
+          
+          const queryString = queryParams.toString();
+          const url = `/api/polls${queryString ? `?${queryString}` : ''}`;
+          
+          console.log('Fetching from API URL:', url);
+          const response = await fetch(url);
+          console.log('API response status:', response.status);
+          
+          if (!response.ok) {
+            console.error('API response not OK:', response.status, response.statusText);
+            throw new Error(`API responded with status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('Received data from API:', data.length, 'polls');
+          return data;
+        } catch (error) {
+          console.error('API error, falling back to mock data:', error.message);
+          return getMockPolls(filter);
+        }
+      } else {
+        // Local development
+        console.log('Using mock polls as fallback');
+        return getMockPolls(filter);
+      }
+    } catch (error) {
+      console.error('Error in getPolls:', error);
+      return getMockPolls(filter);
+    }
   },
   
   // Get a single poll by ID
   getPoll: async (id) => {
     console.log(`Getting poll with ID: ${id}`);
     try {
-      // Use mock data for now
-      const allPolls = getMockPolls();
-      return allPolls.find(poll => poll.id === id) || null;
+      const isProduction = window.location.hostname === 'partivotes.xyz' || 
+                          window.location.hostname === 'www.partivotes.xyz';
+      
+      if (isProduction) {
+        try {
+          // Try to fetch from API first
+          const url = `/api/polls/${id}`;
+          console.log('Fetching from API URL:', url);
+          const response = await fetch(url);
+          
+          if (!response.ok) {
+            console.error('API response not OK:', response.status, response.statusText);
+            throw new Error(`API responded with status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('Received poll from API:', data.title);
+          return data;
+        } catch (error) {
+          console.error(`Error getting poll with ID ${id} from API:`, error);
+          
+          // If API fails, try to find in all polls
+          console.log('Attempting to find poll in all polls as fallback');
+          const allPolls = await getMockPolls();
+          
+          // Check for both id and _id fields
+          const poll = allPolls.find(p => 
+            p.id === id || 
+            p._id === id || 
+            (p._id && p._id.toString() === id)
+          );
+          
+          if (poll) {
+            console.log('Found poll in fallback data:', poll.title);
+            return poll;
+          }
+          
+          console.error('Poll not found in API or fallback data');
+          return null;
+        }
+      } else {
+        // Use mock data for local development
+        const allPolls = getMockPolls();
+        
+        // Check for both id and _id fields
+        const poll = allPolls.find(p => 
+          p.id === id || 
+          p._id === id || 
+          (p._id && p._id.toString() === id)
+        );
+        
+        if (poll) {
+          console.log('Found poll in mock data:', poll.title);
+          return poll;
+        }
+        
+        console.log('Poll not found in mock data');
+        return null;
+      }
     } catch (error) {
       console.error(`Error getting poll with ID ${id}:`, error);
       return null;
@@ -170,17 +264,48 @@ const pollService = {
   createPoll: async (pollData) => {
     console.log('Creating new poll:', pollData);
     try {
-      // Use mock data for now
-      const allPolls = getMockPolls();
-      const newPoll = {
-        ...pollData,
-        id: `poll-${Date.now()}`,
-        createdAt: new Date()
-      };
+      const isProduction = window.location.hostname === 'partivotes.xyz' || 
+                          window.location.hostname === 'www.partivotes.xyz';
       
-      // In a real implementation, this would save to the database
-      console.log('New poll created:', newPoll);
-      return newPoll;
+      if (isProduction) {
+        try {
+          const url = '/api/polls';
+          console.log('Posting to API URL:', url);
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(pollData)
+          });
+          
+          if (!response.ok) {
+            console.error('API response not OK:', response.status, response.statusText);
+            throw new Error(`API responded with status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('New poll created via API:', data.title);
+          return data;
+        } catch (error) {
+          console.error('Error creating poll via API:', error);
+          // Fall back to mock data
+          const newPoll = {
+            ...pollData,
+            id: `poll-${Date.now()}`,
+            createdAt: new Date()
+          };
+          return newPoll;
+        }
+      } else {
+        // Use mock data for local development
+        const newPoll = {
+          ...pollData,
+          id: `poll-${Date.now()}`,
+          createdAt: new Date()
+        };
+        return newPoll;
+      }
     } catch (error) {
       console.error('Error creating poll:', error);
       throw error;
