@@ -1,349 +1,278 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   Box, 
-  Typography,
-  FormControl,
-  FormControlLabel,
-  Radio,
+  Button, 
+  Typography, 
+  FormControl, 
+  FormControlLabel, 
+  FormGroup,
+  Radio, 
   RadioGroup,
   Checkbox,
-  FormGroup,
-  Button,
-  Alert,
-  AlertTitle,
+  CircularProgress,
   Paper,
-  Divider,
-  Chip,
-  Fade,
-  useTheme,
-  CircularProgress
+  Alert,
+  styled
 } from '@mui/material';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import PublicIcon from '@mui/icons-material/Public';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { voteWithSignature, voteWithMPC } from '../../services/polls/voting';
 import { WalletContext } from '../../contexts/WalletContext';
 import { POLL_TYPE } from '../../utils/constants';
 
-const VoteForm = ({ poll, setPoll }) => {
-  console.log('=== VoteForm RENDERING ===', {
-    poll,
-    hasVoted: poll?.hasVoted
-  });
-  
-  const { connected, balance, address } = useContext(WalletContext);
-  const theme = useTheme();
-  const navigate = useNavigate();
-  
+// Custom styled round checkbox
+const RoundCheckbox = styled(Checkbox)({
+  '& .MuiSvgIcon-root': {
+    borderRadius: '50%',
+  },
+  '&.MuiCheckbox-root': {
+    color: '#aaaaaa',
+    '&.Mui-checked': {
+      color: '#6200ee',
+    }
+  }
+});
+
+// Styled radio button
+const StyledRadio = styled(Radio)({
+  '&.MuiRadio-root': {
+    color: '#aaaaaa',
+    '&.Mui-checked': {
+      color: '#6200ee',
+    }
+  }
+});
+
+/**
+ * VoteForm component for casting votes on polls
+ */
+const VoteForm = ({ poll, onVoteSubmitted }) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const [voteMethod, setVoteMethod] = useState('signature');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [voteMethod, setVoteMethod] = useState('public');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  
+  const { wallet } = useContext(WalletContext);
+  const { connected, address } = wallet || { connected: false, address: null };
   
   const isSingleChoice = poll.type === POLL_TYPE.SINGLE_CHOICE;
-  const isMultipleChoice = poll.type === POLL_TYPE.MULTIPLE_CHOICE;
   
-  const maxSelections = poll.maxSelections || 1;
-  
+  // Reset selected options when poll changes
   useEffect(() => {
-    // Reset form state when poll changes
     setSelectedOptions([]);
-    setVoteMethod('signature');
-    setSuccess(false);
     setError(null);
-    
-    // Log poll options for debugging
-    console.log('Poll options in VoteForm:', poll.options);
+    setSuccess(false);
   }, [poll._id]);
   
-  const handleSingleChoiceChange = (event) => {
-    setSelectedOptions([event.target.value]);
-  };
-  
-  const handleMultipleChoiceChange = (event) => {
-    const { value, checked } = event.target;
+  // Handle checkbox/radio change
+  const handleOptionChange = (event) => {
+    const optionIndex = event.target.value;
     
-    if (checked) {
-      // Add to selected options, but respect maxSelections
-      if (selectedOptions.length < maxSelections) {
-        setSelectedOptions([...selectedOptions, value]);
-      }
+    if (isSingleChoice) {
+      // Single choice - just set the selected option
+      setSelectedOptions([optionIndex]);
     } else {
-      // Remove from selected options
-      setSelectedOptions(selectedOptions.filter(option => option !== value));
+      // Multiple choice - add or remove from array
+      const currentSelections = [...selectedOptions];
+      
+      if (currentSelections.includes(optionIndex)) {
+        // Remove if already selected
+        setSelectedOptions(currentSelections.filter(opt => opt !== optionIndex));
+      } else {
+        // Add if not selected
+        if (currentSelections.length < poll.maxSelections) {
+          setSelectedOptions([...currentSelections, optionIndex]);
+        } else {
+          setError(`Maximum ${poll.maxSelections} selections allowed`);
+        }
+      }
     }
   };
   
+  // Handle vote method change
   const handleVoteMethodChange = (event) => {
     setVoteMethod(event.target.value);
   };
   
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    
+  // Submit vote
+  const handleVote = async () => {
     if (selectedOptions.length === 0) {
       setError('Please select at least one option');
       return;
     }
-    
-    if (!connected) {
-      setError('Please connect your wallet to vote');
-      return;
-    }
 
-    console.log('=== VoteForm SUBMITTING ===', {
-      selectedOptions,
-      voteMethod,
-      pollOptions: poll.options
-    });
-    
-    if (isMultipleChoice && selectedOptions.length > maxSelections) {
-      setError(`You can only select up to ${maxSelections} options`);
-      return;
-    }
-    
+    setIsSubmitting(true);
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
+      console.log('Selected options before processing:', selectedOptions);
       
-      // Convert selected option indices to option text values (not objects)
-      // This is the critical fix - we need to send text values, not objects
+      // Convert selected option indices to option text values
       const selectedOptionTexts = selectedOptions.map(index => {
         const optionIndex = parseInt(index, 10);
         // Extract just the text from the option object
         return poll.options[optionIndex].text;
       });
       
-      console.log('Selected option texts for API:', selectedOptionTexts);
-      
-      // This would be a real blockchain transaction in a production app
+      console.log('Sending option texts to server:', selectedOptionTexts);
+
+      // Use the appropriate voting method based on user selection
       let updatedPoll;
-      
-      if (voteMethod === 'signature') {
-        // Send option text values directly, not objects
-        const votePayload = isSingleChoice ? selectedOptionTexts[0] : selectedOptionTexts;
+      if (voteMethod === 'public') {
+        // Public vote with signature
         updatedPoll = await voteWithSignature(
-          poll._id, 
-          votePayload, 
-          address
+          poll._id,
+          selectedOptionTexts,
+          `${address || 'anonymous'}:${Date.now()}`
         );
       } else {
-        // MPC voting (private)
-        // Send option text values directly, not objects
-        const votePayload = isSingleChoice ? selectedOptionTexts[0] : selectedOptionTexts;
+        // Private vote with MPC
         updatedPoll = await voteWithMPC(
-          poll._id, 
-          votePayload, 
-          address
+          poll._id,
+          selectedOptionTexts
         );
       }
+
+      console.log('Vote submitted successfully:', updatedPoll);
       
-      if (updatedPoll) {
-        console.log('=== VoteForm VOTE SUCCESS ===', {
-          updatedPoll,
-          hasVoted: updatedPoll.hasVoted
-        });
-        
-        // Store the original poll object for comparison
-        const originalPoll = { ...poll };
-        
-        // FIX: Update the poll with hasVoted immediately instead of using setTimeout
-        // This prevents race conditions between state updates
-        const updatedPollWithVoteStatus = {
-          ...updatedPoll,
-          hasVoted: true
-        };
-        
-        console.log('=== VoteForm SETTING POLL WITH hasVoted TRUE ===', {
-          originalPoll,
-          updatedPollWithVoteStatus
-        });
-        
-        setSuccess(true);
-        setPoll(updatedPollWithVoteStatus);
-        
-        console.log('=== VoteForm SET POLL COMPARISON ===', {
-          before: originalPoll,
-          after: updatedPollWithVoteStatus,
-          differences: Object.keys(updatedPollWithVoteStatus).filter(key => 
-            JSON.stringify(updatedPollWithVoteStatus[key]) !== JSON.stringify(originalPoll[key])
-          )
-        });
-      } else {
-        setError('Failed to submit vote. Please try again.');
+      // Show success message
+      setSuccess(true);
+      
+      // Notify parent component that vote was submitted
+      if (onVoteSubmitted) {
+        onVoteSubmitted(updatedPoll);
       }
     } catch (err) {
       console.error('Error submitting vote:', err);
-      setError('Failed to submit vote: ' + (err.message || 'Unknown error'));
+      // Display a more user-friendly error message
+      if (err.message && err.message.includes('Failed to fetch')) {
+        setError('Could not connect to the voting server. Please check your connection and try again.');
+      } else {
+        setError(err.message || 'Failed to submit vote. Please try again.');
+      }
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
   
-  // If the user has already voted, show a success message
+  // If already voted, show message
   if (poll.hasVoted) {
     return (
-      <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-        <Box sx={{ textAlign: 'center', py: 2 }}>
-          <CheckCircleOutlineIcon sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
-          <Typography variant="h5" gutterBottom>
-            Thank you for voting!
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Your vote has been recorded successfully.
-          </Typography>
-        </Box>
-      </Paper>
+      <Box sx={{ textAlign: 'center', p: 2 }}>
+        <Alert severity="success">
+          You have already voted on this poll.
+        </Alert>
+      </Box>
+    );
+  }
+  
+  // If success, show message
+  if (success) {
+    return (
+      <Box sx={{ textAlign: 'center', p: 2 }}>
+        <Alert severity="success">
+          Your vote has been recorded successfully!
+        </Alert>
+      </Box>
     );
   }
   
   return (
-    <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+    <Paper sx={{ p: 2, mb: 2 }}>
       <Typography variant="h6" gutterBottom>
         Cast Your Vote
       </Typography>
       
-      <Divider sx={{ mb: 2 }} />
-      
-      <form onSubmit={handleSubmit}>
-        {/* Poll options */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            {isSingleChoice ? 'Select one option:' : `Select up to ${maxSelections} options:`}
-          </Typography>
-          
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="body2" color="textSecondary" gutterBottom>
+          {isSingleChoice 
+            ? 'Select 1 option:' 
+            : `Select up to ${poll.maxSelections} options:`}
+        </Typography>
+        
+        <FormControl component="fieldset" fullWidth>
           {isSingleChoice ? (
-            <FormControl component="fieldset" fullWidth>
-              <RadioGroup
-                value={selectedOptions[0] || ''}
-                onChange={handleSingleChoiceChange}
-              >
-                {poll.options.map((option, index) => (
-                  <FormControlLabel
-                    key={index}
-                    value={index.toString()}
-                    control={<Radio />}
-                    label={
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <Typography>{option.text}</Typography>
-                        <Chip 
-                          label={`${option.votes || 0} votes`} 
-                          size="small" 
-                          variant="outlined"
-                          sx={{ ml: 2 }}
-                        />
-                      </Box>
-                    }
-                    sx={{ mb: 1 }}
-                  />
-                ))}
-              </RadioGroup>
-            </FormControl>
-          ) : (
-            <FormControl component="fieldset" fullWidth>
-              <FormGroup>
-                {poll.options.map((option, index) => (
-                  <FormControlLabel
-                    key={index}
-                    control={
-                      <Checkbox 
-                        checked={selectedOptions.includes(index.toString())}
-                        onChange={handleMultipleChoiceChange}
-                        value={index.toString()}
-                        disabled={selectedOptions.length >= maxSelections && !selectedOptions.includes(index.toString())}
-                      />
-                    }
-                    label={
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                        <Typography>{option.text}</Typography>
-                        <Chip 
-                          label={`${option.votes || 0} votes`} 
-                          size="small" 
-                          variant="outlined"
-                          sx={{ ml: 2 }}
-                        />
-                      </Box>
-                    }
-                    sx={{ mb: 1 }}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
-          )}
-        </Box>
-        
-        {/* Vote method selection */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Vote method:
-          </Typography>
-          
-          <FormControl component="fieldset">
-            <RadioGroup
-              row
-              value={voteMethod}
-              onChange={handleVoteMethodChange}
-            >
-              <FormControlLabel 
-                value="signature" 
-                control={<Radio />} 
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <PublicIcon sx={{ mr: 1, fontSize: 20 }} />
-                    <Typography>Public (Signature)</Typography>
-                  </Box>
-                }
-              />
-              <FormControlLabel 
-                value="mpc" 
-                control={<Radio />} 
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <LockIcon sx={{ mr: 1, fontSize: 20 }} />
-                    <Typography>Private (MPC)</Typography>
-                  </Box>
-                }
-              />
+            <RadioGroup value={selectedOptions[0] || ''} onChange={handleOptionChange}>
+              {poll.options.map((option, index) => (
+                <FormControlLabel
+                  key={index}
+                  value={index.toString()}
+                  control={<StyledRadio />}
+                  label={option.text}
+                />
+              ))}
             </RadioGroup>
-          </FormControl>
-        </Box>
+          ) : (
+            <FormGroup>
+              {poll.options.map((option, index) => (
+                <FormControlLabel
+                  key={index}
+                  control={
+                    <RoundCheckbox
+                      checked={selectedOptions.includes(index.toString())}
+                      onChange={handleOptionChange}
+                      value={index.toString()}
+                    />
+                  }
+                  label={option.text}
+                />
+              ))}
+            </FormGroup>
+          )}
+        </FormControl>
+      </Box>
+      
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="body2" color="textSecondary" gutterBottom>
+          Vote method:
+        </Typography>
         
-        {/* Error message */}
-        {error && (
-          <Fade in={!!error}>
-            <Alert severity="error" sx={{ mb: 2 }}>
-              <AlertTitle>Error</AlertTitle>
-              {error}
-            </Alert>
-          </Fade>
-        )}
-        
-        {/* Success message */}
-        {success && (
-          <Fade in={success}>
-            <Alert severity="success" sx={{ mb: 2 }}>
-              <AlertTitle>Success</AlertTitle>
-              Your vote has been recorded successfully!
-            </Alert>
-          </Fade>
-        )}
-        
-        {/* Submit button */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="large"
-          disabled={loading || selectedOptions.length === 0 || !connected}
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <HowToVoteIcon />}
-          fullWidth
+        <RadioGroup
+          row
+          value={voteMethod}
+          onChange={handleVoteMethodChange}
         >
-          {loading ? 'Submitting...' : 'Cast Vote'}
-        </Button>
-      </form>
+          <FormControlLabel 
+            value="public" 
+            control={<StyledRadio />} 
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <PublicIcon fontSize="small" sx={{ mr: 0.5 }} />
+                Public (Signature)
+              </Box>
+            }
+          />
+          <FormControlLabel 
+            value="private" 
+            control={<StyledRadio />} 
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <LockIcon fontSize="small" sx={{ mr: 0.5 }} />
+                Private (MPC)
+              </Box>
+            }
+          />
+        </RadioGroup>
+      </Box>
+      
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+      
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleVote}
+        disabled={isSubmitting || selectedOptions.length === 0}
+        startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+        fullWidth
+      >
+        {isSubmitting ? 'Submitting...' : 'Cast Vote'}
+      </Button>
     </Paper>
   );
 };

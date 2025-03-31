@@ -4,9 +4,74 @@
 import { POLL_STATUS } from '../../utils/constants';
 import { getPoll } from './retrieval';
 import { updateCreatedPoll } from './storage';
-import { addVote as apiAddVote } from '../apiService';
-import Poll from '../../db/models/Poll';
-import Vote from '../../db/models/Vote';
+
+// API base URL
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+
+/**
+ * Submit vote via API
+ */
+const apiAddVote = async (voteData) => {
+  try {
+    // Make sure options is always an array of strings
+    if (voteData.options && !Array.isArray(voteData.options)) {
+      voteData.options = [String(voteData.options)];
+    } else if (voteData.options) {
+      voteData.options = voteData.options.map(opt => String(opt));
+    }
+    
+    console.log('Submitting vote to API:', voteData);
+    
+    // Add timestamp if not provided
+    if (!voteData.timestamp) {
+      voteData.timestamp = new Date().toISOString();
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/votes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(voteData),
+      mode: 'cors',
+      credentials: 'same-origin'
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        throw new Error(errorData.error || 'Failed to submit vote');
+      } catch (e) {
+        throw new Error('Failed to submit vote: ' + errorText);
+      }
+    }
+    
+    // Get the updated poll after voting
+    const savedVote = await response.json();
+    
+    // Fetch the updated poll
+    const pollResponse = await fetch(`${API_BASE_URL}/polls/${voteData.pollId}`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      mode: 'cors',
+      credentials: 'same-origin'
+    });
+    
+    if (!pollResponse.ok) {
+      throw new Error('Failed to get updated poll');
+    }
+    
+    const updatedPoll = await pollResponse.json();
+    return updatedPoll;
+  } catch (error) {
+    console.error('Error submitting vote to API:', error);
+    throw error;
+  }
+};
 
 /**
  * Vote on a poll with a signature (public voting)
@@ -16,61 +81,31 @@ import Vote from '../../db/models/Vote';
  * @returns {Promise<Object>} Promise resolving to updated poll object
  */
 export const voteWithSignature = async (pollId, optionId, signature) => {
-  console.log(`Voting on poll ${pollId} with option ${JSON.stringify(optionId)} and signature ${signature}`);
-  
   try {
-    // Get the poll from MongoDB
-    const dbPoll = await Poll.findById(pollId);
+    console.log('Voting with signature for poll:', pollId);
+    console.log('Option ID:', optionId);
     
-    if (!dbPoll) {
-      console.error(`Poll ${pollId} not found in database, falling back to local storage`);
-      // Fallback to local storage
-      return await voteWithSignatureLocal(pollId, optionId, signature);
+    // Get poll from API
+    const pollResponse = await fetch(`${API_BASE_URL}/polls/${pollId}`);
+    if (!pollResponse.ok) {
+      console.error('Poll not found:', pollId);
+      throw new Error('Poll not found');
     }
     
-    if (dbPoll.status !== POLL_STATUS.ACTIVE) {
-      throw new Error('Poll is not active');
-    }
+    const dbPoll = await pollResponse.json();
     
-    // For multiple choice polls
+    // Handle both single option and multiple options
     const optionIds = Array.isArray(optionId) ? optionId : [optionId];
-    
-    // Check if we have too many selections
-    if (optionIds.length > dbPoll.maxSelections) {
-      throw new Error(`Maximum ${dbPoll.maxSelections} selections allowed`);
-    }
     
     // Extract voter address from signature (in a real app, this would verify the signature)
     const voterAddress = signature.split(':')[0] || 'anonymous';
     
     // Process option objects to extract text values for the API
-    // ENHANCED: More robust option processing to handle all possible formats
     const processedOptions = optionIds.map(option => {
       // If option is an object with text property, use that
-      if (option && typeof option === 'object') {
-        if (option.text) {
-          return option.text;
-        } else if (option.value) {
-          return option.value;
-        } else if (option.label) {
-          return option.label;
-        }
+      if (option && typeof option === 'object' && option.text) {
+        return option.text;
       }
-      
-      // If option is already a string, use it directly
-      if (typeof option === 'string') {
-        return option;
-      }
-      
-      // If option is a number, try to get the corresponding option text from the poll
-      if (typeof option === 'number' || !isNaN(parseInt(option, 10))) {
-        const index = parseInt(option, 10);
-        if (dbPoll.options && dbPoll.options[index] && dbPoll.options[index].text) {
-          return dbPoll.options[index].text;
-        }
-      }
-      
-      // Last resort: stringify the option
       return String(option);
     });
     
@@ -82,65 +117,18 @@ export const voteWithSignature = async (pollId, optionId, signature) => {
       voter: voterAddress,
       options: processedOptions,
       voteMethod: 'signature',
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     };
     
     // Submit vote via API
     const result = await apiAddVote(voteData);
     console.log('Vote recorded successfully:', result);
     
-    // Get updated poll after voting
-    const updatedDbPoll = await Poll.findById(pollId);
-    
-    // Also update local storage for compatibility
-    try {
-      const localPoll = await getPoll(pollId);
-      if (localPoll) {
-        // Update the poll in local storage
-        const updatedLocalPoll = { ...localPoll };
-        
-        // Mark as voted
-        updatedLocalPoll.hasVoted = true;
-        
-        // Store user's vote
-        updatedLocalPoll.userVote = {
-          optionId: Array.isArray(optionId) ? null : optionId,
-          optionIds: Array.isArray(optionId) ? optionId : null,
-          voteMethod: 'signature'
-        };
-        
-        // Update vote counts to match database
-        updatedLocalPoll.options.forEach(option => {
-          const dbOption = updatedDbPoll.options.find(o => o.text === option.text);
-          if (dbOption) {
-            option.votes = dbOption.votes;
-          }
-        });
-        
-        updatedLocalPoll.totalVotes = updatedDbPoll.totalVotes;
-        
-        // Update local storage
-        updateCreatedPoll(updatedLocalPoll);
-      }
-    } catch (localError) {
-      console.error('Error updating local storage:', localError);
-    }
-    
-    // Convert MongoDB document to expected format
-    return {
-      ...updatedDbPoll.toObject(),
-      id: updatedDbPoll._id.toString(),
-      hasVoted: true,
-      userVote: {
-        optionId: Array.isArray(optionId) ? null : optionId,
-        optionIds: Array.isArray(optionId) ? optionId : null,
-        voteMethod: 'signature'
-      }
-    };
+    // Return the updated poll
+    return result;
   } catch (error) {
     console.error('Error voting with signature:', error);
-    // Fallback to local storage if database fails
-    return await voteWithSignatureLocal(pollId, optionId, signature);
+    throw error;
   }
 };
 
@@ -151,61 +139,31 @@ export const voteWithSignature = async (pollId, optionId, signature) => {
  * @returns {Promise<Object>} Promise resolving to updated poll object
  */
 export const voteWithMPC = async (pollId, optionId) => {
-  console.log(`Voting on poll ${pollId} with MPC and option ${JSON.stringify(optionId)}`);
-  
   try {
-    // Get the poll from MongoDB
-    const dbPoll = await Poll.findById(pollId);
+    console.log('Voting with MPC for poll:', pollId);
+    console.log('Option ID:', optionId);
     
-    if (!dbPoll) {
-      console.error(`Poll ${pollId} not found in database, falling back to local storage`);
-      // Fallback to local storage
-      return await voteWithMPCLocal(pollId, optionId);
+    // Get poll from API
+    const pollResponse = await fetch(`${API_BASE_URL}/polls/${pollId}`);
+    if (!pollResponse.ok) {
+      console.error('Poll not found:', pollId);
+      throw new Error('Poll not found');
     }
     
-    if (dbPoll.status !== POLL_STATUS.ACTIVE) {
-      throw new Error('Poll is not active');
-    }
+    const dbPoll = await pollResponse.json();
     
-    // For multiple choice polls
+    // Handle both single option and multiple options
     const optionIds = Array.isArray(optionId) ? optionId : [optionId];
-    
-    // Check if we have too many selections
-    if (optionIds.length > dbPoll.maxSelections) {
-      throw new Error(`Maximum ${dbPoll.maxSelections} selections allowed`);
-    }
     
     // Extract voter address from signature (in a real app, this would verify the signature)
     const voterAddress = 'anonymous'; // MPC voting is always anonymous
     
     // Process option objects to extract text values for the API
-    // ENHANCED: More robust option processing to handle all possible formats
     const processedOptions = optionIds.map(option => {
       // If option is an object with text property, use that
-      if (option && typeof option === 'object') {
-        if (option.text) {
-          return option.text;
-        } else if (option.value) {
-          return option.value;
-        } else if (option.label) {
-          return option.label;
-        }
+      if (option && typeof option === 'object' && option.text) {
+        return option.text;
       }
-      
-      // If option is already a string, use it directly
-      if (typeof option === 'string') {
-        return option;
-      }
-      
-      // If option is a number, try to get the corresponding option text from the poll
-      if (typeof option === 'number' || !isNaN(parseInt(option, 10))) {
-        const index = parseInt(option, 10);
-        if (dbPoll.options && dbPoll.options[index] && dbPoll.options[index].text) {
-          return dbPoll.options[index].text;
-        }
-      }
-      
-      // Last resort: stringify the option
       return String(option);
     });
     
@@ -217,65 +175,18 @@ export const voteWithMPC = async (pollId, optionId) => {
       voter: voterAddress,
       options: processedOptions,
       voteMethod: 'mpc',
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     };
     
     // Submit vote via API
     const result = await apiAddVote(voteData);
     console.log('Vote recorded successfully:', result);
     
-    // Get updated poll after voting
-    const updatedDbPoll = await Poll.findById(pollId);
-    
-    // Also update local storage for compatibility
-    try {
-      const localPoll = await getPoll(pollId);
-      if (localPoll) {
-        // Update the poll in local storage
-        const updatedLocalPoll = { ...localPoll };
-        
-        // Mark as voted
-        updatedLocalPoll.hasVoted = true;
-        
-        // Store user's vote
-        updatedLocalPoll.userVote = {
-          optionId: Array.isArray(optionId) ? null : optionId,
-          optionIds: Array.isArray(optionId) ? optionId : null,
-          voteMethod: 'mpc'
-        };
-        
-        // Update vote counts to match database
-        updatedLocalPoll.options.forEach(option => {
-          const dbOption = updatedDbPoll.options.find(o => o.text === option.text);
-          if (dbOption) {
-            option.votes = dbOption.votes;
-          }
-        });
-        
-        updatedLocalPoll.totalVotes = updatedDbPoll.totalVotes;
-        
-        // Update local storage
-        updateCreatedPoll(updatedLocalPoll);
-      }
-    } catch (localError) {
-      console.error('Error updating local storage:', localError);
-    }
-    
-    // Convert MongoDB document to expected format
-    return {
-      ...updatedDbPoll.toObject(),
-      id: updatedDbPoll._id.toString(),
-      hasVoted: true,
-      userVote: {
-        optionId: Array.isArray(optionId) ? null : optionId,
-        optionIds: Array.isArray(optionId) ? optionId : null,
-        voteMethod: 'mpc'
-      }
-    };
+    // Return the updated poll
+    return result;
   } catch (error) {
     console.error('Error voting with MPC:', error);
-    // Fallback to local storage if database fails
-    return await voteWithMPCLocal(pollId, optionId);
+    throw error;
   }
 };
 

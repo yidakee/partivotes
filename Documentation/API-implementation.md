@@ -62,6 +62,39 @@ Key features:
 - Automatic timestamps for creation and updates
 - Default values for type and creation date
 
+#### Vote Schema
+```javascript
+const voteSchema = new mongoose.Schema({
+  pollId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Poll',
+    required: true 
+  },
+  voter: { type: String, default: 'anonymous' },
+  option: { type: String }, // Single option
+  options: [{ type: String }], // Array of options
+  timestamp: { type: Date, default: Date.now },
+  type: { 
+    type: String, 
+    enum: ['Public', 'Private'],
+    default: 'Public',
+    required: true
+  },
+  network: { 
+    type: String, 
+    enum: ['mainnet', 'testnet'],
+    default: 'testnet',
+    required: true
+  }
+});
+```
+
+Important notes:
+- The `pollId` must be a MongoDB ObjectId type, not a string
+- The `type` field must be either "Public" or "Private"
+- The `network` field must be either "mainnet" or "testnet"
+- Both `type` and `network` fields are required
+
 ## API Endpoints
 
 ### GET /api/polls
@@ -128,6 +161,26 @@ Creates a new poll.
 **Response:**
 The created poll object with MongoDB ID and timestamps.
 
+### POST /api/votes
+Submits a vote for a poll.
+
+**Request Body:**
+```json
+{
+  "pollId": "67eb0f24d7eddb8ca9104b97",
+  "option": "Option 1",
+  "voter": "test-voter"
+}
+```
+
+**Processing:**
+- The poll ID is converted to an ObjectId
+- Default values are set for type and network
+- The options are formatted as an array
+
+**Response:**
+The submitted vote object with MongoDB ID and timestamps.
+
 ## Frontend Integration
 
 ### API Service
@@ -146,6 +199,10 @@ export const fetchPollById = async (id) => {
 export const createPoll = async (pollData) => {
   // Creates a new poll with the provided data
 };
+
+export const submitVote = async (voteData) => {
+  // Submits a vote for a poll with the provided data
+};
 ```
 
 ### Poll Creation Flow
@@ -154,6 +211,13 @@ export const createPoll = async (pollData) => {
 3. The wallet address is added as the creator
 4. Data is sent to the API via `createPoll` function
 5. On success, user is redirected to the new poll page
+
+### Vote Submission Flow
+1. User selects an option in `PollVote.jsx`
+2. Form data is validated and formatted
+3. The wallet address is added as the voter
+4. Data is sent to the API via `submitVote` function
+5. On success, user is redirected to the poll results page
 
 ## Error Handling
 
@@ -174,6 +238,7 @@ The API implements comprehensive error handling:
 1. The poll creation process occasionally fails with 502 Bad Gateway errors
 2. Poll options formatting needs to be consistent between frontend and backend
 3. The creator field must be properly set from the authenticated wallet
+4. MongoDB ObjectId handling: When using poll IDs, they must be in a valid MongoDB ObjectId format (24 hex characters). The creator wallet address (which is longer than 24 characters) cannot be used directly as a poll ID. The API has been updated to handle both ObjectId and string-based lookups.
 
 ## Troubleshooting
 
@@ -181,6 +246,8 @@ Common issues and solutions:
 - If the API server is not responding, check `api-server.log` for errors
 - If poll creation fails, verify the format of options and creator fields
 - If MongoDB connection fails, check environment variables and database status
+- If vote submission fails with "Document failed validation", ensure the vote data matches the expected schema format
+- If you get "Cast to ObjectId failed" errors, make sure you're using a valid MongoDB ObjectId as the poll ID (not the creator wallet address)
 
 ## Future Improvements
 
