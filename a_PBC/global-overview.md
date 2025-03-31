@@ -91,7 +91,7 @@ This approach:
 3. Is consistent with how other blockchain wallet integrations work in browser environments
 4. Does not require additional npm packages
 
-For reference, you can examine working implementations in the [Partisia Blockchain Browser](https://browser.partisiablockchain.com/) to see this pattern in action.
+For reference, you can examine working implementations in the [Partisia Blockchain Browser](https://browser.partisiablockchain.com/accounts) to see this pattern in action.
 
 > **Note to PartiVotes developers**: The official documentation isn't necessarily wrong, but it's incomplete and potentially misleading for browser-based applications. The documentation appears to be written primarily for Node.js environments or server-side applications, where the `partisia-sdk` npm package would work correctly. For browser-based applications (like PartiVotes), the documentation doesn't clearly distinguish between server-side and client-side integration approaches. The browser extension approach (using `window.partisiawallet`) is the standard pattern for wallet integrations in web applications, similar to how MetaMask and other blockchain wallets work.
 

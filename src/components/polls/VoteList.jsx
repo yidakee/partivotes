@@ -27,7 +27,8 @@ const mockVotes = [
     option: 'Ethereum', 
     timestamp: new Date('2025-03-25T10:30:00Z'),
     txId: 'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   },
   { 
     id: 'vote2', 
@@ -35,7 +36,8 @@ const mockVotes = [
     option: 'Solana', 
     timestamp: new Date('2025-03-26T14:20:00Z'),
     txId: 'bcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890a',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   },
   { 
     id: 'vote3', 
@@ -43,21 +45,24 @@ const mockVotes = [
     option: 'Partisia Blockchain', 
     timestamp: new Date('2025-03-27T09:15:00Z'),
     txId: 'cdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   },
   { 
     id: 'vote4', 
     option: 'Ethereum',
     verificationHash: 'def1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc', 
     timestamp: new Date('2025-03-28T11:45:00Z'),
-    type: 'Private'
+    type: 'Private',
+    network: 'mainnet'
   },
   { 
     id: 'vote5', 
     option: 'Solana',
     verificationHash: 'ef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd', 
     timestamp: new Date('2025-03-29T16:30:00Z'),
-    type: 'Private'
+    type: 'Private',
+    network: 'mainnet'
   },
   { 
     id: 'vote6', 
@@ -65,14 +70,16 @@ const mockVotes = [
     option: 'Ethereum', 
     timestamp: new Date('2025-03-21T08:15:00Z'),
     txId: 'def1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   },
   { 
     id: 'vote7', 
     option: 'Partisia Blockchain',
     verificationHash: 'f1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde', 
     timestamp: new Date('2025-03-22T13:45:00Z'),
-    type: 'Private'
+    type: 'Private',
+    network: 'mainnet'
   },
   { 
     id: 'vote8', 
@@ -80,14 +87,16 @@ const mockVotes = [
     option: 'Solana', 
     timestamp: new Date('2025-03-23T15:20:00Z'),
     txId: 'ef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   },
   { 
     id: 'vote9', 
     option: 'Ethereum',
     verificationHash: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 
     timestamp: new Date('2025-03-24T09:30:00Z'),
-    type: 'Private'
+    type: 'Private',
+    network: 'mainnet'
   },
   { 
     id: 'vote10', 
@@ -95,14 +104,16 @@ const mockVotes = [
     option: 'Partisia Blockchain', 
     timestamp: new Date('2025-03-20T11:10:00Z'),
     txId: 'f1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   },
   { 
     id: 'vote11', 
     option: 'Solana',
     verificationHash: '123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0', 
     timestamp: new Date('2025-03-19T14:25:00Z'),
-    type: 'Private'
+    type: 'Private',
+    network: 'mainnet'
   },
   { 
     id: 'vote12', 
@@ -110,14 +121,16 @@ const mockVotes = [
     option: 'Ethereum', 
     timestamp: new Date('2025-03-18T16:40:00Z'),
     txId: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   },
   { 
     id: 'vote13', 
     option: 'Partisia Blockchain',
     verificationHash: '23456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01', 
     timestamp: new Date('2025-03-17T10:15:00Z'),
-    type: 'Private'
+    type: 'Private',
+    network: 'mainnet'
   },
   { 
     id: 'vote14', 
@@ -125,19 +138,15 @@ const mockVotes = [
     option: 'Solana', 
     timestamp: new Date('2025-03-16T12:30:00Z'),
     txId: '123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0',
-    type: 'Public'
+    type: 'Public',
+    network: 'mainnet'
   }
 ];
 
 // Helper function to truncate wallet addresses and transaction IDs
-const truncateAddress = (address) => {
+const shortenAddress = (address) => {
   if (!address) return '';
   return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-};
-
-const truncateTxId = (txId) => {
-  if (!txId) return '';
-  return `${txId.substring(0, 8)}...${txId.substring(txId.length - 8)}`;
 };
 
 // Helper function to format dates
@@ -185,14 +194,14 @@ const VoteList = ({ poll }) => {
                   <TableCell>
                     {vote.type === 'Public' ? (
                       <Link 
-                        href={`https://browser.partisiablockchain.com/account/${vote.voter}`}
+                        href={`https://browser.${vote.network === 'testnet' ? 'testnet.' : ''}partisiablockchain.com/accounts/${vote.voter}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {truncateAddress(vote.voter)}
+                        {shortenAddress(vote.voter)}
                       </Link>
                     ) : (
-                      'Hidden (MPC)'
+                      'Private Vote'
                     )}
                   </TableCell>
                   <TableCell>{vote.option}</TableCell>
@@ -200,19 +209,19 @@ const VoteList = ({ poll }) => {
                   <TableCell>
                     {vote.type === 'Public' ? (
                       <Link 
-                        href={`https://browser.partisiablockchain.com/transaction/${vote.txId}`}
+                        href={`https://browser.${vote.network === 'testnet' ? 'testnet.' : ''}partisiablockchain.com/transactions/${vote.txId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {truncateTxId(vote.txId)}
+                        {shortenAddress(vote.txId)}
                       </Link>
                     ) : (
                       <Link 
-                        href={`https://browser.partisiablockchain.com/transaction/${vote.verificationHash}`}
+                        href={`https://browser.${vote.network === 'testnet' ? 'testnet.' : ''}partisiablockchain.com/transactions/${vote.verificationHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {truncateTxId(vote.verificationHash)}
+                        {shortenAddress(vote.verificationHash)}
                       </Link>
                     )}
                   </TableCell>

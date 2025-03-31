@@ -38,8 +38,10 @@ const WalletStatus = ({ address, balance, isTestnet }) => {
 
   // Open address in explorer
   const openInExplorer = () => {
-    // Partisia Blockchain explorer URL - works for both mainnet and testnet
-    const explorerUrl = `https://browser.partisiablockchain.com/account/${address}`;
+    // Generate explorer URL based on network
+    const explorerUrl = isTestnet 
+      ? `https://browser.testnet.partisiablockchain.com/accounts/${address}`
+      : `https://browser.partisiablockchain.com/accounts/${address}`;
     window.open(explorerUrl, '_blank');
   };
 
