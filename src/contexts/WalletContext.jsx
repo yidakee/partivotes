@@ -42,14 +42,14 @@ export const WalletProvider = ({ children }) => {
   const updateWalletInfo = async () => {
     try {
       // Get wallet address
-      const walletAddress = await getWalletAddress();
-      if (walletAddress) {
-        setAddress(walletAddress);
+      const addressResult = await getWalletAddress();
+      if (addressResult && addressResult.success && addressResult.address) {
+        setAddress(addressResult.address);
         
         // Get wallet balance
-        const walletBalance = await getWalletBalance();
-        if (walletBalance) {
-          setBalance(walletBalance);
+        const balanceResult = await getWalletBalance();
+        if (balanceResult && balanceResult.success) {
+          setBalance(balanceResult.balance || { balance: 0, token: 'MPC' });
         }
       }
     } catch (err) {
@@ -65,14 +65,14 @@ export const WalletProvider = ({ children }) => {
     
     try {
       console.log('WalletContext: Connecting wallet...');
-      const success = await connectWallet();
+      const result = await connectWallet();
       
-      if (success) {
+      if (result && result.success) {
         setConnected(true);
         await updateWalletInfo();
         console.log('WalletContext: Wallet connected successfully');
       } else {
-        setError('Failed to connect wallet');
+        setError(result?.error || 'Failed to connect wallet');
       }
     } catch (err) {
       console.error('WalletContext: Error connecting wallet:', err);

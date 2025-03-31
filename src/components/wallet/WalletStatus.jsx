@@ -19,7 +19,14 @@ const WalletStatus = ({ address, balance }) => {
   // Partisia addresses are 42 characters (21 bytes) in hex format without 0x prefix
   const formatAddress = (addr) => {
     if (!addr) return '';
-    return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
+    
+    // Ensure addr is a string
+    const addrStr = String(addr);
+    
+    // Check if the address is valid before formatting
+    if (addrStr.length < 10) return addrStr;
+    
+    return `${addrStr.substring(0, 6)}...${addrStr.substring(addrStr.length - 4)}`;
   };
 
   // Copy address to clipboard
