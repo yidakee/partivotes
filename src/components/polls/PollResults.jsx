@@ -48,13 +48,16 @@ const PollResults = ({ poll }) => {
           optionsLength: poll.options.length
         });
         
+        // Ensure all options have votes property (default to 0)
+        const processedOptions = poll.options.map(option => ({
+          ...option,
+          id: option._id || option.id || `option-${Math.random().toString(36).substr(2, 9)}`,
+          votes: typeof option.votes === 'number' ? option.votes : 0,
+          text: option.text || 'Unnamed Option'
+        }));
+        
         // Sort options by votes (descending)
-        const sorted = [...poll.options].sort((a, b) => {
-          // Ensure we have numerical votes values to compare
-          const votesA = typeof a.votes === 'number' ? a.votes : 0;
-          const votesB = typeof b.votes === 'number' ? b.votes : 0;
-          return votesB - votesA;
-        });
+        const sorted = [...processedOptions].sort((a, b) => b.votes - a.votes);
         setSortedOptions(sorted);
         
         // Set the leading option
@@ -68,8 +71,8 @@ const PollResults = ({ poll }) => {
         
         // Prepare data for pie chart
         const chartData = sorted.map(option => ({
-          name: option.text || 'Unnamed Option',
-          value: typeof option.votes === 'number' ? option.votes : 0
+          name: option.text,
+          value: option.votes
         }));
         console.log('=== PollResults CHART DATA ===', chartData);
         setPieChartData(chartData);
@@ -176,10 +179,14 @@ const PollResults = ({ poll }) => {
                 Total Votes: {poll.totalVotes || 0}
               </Typography>
               
-              {leadingOption && poll.totalVotes > 0 && (
+              {leadingOption && poll.totalVotes > 0 ? (
                 <Typography variant="body2" color="textSecondary">
                   Leading Option: {leadingOption.text} 
                   ({Math.round((leadingOption.votes / poll.totalVotes) * 100)}%)
+                </Typography>
+              ) : (
+                <Typography variant="body2" color="textSecondary">
+                  No votes have been cast yet. Be the first to vote!
                 </Typography>
               )}
             </Box>
@@ -190,36 +197,30 @@ const PollResults = ({ poll }) => {
               {sortedOptions.map((option, index) => {
                 const percentage = poll.totalVotes ? (option.votes / poll.totalVotes) * 100 : 0;
                 return (
-                  <ListItem key={option.id} disablePadding sx={{ mb: 2 }}>
+                  <ListItem key={option.id || index} disablePadding sx={{ mb: 2 }}>
                     <ListItemText
                       primary={
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                           <Typography variant="body1">{option.text}</Typography>
-                          <Box display="flex" alignItems="center">
-                            <Typography variant="body2" color="textSecondary" sx={{ mr: 1 }}>
-                              {option.votes} votes ({percentage.toFixed(1)}%)
-                            </Typography>
-                            {index === 0 && poll.totalVotes > 0 && (
-                              <Chip size="small" color="primary" label="Leading" />
-                            )}
-                          </Box>
+                          <Typography variant="body2" color="textSecondary">
+                            {option.votes || 0} votes ({percentage.toFixed(0)}%)
+                          </Typography>
                         </Box>
                       }
                       secondary={
-                        <Box sx={{ mt: 1 }}>
-                          <LinearProgress 
-                            variant="determinate" 
-                            value={percentage} 
-                            sx={{ 
-                              height: 8, 
-                              borderRadius: 4,
-                              backgroundColor: '#e0e0e0',
-                              '& .MuiLinearProgress-bar': {
-                                backgroundColor: COLORS[index % COLORS.length],
-                              }
-                            }} 
-                          />
-                        </Box>
+                        <LinearProgress 
+                          variant="determinate" 
+                          value={percentage} 
+                          sx={{ 
+                            mt: 1, 
+                            height: 8, 
+                            borderRadius: 4,
+                            backgroundColor: 'rgba(0,0,0,0.1)',
+                            '& .MuiLinearProgress-bar': {
+                              backgroundColor: COLORS[index % COLORS.length]
+                            }
+                          }} 
+                        />
                       }
                     />
                   </ListItem>

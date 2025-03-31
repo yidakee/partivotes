@@ -12,7 +12,8 @@ import {
   AlertTitle,
   Skeleton,
   Grid,
-  LinearProgress
+  LinearProgress,
+  useTheme
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { formatDate } from '../../utils/dateUtils';
@@ -36,6 +37,7 @@ const PollDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { connected, address } = useContext(WalletContext);
+  const theme = useTheme();
   
   // Check if the URL has a view=vote query parameter
   const searchParams = new URLSearchParams(location.search);
@@ -287,7 +289,22 @@ const PollDetail = () => {
             </Typography>
             
             <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-              Created by: {poll.creator.substring(0, 6)}...{poll.creator.substring(poll.creator.length - 4)}
+              Created by: 
+              <Box 
+                component="a" 
+                href={`https://browser.partisiablockchain.com/accounts/${poll.creator}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  color: 'primary.main',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
+                {poll.creator}
+              </Box>
             </Typography>
           </Box>
           

@@ -1,0 +1,55 @@
+{
+  "polls": [
+    {
+      "_id": "67eab6cc30db5b41b4dda45f",
+      "title": "Test Poll",
+      "description": "Testing API",
+      "status": "ACTIVE",
+      "creator": "anonymous",
+      "options": [
+        {
+          "text": "Option 1"
+        },
+        {
+          "text": "Option 2"
+        }
+      ],
+      "type": "SINGLE_CHOICE",
+      "createdAt": "2025-03-31T15:37:48.591000",
+      "startDate": "2025-04-01T00:00:00",
+      "endDate": "2025-04-10T00:00:00",
+      "maxSelections": 1,
+      "votes": 0,
+      "totalVotes": 0,
+      "updatedAt": "2025-03-31T15:37:48.591000",
+      "network": "testnet",
+      "startTime": "2025-03-31T15:37:48.601000",
+      "endTime": "2025-04-07T15:37:48.602000",
+      "__v": 0
+    },
+    {
+      "_id": "67eab83730db5b41b4dda469",
+      "title": "test 16:43",
+      "description": "test 16:43",
+      "status": "ACTIVE",
+      "creator": "anonymous",
+      "options": [
+        "yy",
+        "nn"
+      ],
+      "type": "SINGLE_CHOICE",
+      "createdAt": "2025-03-31T15:43:51.886000",
+      "startDate": "2025-04-01T15:43:23.125000",
+      "endDate": "2025-04-07T15:43:23.125000",
+      "maxSelections": 1,
+      "votes": 0,
+      "totalVotes": 0,
+      "updatedAt": "2025-03-31T15:43:51.886000",
+      "network": "testnet",
+      "startTime": "2025-03-31T15:43:51.887000",
+      "endTime": "2025-04-07T15:43:51.887000",
+      "__v": 0
+    }
+  ],
+  "votes": []
+}

@@ -54,6 +54,9 @@ const VoteForm = ({ poll, setPoll }) => {
     setVoteMethod('signature');
     setSuccess(false);
     setError(null);
+    
+    // Log poll options for debugging
+    console.log('Poll options in VoteForm:', poll.options);
   }, [poll._id]);
   
   const handleSingleChoiceChange = (event) => {
@@ -233,10 +236,10 @@ const VoteForm = ({ poll, setPoll }) => {
               value={selectedOptions[0] || ''}
               onChange={handleSingleChoiceChange}
             >
-              {poll.options.map((option) => (
+              {poll.options && poll.options.map((option) => (
                 <FormControlLabel
-                  key={option.id}
-                  value={option.id}
+                  key={option._id || option.id}
+                  value={option._id || option.id}
                   control={<Radio />}
                   label={option.text}
                 />
@@ -250,15 +253,15 @@ const VoteForm = ({ poll, setPoll }) => {
                 Select up to {maxSelections} options
               </Typography>
               
-              {poll.options.map((option) => (
+              {poll.options && poll.options.map((option) => (
                 <FormControlLabel
-                  key={option.id}
+                  key={option._id || option.id}
                   control={
                     <Checkbox 
-                      checked={selectedOptions.includes(option.id)}
+                      checked={selectedOptions.includes(option._id || option.id)}
                       onChange={handleMultipleChoiceChange}
-                      value={option.id}
-                      disabled={!selectedOptions.includes(option.id) && selectedOptions.length >= maxSelections}
+                      value={option._id || option.id}
+                      disabled={!selectedOptions.includes(option._id || option.id) && selectedOptions.length >= maxSelections}
                     />
                   }
                   label={option.text}
@@ -326,13 +329,21 @@ const VoteForm = ({ poll, setPoll }) => {
       
       <Divider sx={{ mb: 3 }} />
       
-      <Box textAlign="right">
+      <Box textAlign="center" sx={{ mt: 3 }}>
         <Button 
           type="submit" 
           variant="contained" 
           color="primary" 
+          size="large"
           disabled={selectedOptions.length === 0 || loading || !connected}
           startIcon={loading ? <CircularProgress size={20} /> : <CheckCircleOutlineIcon />}
+          sx={{ 
+            py: 1.5, 
+            px: 4, 
+            borderRadius: 2,
+            fontWeight: 'bold',
+            boxShadow: 3
+          }}
         >
           {loading ? 'Submitting...' : 'Submit Vote'}
         </Button>
