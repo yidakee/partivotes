@@ -11,17 +11,22 @@ let mockBalance = 1000; // Example balance in TEST_COIN tokens
 
 // SDK instance
 let partisiaSdk = null;
+let currentNetwork = 'mainnet'; // Default to mainnet
 
 // Initialize the wallet SDK
-export const initializeWalletSDK = async () => {
+export const initializeWalletSDK = async (isTestnet = false) => {
   if (USE_MOCK_WALLET) {
     console.log('Using mock Partisia wallet data');
     return true;
   }
   
   try {
-    // Create SDK instance if it doesn't exist
-    if (!partisiaSdk) {
+    // Update current network
+    currentNetwork = isTestnet ? 'testnet' : 'mainnet';
+    console.log(`Initializing Partisia SDK for ${currentNetwork}`);
+    
+    // Create SDK instance if it doesn't exist or if network changed
+    if (!partisiaSdk || currentNetwork !== (partisiaSdk.chainId === "Partisia Blockchain Testnet" ? 'testnet' : 'mainnet')) {
       partisiaSdk = new PartisiaSdk();
       console.log('Partisia SDK initialized');
     }
@@ -53,7 +58,7 @@ export const isWalletConnected = async () => {
 };
 
 // Connect to wallet
-export const connectWallet = async () => {
+export const connectWallet = async (isTestnet = false) => {
   if (USE_MOCK_WALLET) {
     mockConnected = true;
     return {
@@ -66,24 +71,26 @@ export const connectWallet = async () => {
   try {
     // Initialize SDK if needed
     if (!partisiaSdk) {
-      await initializeWalletSDK();
+      await initializeWalletSDK(isTestnet);
     }
     
-    console.log('Attempting to connect to Partisia Wallet...');
+    // Update current network
+    currentNetwork = isTestnet ? 'testnet' : 'mainnet';
+    console.log(`Attempting to connect to Partisia Wallet on ${currentNetwork}...`);
     
     // Connect to the wallet
     const connection = await partisiaSdk.connect({
       permissions: ["sign"],
       dappName: "PartiVotes",
       description: "Decentralized voting application on Partisia Blockchain",
-      chainId: "Partisia Blockchain", // Use "Partisia Blockchain Testnet" for testnet
+      chainId: isTestnet ? "Partisia Blockchain Testnet" : "Partisia Blockchain",
     });
     
     if (!partisiaSdk.connection?.account) {
       throw new Error('Failed to connect to wallet');
     }
     
-    console.log('Successfully connected to Partisia Wallet');
+    console.log(`Successfully connected to Partisia Wallet on ${currentNetwork}`);
     return {
       success: true,
       address: partisiaSdk.connection.account.address,
@@ -103,34 +110,22 @@ export const connectWallet = async () => {
 export const disconnectWallet = async () => {
   if (USE_MOCK_WALLET) {
     mockConnected = false;
-    return {
-      success: true,
-      error: null
-    };
+    return true;
   }
   
   try {
-    // Check if SDK is initialized
-    if (!partisiaSdk) {
-      return {
-        success: true,
-        error: null
-      }; // Nothing to disconnect
+    // Check if SDK is initialized and connected
+    if (!partisiaSdk || !partisiaSdk.connection?.account) {
+      return true; // Already disconnected
     }
     
-    // Disconnect from wallet
+    // Disconnect from the wallet
     await partisiaSdk.disconnect();
-    console.log('Disconnected from Partisia Wallet');
-    return {
-      success: true,
-      error: null
-    };
+    console.log('Successfully disconnected from Partisia Wallet');
+    return true;
   } catch (error) {
     console.error('Error disconnecting from wallet:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to disconnect from wallet'
-    };
+    return false;
   }
 };
 
@@ -174,7 +169,10 @@ export const getWalletBalance = async () => {
   if (USE_MOCK_WALLET) {
     return {
       success: mockConnected,
-      balance: mockConnected ? mockBalance : 0,
+      balance: { 
+        balance: mockConnected ? mockBalance : 0, 
+        token: currentNetwork === 'testnet' ? 'TEST_COIN' : 'MPC' 
+      },
       error: null
     };
   }
@@ -184,28 +182,29 @@ export const getWalletBalance = async () => {
     if (!partisiaSdk || !partisiaSdk.connection?.account) {
       return {
         success: false,
-        balance: 0,
+        balance: { balance: 0, token: currentNetwork === 'testnet' ? 'TEST_COIN' : 'MPC' },
         error: 'Wallet not connected'
       };
     }
     
-    // The SDK doesn't have a direct getBalance method
-    // We need to use the connection object to get the balance
-    // This is a simplified implementation that matches the format of the original
     const address = partisiaSdk.connection.account.address;
+    const isTestnet = currentNetwork === 'testnet';
     
-    // If we have a valid address, we can try to get the balance
-    // For now, returning a placeholder that matches the expected format
+    // For testnet, we'll return a placeholder balance of 1000 TEST_COIN
+    // For mainnet, we'll return 0 MPC since we don't have a real balance retrieval yet
     return {
       success: true,
-      balance: 0, // This needs to be updated with actual balance retrieval
+      balance: { 
+        balance: isTestnet ? 1000 : 0, 
+        token: isTestnet ? 'TEST_COIN' : 'MPC' 
+      },
       error: null
     };
   } catch (error) {
     console.error('Error getting wallet balance:', error);
     return {
       success: false,
-      balance: 0,
+      balance: { balance: 0, token: currentNetwork === 'testnet' ? 'TEST_COIN' : 'MPC' },
       error: error.message || 'Failed to get wallet balance'
     };
   }

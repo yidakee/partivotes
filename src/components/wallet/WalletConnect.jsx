@@ -7,6 +7,8 @@ import {
   Typography,
   Box,
   Divider,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { WalletContext } from '../../contexts/WalletContext';
@@ -14,7 +16,7 @@ import { ThemeContext } from '../../contexts/ThemeContext';
 import WalletStatus from './WalletStatus';
 
 const WalletConnect = () => {
-  const { connected, address, balance, loading, error, connect, disconnect } = useContext(WalletContext);
+  const { connected, address, balance, loading, error, connect, disconnect, isTestnet, toggleNetwork } = useContext(WalletContext);
   const { themeMode } = useContext(ThemeContext);
   const isFuturistic = themeMode === 'futuristic';
   const [anchorEl, setAnchorEl] = useState(null);
@@ -66,48 +68,81 @@ const WalletConnect = () => {
     }
   };
 
+  // Handle network toggle
+  const handleNetworkToggle = () => {
+    toggleNetwork();
+    if (connected) {
+      // Reconnect to apply network change
+      disconnect().then(() => {
+        setTimeout(() => {
+          connect();
+        }, 500);
+      });
+    }
+  };
+
   return (
     <>
-      <Button
-        variant={connected ? "outlined" : "contained"}
-        color={connected ? "secondary" : "primary"}
-        onClick={connected ? handleClick : handleConnect}
-        startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <AccountBalanceWalletIcon />}
-        disabled={loading}
-        sx={{ 
-          borderRadius: '20px',
-          px: 2,
-          py: 0,
-          height: '36px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          ...(isFuturistic && {
-            background: connected ? 'transparent' : 'linear-gradient(90deg, #4c00ff, #00a3ff)',
-            border: connected ? '1px solid #00a3ff' : 'none',
-            boxShadow: '0 0 10px rgba(0, 163, 255, 0.5)',
-            '&:hover': {
-              boxShadow: '0 0 15px rgba(0, 163, 255, 0.7)',
-              background: connected ? 'transparent' : 'linear-gradient(90deg, #5c10ff, #10b3ff)',
-            }
-          })
-        }}
-      >
-        {loading ? (
-          'Loading...'
-        ) : connected ? (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ mr: 1 }}>
-              {formatAddress(address)}
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={!isTestnet}
+              onChange={handleNetworkToggle}
+              size="small"
+              color="primary"
+            />
+          }
+          label={
+            <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+              {isTestnet ? 'Testnet' : 'Mainnet'}
             </Typography>
-            <Typography variant="body2" color={isFuturistic ? "#00ffea" : "primary.main"} fontWeight="bold">
-              {typeof balance === 'object' ? `${balance?.balance || 0} ${balance?.token || 'MPC'}` : balance || 0}
-            </Typography>
-          </Box>
-        ) : (
-          'Connect Wallet'
-        )}
-      </Button>
+          }
+          sx={{ mr: 1, '.MuiFormControlLabel-label': { fontSize: '0.7rem' } }}
+        />
+        <Button
+          variant={connected ? "outlined" : "contained"}
+          color={connected ? "secondary" : "primary"}
+          onClick={connected ? handleClick : handleConnect}
+          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <AccountBalanceWalletIcon />}
+          disabled={loading}
+          sx={{ 
+            borderRadius: '20px',
+            px: 2,
+            py: 0,
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            ...(isFuturistic && {
+              background: connected ? 'transparent' : 'linear-gradient(90deg, #4c00ff, #00a3ff)',
+              border: connected ? '1px solid #00a3ff' : 'none',
+              boxShadow: '0 0 10px rgba(0, 163, 255, 0.5)',
+              '&:hover': {
+                boxShadow: '0 0 15px rgba(0, 163, 255, 0.7)',
+                background: connected ? 'transparent' : 'linear-gradient(90deg, #5c10ff, #10b3ff)',
+              }
+            })
+          }}
+        >
+          {loading ? (
+            'Loading...'
+          ) : connected ? (
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="body2" sx={{ mr: 1 }}>
+                {formatAddress(address)}
+              </Typography>
+              <Typography variant="body2" color={isFuturistic ? "#00ffea" : "primary.main"} fontWeight="bold">
+                {typeof balance === 'object' 
+                  ? `${balance?.balance || 0} ${isTestnet ? 'TEST_COIN' : (balance?.token || 'MPC')}` 
+                  : `${balance || 0} ${isTestnet ? 'TEST_COIN' : 'MPC'}`}
+              </Typography>
+            </Box>
+          ) : (
+            'Connect Wallet'
+          )}
+        </Button>
+      </Box>
 
       <Menu
         anchorEl={anchorEl}
@@ -128,7 +163,7 @@ const WalletConnect = () => {
         }}
       >
         <Box sx={{ px: 2, py: 1, width: 300 }}>
-          <WalletStatus address={address} balance={balance} />
+          <WalletStatus address={address} balance={balance} isTestnet={isTestnet} />
         </Box>
         <Divider />
         <MenuItem onClick={handleDisconnect}>Disconnect</MenuItem>

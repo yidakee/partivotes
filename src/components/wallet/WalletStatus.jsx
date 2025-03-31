@@ -8,11 +8,12 @@ import {
   Tooltip,
   Snackbar,
   Alert,
+  Chip,
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
-const WalletStatus = ({ address, balance }) => {
+const WalletStatus = ({ address, balance, isTestnet }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   // Format address for display (first 6 and last 4 characters)
@@ -44,9 +45,17 @@ const WalletStatus = ({ address, balance }) => {
 
   return (
     <Paper elevation={0} sx={{ p: 2, mb: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Wallet Status
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="h6">
+          Wallet Status
+        </Typography>
+        <Chip 
+          label={isTestnet ? "Testnet" : "Mainnet"} 
+          color={isTestnet ? "warning" : "success"} 
+          size="small" 
+          variant="outlined"
+        />
+      </Box>
       <Divider sx={{ mb: 2 }} />
       
       <Box sx={{ mb: 2 }}>
@@ -75,13 +84,8 @@ const WalletStatus = ({ address, balance }) => {
           Balance
         </Typography>
         <Typography variant="body1">
-          {balance?.balance || 0} {balance?.token || 'MPC'}
+          {balance?.balance || 0} {isTestnet ? 'TEST_COIN' : (balance?.token || 'MPC')}
         </Typography>
-        {balance?.isMainnet && (
-          <Typography variant="caption" color="success.main">
-            Connected to Mainnet
-          </Typography>
-        )}
       </Box>
       
       <Snackbar

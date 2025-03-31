@@ -14,21 +14,25 @@ export const WalletContext = createContext();
 export const WalletProvider = ({ children }) => {
   // State variables
   const [connected, setConnected] = useState(false);
-  const [address, setAddress] = useState('');
-  const [balance, setBalance] = useState({ balance: 0, token: 'MPC' });
+  const [address, setAddress] = useState(null);
+  const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isTestnet, setIsTestnet] = useState(false); // Default to mainnet
 
   // Initialize wallet on component mount
   useEffect(() => {
     const init = async () => {
       try {
-        await initializeWalletSDK();
-        // Check if already connected
-        const connected = await isWalletConnected();
-        if (connected) {
+        // Initialize wallet SDK
+        await initializeWalletSDK(isTestnet);
+        
+        // Check if wallet is already connected
+        const walletConnected = await isWalletConnected();
+        
+        if (walletConnected) {
           setConnected(true);
-          updateWalletInfo();
+          await updateWalletInfo();
         }
       } catch (err) {
         console.error('Error initializing wallet:', err);
@@ -36,7 +40,7 @@ export const WalletProvider = ({ children }) => {
     };
     
     init();
-  }, []);
+  }, [isTestnet]); // Re-initialize when network changes
 
   // Update wallet info (address and balance)
   const updateWalletInfo = async () => {
@@ -58,6 +62,11 @@ export const WalletProvider = ({ children }) => {
     }
   };
 
+  // Toggle between testnet and mainnet
+  const toggleNetwork = () => {
+    setIsTestnet(prev => !prev);
+  };
+
   // Connect wallet
   const connect = async () => {
     setLoading(true);
@@ -65,7 +74,7 @@ export const WalletProvider = ({ children }) => {
     
     try {
       console.log('WalletContext: Connecting wallet...');
-      const result = await connectWallet();
+      const result = await connectWallet(isTestnet);
       
       if (result && result.success) {
         setConnected(true);
@@ -91,8 +100,8 @@ export const WalletProvider = ({ children }) => {
     try {
       await disconnectWallet();
       setConnected(false);
-      setAddress('');
-      setBalance({ balance: 0, token: 'MPC' });
+      setAddress(null);
+      setBalance(null);
     } catch (err) {
       console.error('Error disconnecting wallet:', err);
       setError(err.message || 'Failed to disconnect wallet');
@@ -108,8 +117,10 @@ export const WalletProvider = ({ children }) => {
     balance,
     loading,
     error,
+    isTestnet,
     connect,
-    disconnect
+    disconnect,
+    toggleNetwork
   };
 
   return (
