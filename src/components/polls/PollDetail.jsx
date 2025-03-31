@@ -257,6 +257,17 @@ const PollDetail = () => {
             
             <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
               <Chip 
+                label="Mock Poll"
+                color="secondary"
+                size="small"
+                sx={{ 
+                  backgroundColor: '#ff9800', 
+                  color: '#fff',
+                  fontWeight: 'bold'
+                }}
+              />
+              
+              <Chip 
                 label={poll.status.charAt(0).toUpperCase() + poll.status.slice(1)} 
                 color={statusColors[poll.status]} 
                 size="small" 

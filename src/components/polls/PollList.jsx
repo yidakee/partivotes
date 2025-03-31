@@ -198,11 +198,23 @@ const PollList = () => {
                       <Typography variant="h6" component="h2" gutterBottom noWrap sx={{ maxWidth: '70%' }}>
                         {poll.title}
                       </Typography>
-                      <Chip 
-                        label={poll.status.charAt(0).toUpperCase() + poll.status.slice(1)} 
-                        color={statusColors[poll.status]} 
-                        size="small" 
-                      />
+                      <Box display="flex" gap={1}>
+                        <Chip 
+                          label="Mock Poll"
+                          color="secondary"
+                          size="small"
+                          sx={{ 
+                            backgroundColor: '#ff9800', 
+                            color: '#fff',
+                            fontWeight: 'bold'
+                          }}
+                        />
+                        <Chip 
+                          label={poll.status.charAt(0).toUpperCase() + poll.status.slice(1)} 
+                          color={statusColors[poll.status]} 
+                          size="small" 
+                        />
+                      </Box>
                     </Box>
                     
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
