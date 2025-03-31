@@ -1,0 +1,65 @@
+# NGINX Configuration for PartiVotes
+# Save this file to /etc/nginx/sites-available/partivotes
+# Then create a symbolic link: sudo ln -s /etc/nginx/sites-available/partivotes /etc/nginx/sites-enabled/
+# Test the configuration: sudo nginx -t
+# Reload NGINX: sudo systemctl reload nginx
+
+server {
+    listen 80;
+    server_name partivotes.xyz www.partivotes.xyz;
+
+    # Redirect HTTP to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name partivotes.xyz www.partivotes.xyz;
+
+    # SSL configuration
+    ssl_certificate /etc/letsencrypt/live/partivotes.xyz/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/partivotes.xyz/privkey.pem;
+    
+    # SSL settings (recommended)
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    
+    # Root directory for static files
+    root /home/partivotes/partivotes;
+    index index.html;
+
+    # API requests - proxy to Node.js server
+    location /api/ {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        
+        # CORS headers if needed
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+    }
+
+    # Primary location for static files
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache static assets
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+        expires 7d;
+    }
+
+    # Error pages
+    error_page 404 /index.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+}

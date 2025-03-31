@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   AppBar,
@@ -24,15 +24,59 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // Add debugging console logs
+  useEffect(() => {
+    console.log('Header: Current pathname:', location.pathname);
+    console.log('Header: Current filter:', getCurrentFilter());
+  }, [location]);
+
   // Handle filter button click
   const handleFilterClick = (status) => {
-    navigate(`/?status=${status}`);
+    // Always use lowercase URL paths for navigation
+    // This ensures consistent navigation regardless of constant values
+    switch(status) {
+      case POLL_STATUS.ACTIVE:
+        navigate(`/polls/active`);
+        break;
+      case POLL_STATUS.PENDING:
+        navigate(`/polls/pending`);
+        break;
+      case POLL_STATUS.ENDED:
+        navigate(`/polls/finished`);
+        break;
+      default:
+        navigate(`/polls/active`);
+    }
   };
   
   // Get current filter from URL
   const getCurrentFilter = () => {
+    const path = location.pathname.toLowerCase();
+    
+    // Check for standard lowercase URL paths
+    if (path.includes('/polls/active')) return POLL_STATUS.ACTIVE;
+    if (path.includes('/polls/pending')) return POLL_STATUS.PENDING;
+    if (path.includes('/polls/finished') || path.includes('/polls/ended')) return POLL_STATUS.ENDED;
+    
+    // Also check for uppercase URL paths as seen in production
+    if (path.includes('/polls/' + POLL_STATUS.ACTIVE.toLowerCase())) return POLL_STATUS.ACTIVE;
+    if (path.includes('/polls/' + POLL_STATUS.PENDING.toLowerCase())) return POLL_STATUS.PENDING;
+    if (path.includes('/polls/' + POLL_STATUS.ENDED.toLowerCase())) return POLL_STATUS.ENDED;
+    
+    // Check URL parameters (backward compatibility)
     const params = new URLSearchParams(location.search);
-    return params.get('status') || POLL_STATUS.ACTIVE;
+    const status = params.get('status');
+    
+    if (status) {
+      // Normalize status to match our constants (case insensitive matching)
+      const normalizedStatus = status.toUpperCase();
+      if (normalizedStatus === POLL_STATUS.ACTIVE) return POLL_STATUS.ACTIVE;
+      if (normalizedStatus === POLL_STATUS.PENDING) return POLL_STATUS.PENDING;
+      if (normalizedStatus === POLL_STATUS.ENDED) return POLL_STATUS.ENDED;
+    }
+    
+    // Default to active
+    return POLL_STATUS.ACTIVE;
   };
   
   const currentFilter = getCurrentFilter();

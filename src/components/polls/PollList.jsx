@@ -7,21 +7,15 @@ import {
   Button, 
   Card, 
   CardContent, 
-  CardActions, 
   Grid, 
   Chip, 
-  Divider,
   CircularProgress,
   Tooltip,
   LinearProgress,
-  Stack
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import PersonIcon from '@mui/icons-material/Person';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EventIcon from '@mui/icons-material/Event';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { getPolls } from '../../services/pollService';
 import { formatDate } from '../../utils/dateUtils';
@@ -45,35 +39,110 @@ const pollTypeLabels = {
 const pollTypeColors = {
   [POLL_TYPE.SINGLE_CHOICE]: '#3f51b5', // Indigo blue
   [POLL_TYPE.MULTIPLE_CHOICE]: '#9c27b0', // Purple
-  [POLL_TYPE.RANKED_CHOICE]: '#00bcd4'  // Cyan (changed from pink to avoid overlap with error/ended)
+  [POLL_TYPE.RANKED_CHOICE]: '#00bcd4'  // Cyan
 };
 
-const PollList = () => {
+const PollList = ({ statusFilter }) => {
   const { connected } = useContext(WalletContext);
   const { themeMode } = useContext(ThemeContext);
   const isFuturistic = themeMode === 'futuristic';
   const [polls, setPolls] = useState([]);
-  const [filteredPolls, setFilteredPolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [noPolls, setNoPolls] = useState(false);
   const location = useLocation();
+  const { pathname, search } = location;
 
-  // Get current filter from URL
+  // Get current filter from various sources
   const getCurrentFilter = () => {
-    const params = new URLSearchParams(location.search);
-    return params.get('status') || POLL_STATUS.ACTIVE;
+    console.log('PollList: Getting current filter');
+    console.log('PollList: statusFilter prop =', statusFilter);
+    console.log('PollList: URL path =', pathname);
+    console.log('PollList: URL search params =', search);
+    
+    // Priority 1: Direct prop from route (new approach)
+    if (statusFilter) {
+      console.log(`PollList: Using status filter from route prop: ${statusFilter}`);
+      return statusFilter;
+    }
+    
+    // Priority 2: URL path segments (case insensitive)
+    const path = pathname.toLowerCase();
+    if (path.includes('/polls/active')) {
+      console.log('PollList: Detected ACTIVE status from URL path');
+      return POLL_STATUS.ACTIVE;
+    }
+    if (path.includes('/polls/pending')) {
+      console.log('PollList: Detected PENDING status from URL path');
+      return POLL_STATUS.PENDING;
+    }
+    if (path.includes('/polls/finished') || path.includes('/polls/ended')) {
+      console.log('PollList: Detected ENDED status from URL path');
+      return POLL_STATUS.ENDED;
+    }
+    
+    // Priority 3: URL parameters (backward compatibility)
+    const params = new URLSearchParams(search);
+    const status = params.get('status');
+    if (status) {
+      // Normalize status to match our constants
+      const normalizedStatus = status.toUpperCase();
+      console.log(`PollList: Using status from URL parameter: ${status} (normalized to ${normalizedStatus})`);
+      
+      // Match to known status values
+      if (normalizedStatus === POLL_STATUS.ACTIVE) return POLL_STATUS.ACTIVE;
+      if (normalizedStatus === POLL_STATUS.PENDING) return POLL_STATUS.PENDING;
+      if (normalizedStatus === POLL_STATUS.ENDED) return POLL_STATUS.ENDED;
+      
+      // If no match, return the original status (will be converted to uppercase by retrieval.js)
+      return normalizedStatus;
+    }
+    
+    // Default fallback
+    console.log('PollList: No status found, defaulting to ACTIVE');
+    return POLL_STATUS.ACTIVE;
   };
 
   useEffect(() => {
     const fetchPolls = async () => {
       try {
         setLoading(true);
-        const data = await getPolls();
-        console.log("Fetched polls:", data); // Debug log
-        setPolls(data);
         setError(null);
+        
+        // Get the current filter from URL or props
+        const currentFilter = getCurrentFilter();
+        
+        console.log(`PollList: Fetching polls with status: ${currentFilter}`);
+        
+        // Add extra debug info
+        const isBrowser = typeof window !== 'undefined';
+        const isProduction = isBrowser && (
+          window.location.hostname === 'partivotes.xyz' || 
+          window.location.hostname === 'www.partivotes.xyz'
+        );
+        console.log('PollList: Environment info:', { 
+          isBrowser, 
+          isProduction,
+          hostname: window.location.hostname
+        });
+        
+        // Force polls to show even if no polls are returned
+        setNoPolls(false); // Reset this flag first
+        
+        // Fetch polls with the current filter
+        const data = await getPolls({ status: currentFilter });
+        console.log(`PollList: Fetched ${data.length} polls for status "${currentFilter}":`, data);
+        
+        if (data.length === 0) {
+          console.log('PollList: No polls found, showing empty state');
+          setNoPolls(true);
+        } else {
+          console.log('PollList: Setting polls data:', data);
+        }
+        
+        setPolls(data);
       } catch (err) {
-        console.error('Error fetching polls:', err);
+        console.error('PollList: Error fetching polls:', err);
         setError('Failed to load polls. Please try again later.');
       } finally {
         setLoading(false);
@@ -81,14 +150,7 @@ const PollList = () => {
     };
 
     fetchPolls();
-  }, []);
-
-  // Filter polls based on the status in the URL
-  useEffect(() => {
-    const currentFilter = getCurrentFilter();
-    const filtered = polls.filter(poll => poll.status === currentFilter);
-    setFilteredPolls(filtered);
-  }, [polls, location.search]);
+  }, [location, statusFilter]); // Re-fetch when URL or statusFilter prop changes
 
   if (loading) {
     return (
@@ -132,14 +194,14 @@ const PollList = () => {
               disabled={!connected}
               sx={{
                 ...(isFuturistic && {
-                  background: 'linear-gradient(45deg, #ff00cc, #ff0055)', // Neon magenta gradient
-                  color: '#ffffff !important', // Pure white with !important
+                  background: 'linear-gradient(45deg, #ff00cc, #ff0055)',
+                  color: '#ffffff !important',
                   fontWeight: 'bold',
                   border: '1px solid rgba(255, 255, 255, 0.3)',
-                  boxShadow: '0 0 15px rgba(255, 0, 204, 0.5)', // Magenta glow
+                  boxShadow: '0 0 15px rgba(255, 0, 204, 0.5)',
                   textShadow: '0 0 2px rgba(255, 255, 255, 0.5)',
                   '& .MuiSvgIcon-root': {
-                    color: '#ffffff !important', // Force white icon
+                    color: '#ffffff !important',
                   },
                   '&:hover': {
                     background: 'linear-gradient(45deg, #ff33cc, #ff3377)',
@@ -159,7 +221,7 @@ const PollList = () => {
         </Tooltip>
       </Box>
 
-      {filteredPolls.length === 0 ? (
+      {noPolls ? (
         <Box textAlign="center" py={4}>
           <Typography variant="h6" color="textSecondary" gutterBottom>
             No {currentFilter.toLowerCase()} polls available
@@ -172,7 +234,7 @@ const PollList = () => {
         </Box>
       ) : (
         <Grid container spacing={3}>
-          {filteredPolls.map((poll) => {
+          {polls.map((poll) => {
             // Get top 3 options by votes for mini chart
             const topOptions = [...poll.options]
               .sort((a, b) => b.votes - a.votes)
@@ -199,16 +261,6 @@ const PollList = () => {
                         {poll.title}
                       </Typography>
                       <Box display="flex" gap={1}>
-                        <Chip 
-                          label="Mock Poll"
-                          color="secondary"
-                          size="small"
-                          sx={{ 
-                            backgroundColor: '#ff9800', 
-                            color: '#fff',
-                            fontWeight: 'bold'
-                          }}
-                        />
                         <Chip 
                           label={poll.status.charAt(0).toUpperCase() + poll.status.slice(1)} 
                           color={statusColors[poll.status]} 

@@ -184,7 +184,8 @@ export const WalletProvider = ({ children }) => {
     isTestnet,
     connect,
     disconnect,
-    toggleNetwork
+    toggleNetwork,
+    refreshBalance: updateWalletInfo
   };
 
   return (

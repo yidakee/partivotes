@@ -37,6 +37,21 @@ const WalletConnect = () => {
     return `${addrStr.substring(0, 6)}...${addrStr.substring(addrStr.length - 4)}`;
   };
 
+  // Format balance for display
+  const formatBalance = () => {
+    if (!balance) return '0 MPC';
+    
+    // Handle balance as object with balance and token properties
+    if (typeof balance === 'object' && balance !== null) {
+      const balanceValue = balance.balance || 0;
+      const tokenSymbol = isTestnet ? 'TEST_COIN' : (balance.token || 'MPC');
+      return `${balanceValue} ${tokenSymbol}`;
+    }
+    
+    // Handle balance as number or string
+    return `${balance} ${isTestnet ? 'TEST_COIN' : 'MPC'}`;
+  };
+
   // Handle opening the menu
   const handleClick = (event) => {
     if (connected) {
@@ -142,9 +157,7 @@ const WalletConnect = () => {
                 {formatAddress(address)}
               </Typography>
               <Typography variant="body2" color={isFuturistic ? "#00ffea" : "primary.main"} fontWeight="bold">
-                {typeof balance === 'object' 
-                  ? `${balance?.balance || 0} ${isTestnet ? 'TEST_COIN' : (balance?.token || 'MPC')}` 
-                  : `${balance || 0} ${isTestnet ? 'TEST_COIN' : 'MPC'}`}
+                {formatBalance()}
               </Typography>
             </Box>
           ) : (

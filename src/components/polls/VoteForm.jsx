@@ -173,6 +173,22 @@ const VoteForm = ({ poll, setPoll }) => {
     navigate(`/poll/${poll.id}`);
   };
   
+  // Format balance for display
+  const formatBalance = () => {
+    if (!balance) return 0;
+    
+    // Handle balance as object with balance and token properties
+    if (typeof balance === 'object' && balance !== null) {
+      return balance.balance || 0;
+    }
+    
+    // Handle balance as number or string
+    return balance;
+  };
+
+  // Get formatted balance value for comparisons
+  const balanceValue = formatBalance();
+  
   if (success) {
     return (
       <Fade in={success}>
@@ -288,7 +304,7 @@ const VoteForm = ({ poll, setPoll }) => {
                 />
               </Box>
             }
-            disabled={balance < (poll.mpcCost || 5)}
+            disabled={balanceValue < (poll.mpcCost || 5)}
           />
         </RadioGroup>
         

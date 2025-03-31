@@ -8,6 +8,8 @@ module.exports = function override(config) {
     "buffer": require.resolve("buffer/"),
     "stream": require.resolve("stream-browserify"),
     "process": require.resolve("process/browser"),
+    "path": require.resolve("path-browserify"),
+    "os": require.resolve("os-browserify/browser"),
   };
   
   // Add plugins to provide global variables

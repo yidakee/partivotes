@@ -9,6 +9,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import theme from './styles/theme';
 
+// Import database service
+import { initDatabase } from './services/dbService';
+
 // Import theme styles including our fixes - ORDER MATTERS
 import './styles/standard-theme.css'; // Light theme first
 import './styles/futuristic-theme.css'; // Dark theme second
@@ -74,6 +77,48 @@ if (currentTheme === 'futuristic') {
   setTimeout(() => {
     if (window.toggleStarfield) window.toggleStarfield(true);
   }, 100);
+}
+
+// Initialize MongoDB database connection
+initDatabase()
+  .then(() => {
+    console.log('MongoDB connected successfully');
+  })
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    // Continue rendering the app even if database connection fails
+    console.warn('Application will continue without database connection');
+  });
+
+// Load debug script in production for troubleshooting
+if (typeof window !== 'undefined' && 
+    (window.location.hostname === 'partivotes.xyz' || window.location.hostname === 'www.partivotes.xyz')) {
+  console.log('Loading debug script for production troubleshooting');
+  
+  // Create and append debug script
+  const debugScript = document.createElement('script');
+  debugScript.src = '/debug-api.js';
+  debugScript.async = true;
+  debugScript.onload = () => console.log('Debug script loaded successfully');
+  debugScript.onerror = (err) => console.error('Error loading debug script:', err);
+  document.head.appendChild(debugScript);
+  
+  // Add visual indicator for mock data mode
+  window.addEventListener('load', () => {
+    const debugBanner = document.createElement('div');
+    debugBanner.style.position = 'fixed';
+    debugBanner.style.bottom = '10px';
+    debugBanner.style.right = '10px';
+    debugBanner.style.backgroundColor = 'rgba(255, 200, 0, 0.8)';
+    debugBanner.style.color = 'black';
+    debugBanner.style.padding = '5px 10px';
+    debugBanner.style.borderRadius = '5px';
+    debugBanner.style.fontSize = '12px';
+    debugBanner.style.fontWeight = 'bold';
+    debugBanner.style.zIndex = '9999';
+    debugBanner.innerText = 'DEMO MODE - Using Mock Data';
+    document.body.appendChild(debugBanner);
+  });
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

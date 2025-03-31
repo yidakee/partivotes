@@ -70,12 +70,30 @@ const PollCreate = () => {
     setMpcCost(cost);
   }, [pollData.options]);
 
-  // Refresh wallet balance when component mounts
+  // Refresh wallet balance only when component mounts
   useEffect(() => {
     if (connected) {
+      // Call refresh balance once when component mounts
       refreshBalance();
     }
-  }, [connected, refreshBalance]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected]); // Remove refreshBalance from dependencies to prevent infinite loops
+
+  // Format balance for display
+  const formatBalance = () => {
+    if (!balance) return 0;
+    
+    // Handle balance as object with balance and token properties
+    if (typeof balance === 'object' && balance !== null) {
+      return balance.balance || 0;
+    }
+    
+    // Handle balance as number or string
+    return balance;
+  };
+
+  // Get formatted balance value for comparisons and display
+  const balanceValue = formatBalance();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -257,7 +275,7 @@ const PollCreate = () => {
       return;
     }
     
-    if (balance < mpcCost) {
+    if (balanceValue < mpcCost) {
       setError(`Insufficient balance. You need at least ${mpcCost} tokens to create this poll.`);
       playErrorSound();
       return;
@@ -300,10 +318,10 @@ const PollCreate = () => {
         createdAt: new Date().toISOString()
       }));
       
-      // Refresh wallet balance after poll creation
-      if (connected) {
-        refreshBalance();
-      }
+      // Navigate to the poll detail page after a short delay
+      setTimeout(() => {
+        navigate(`/poll/${result.id}`);
+      }, 2000);
     } catch (err) {
       console.error('Error creating poll:', err);
       setError('Failed to create poll. Please try again.');
@@ -332,7 +350,7 @@ const PollCreate = () => {
         </Alert>
       )}
       
-      {connected && balance < mpcCost && (
+      {connected && balanceValue < mpcCost && (
         <Alert severity="warning" sx={{ mb: 3 }}>
           Insufficient balance. You need at least {mpcCost} tokens to create this poll.
         </Alert>
@@ -382,9 +400,9 @@ const PollCreate = () => {
           {connected && (
             <Box display="flex" flexDirection="column" alignItems="flex-end">
               <Typography variant="body2" color="textSecondary">
-                Wallet Balance: {balance} tokens
+                Wallet Balance: {balanceValue} tokens
               </Typography>
-              <Typography variant="body2" color={balance < mpcCost ? "error" : "textSecondary"}>
+              <Typography variant="body2" color={balanceValue < mpcCost ? "error" : "textSecondary"}>
                 Required: {mpcCost} tokens
               </Typography>
             </Box>
@@ -645,7 +663,7 @@ const PollCreate = () => {
                   type="submit"
                   variant="contained"
                   color={isFuturistic ? "inherit" : "primary"}
-                  disabled={loading || !connected || balance < mpcCost}
+                  disabled={loading || !connected || balanceValue < mpcCost}
                   sx={{
                     ...(isFuturistic && {
                       background: 'linear-gradient(45deg, #ff00cc, #ff0055)', // Neon magenta gradient

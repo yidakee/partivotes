@@ -10,10 +10,10 @@ export const COPYRIGHT_YEAR = new Date().getFullYear();
 
 // Poll statuses
 export const POLL_STATUS = {
-  ACTIVE: 'active',
-  ENDED: 'ended',
-  PENDING: 'pending',
-  CANCELLED: 'cancelled',
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED',
+  PENDING: 'PENDING',
+  CANCELLED: 'CANCELLED',
 };
 
 // Poll types

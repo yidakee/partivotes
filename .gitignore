@@ -42,3 +42,8 @@ Thumbs.db
 
 # Documentation files
 /a_docs
+
+# Credentials and sensitive data
+scripts/mongodb_credentials.txt
+**/mongodb_credentials.txt
+.env*
