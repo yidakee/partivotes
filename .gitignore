@@ -47,3 +47,11 @@ Thumbs.db
 scripts/mongodb_credentials.txt
 **/mongodb_credentials.txt
 .env*
+
+# Virtual environments
+venv/
+**/venv/
+tools/venv/
+env/
+.venv/
+.env/

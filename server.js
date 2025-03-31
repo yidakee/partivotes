@@ -52,13 +52,17 @@ connectDB();
 // Basic schema for polls
 const pollSchema = new mongoose.Schema({
   title: String,
+  description: String,
   status: String,
   creator: String,
   options: Array,
-  startTime: Date,
-  endTime: Date,
+  startDate: Date,
+  endDate: Date,
   type: String
-}, { strict: false }); // Allow for flexible schema
+}, { 
+  strict: false,
+  timestamps: true
+});
 
 // Create model
 const Poll = mongoose.model('Poll', pollSchema);
@@ -112,23 +116,33 @@ app.get('/api/polls/:id', async (req, res) => {
 // Create new poll
 app.post('/api/polls', async (req, res) => {
   try {
+    console.log('Creating new poll with data:', req.body);
+    
     // Ensure status is uppercase
     if (req.body.status) {
       req.body.status = req.body.status.toUpperCase();
     }
     
+    // Format options properly if they're just strings
+    if (req.body.options && Array.isArray(req.body.options)) {
+      req.body.options = req.body.options.map(option => 
+        typeof option === 'string' ? { text: option, votes: 0 } : option
+      );
+    }
+    
     const newPoll = new Poll(req.body);
     const savedPoll = await newPoll.save();
     
+    console.log('Poll created successfully:', savedPoll);
     res.status(201).json(savedPoll);
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('API Error creating poll:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '.')));
+app.use(express.static(path.join(__dirname)));
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back the index.html file

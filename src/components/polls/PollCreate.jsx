@@ -297,7 +297,8 @@ const PollCreate = () => {
         options: pollData.options,
         startDate: pollData.startDate,
         endDate: pollData.endDate,
-        maxSelections: pollData.maxSelections || 1
+        maxSelections: pollData.maxSelections || 1,
+        creator: address // Add the wallet address as the creator
       };
       
       console.log('Creating poll with data:', formattedPollData);
@@ -313,14 +314,14 @@ const PollCreate = () => {
       
       // Store the created poll ID in localStorage
       localStorage.setItem('lastCreatedPoll', JSON.stringify({
-        id: result.id,
+        id: result._id, // Use _id from MongoDB instead of id
         title: result.title,
         createdAt: new Date().toISOString()
       }));
       
       // Navigate to the poll detail page after a short delay
       setTimeout(() => {
-        navigate(`/poll/${result.id}`);
+        navigate(`/poll/${result._id}`); // Use _id from MongoDB instead of id
       }, 2000);
     } catch (err) {
       console.error('Error creating poll:', err);

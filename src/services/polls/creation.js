@@ -16,12 +16,12 @@ export const createPoll = async (pollData) => {
     const formattedPoll = {
       title: pollData.title,
       description: pollData.description || '',
-      options: pollData.options || [],
+      options: pollData.options?.map(option => typeof option === 'string' ? { text: option } : option) || [],
       startDate: pollData.startDate || new Date(),
       endDate: pollData.endDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       type: pollData.type || 'single',
       status: (pollData.status || 'ACTIVE').toUpperCase(),
-      creator: pollData.creator || 'anonymous',
+      creator: pollData.creator ? pollData.creator : 'anonymous', 
       network: pollData.network || 'testnet'
     };
     
