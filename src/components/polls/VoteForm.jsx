@@ -54,7 +54,7 @@ const VoteForm = ({ poll, setPoll }) => {
     setVoteMethod('signature');
     setSuccess(false);
     setError(null);
-  }, [poll.id]);
+  }, [poll._id]);
   
   const handleSingleChoiceChange = (event) => {
     setSelectedOptions([event.target.value]);
@@ -111,7 +111,7 @@ const VoteForm = ({ poll, setPoll }) => {
       if (voteMethod === 'signature') {
         const votePayload = isSingleChoice ? selectedOptions[0] : selectedOptions;
         updatedPoll = await voteWithSignature(
-          poll.id, 
+          poll._id, 
           votePayload, 
           address
         );
@@ -119,7 +119,7 @@ const VoteForm = ({ poll, setPoll }) => {
         // MPC voting (private)
         const votePayload = isSingleChoice ? selectedOptions[0] : selectedOptions;
         updatedPoll = await voteWithMPC(
-          poll.id, 
+          poll._id, 
           votePayload, 
           address
         );
@@ -170,7 +170,7 @@ const VoteForm = ({ poll, setPoll }) => {
   const handleViewResults = () => {
     console.log('=== VoteForm VIEW RESULTS BUTTON CLICKED ===');
     // Navigate to the correct poll URL using the singular "poll" path
-    navigate(`/poll/${poll.id}`);
+    navigate(`/poll/${poll._id}`);
   };
   
   // Format balance for display

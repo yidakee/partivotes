@@ -125,8 +125,7 @@ const getAllPolls = () => {
     // Add created polls that aren't already in the main collection
     createdPolls.forEach(createdPoll => {
       const exists = allPolls.some(poll => 
-        (poll._id && createdPoll._id && poll._id.toString() === createdPoll._id.toString()) || 
-        (poll.id && createdPoll.id && poll.id === createdPoll.id)
+        (poll._id && createdPoll._id && poll._id.toString() === createdPoll._id.toString())
       );
       
       if (!exists) {

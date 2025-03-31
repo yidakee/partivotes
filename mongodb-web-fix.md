@@ -365,7 +365,42 @@ The MongoDB collection had the following validation requirements:
 - Consider implementing rate limiting for API endpoints
 - Add more comprehensive error handling for API requests
 
-## 22. Implementation Plan (April 1)
+## 22. Poll ID Reference Fix (March 31, 2025)
+
+### Issue Identified
+- When clicking "View Details" on a poll, the URL showed `/poll/undefined` instead of the actual poll ID
+- Poll details page was unable to fetch the poll data due to incorrect ID references
+- The frontend components were using `poll.id` instead of MongoDB's `poll._id`
+
+### Solution Implemented
+1. **Fixed ID References in Components**
+   - Updated all instances of `poll.id` to use `poll._id` instead
+   - Fixed the following components:
+     - `PollList.jsx`: Updated the RouterLink URL and Grid item key
+     - `VoteForm.jsx`: Updated all references to poll ID in useEffect and navigation
+     - `dbService.js`: Updated poll comparison logic to only use `_id`
+
+2. **MongoDB ID Handling**
+   - MongoDB uses `_id` as the document identifier, not `id`
+   - Ensured consistent use of `_id` throughout the application
+   - Removed fallback to `id` which was causing undefined references
+
+### Results
+- Poll details page now correctly shows the poll information
+- "View Details" button now navigates to the correct URL with the MongoDB ID
+- Eliminated 404 errors when viewing poll details
+
+### Technical Details
+- MongoDB IDs are stored as ObjectId types, which need special handling
+- Updated code to properly reference these IDs in all components
+- Ensured consistent ID handling between frontend and backend
+
+### Next Steps
+- Consider adding a data transformation layer to normalize MongoDB's `_id` to `id` for frontend components
+- Add more robust error handling for invalid poll IDs
+- Implement proper 404 page for non-existent polls
+
+## 23. Implementation Plan (April 1)
 
 1. **Step 1: Fix API Server Process Management**
    - Create a proper systemd service for the API server
@@ -383,7 +418,7 @@ The MongoDB collection had the following validation requirements:
    - Add detailed error logging
    - Implement proper error responses
 
-## 23. Implementation Attempt (April 1)
+## 24. Implementation Attempt (April 1)
 
 We attempted a more comprehensive approach to fix the MongoDB database issues:
 
@@ -406,7 +441,7 @@ We attempted a more comprehensive approach to fix the MongoDB database issues:
 
 **Result:** Despite these improvements, we're still encountering the same issues with poll details. The frontend is still showing "Poll not found" errors when trying to view poll details.
 
-## 24. Next Steps
+## 25. Next Steps
 
 Since the comprehensive backend approach didn't resolve the issue, we need to:
 
@@ -422,7 +457,7 @@ Since the comprehensive backend approach didn't resolve the issue, we need to:
    - Add more detailed logging on both frontend and backend
    - Trace the exact request/response flow for poll details
 
-## 25. Conclusion
+## 26. Conclusion
 
 The MongoDB integration issues have been successfully resolved. The application is now:
 

@@ -243,7 +243,7 @@ const PollList = ({ statusFilter }) => {
             const totalVotes = poll.totalVotes || 0;
             
             return (
-              <Grid item xs={12} sm={6} key={poll.id}>
+              <Grid item xs={12} sm={6} key={poll._id}>
                 <Card className="poll-card" sx={{ 
                   overflow: 'visible', 
                   height: '100%', 
@@ -363,7 +363,7 @@ const PollList = ({ statusFilter }) => {
                   
                   <Box 
                     component={RouterLink} 
-                    to={`/poll/${poll.id}`}
+                    to={`/poll/${poll._id}`}
                     sx={{
                       display: 'flex',
                       justifyContent: 'center',
