@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { Box, Container, Typography, Link } from '@mui/material';
 import { ThemeContext } from '../../contexts/ThemeContext';
-import MusicPlayer from '../music/MusicPlayer';
 
 const Footer = () => {
   const { themeMode } = useContext(ThemeContext);
@@ -29,20 +28,6 @@ const Footer = () => {
           : '1px solid rgba(0, 0, 0, 0.1) !important',
       }}
     >
-      {/* Music Player - Bottom Left */}
-      {isFuturistic && (
-        <Box sx={{ 
-          position: 'absolute',
-          left: '20px',
-          bottom: '10px',
-          display: 'flex',
-          alignItems: 'center',
-          zIndex: 1010,
-        }}>
-          <MusicPlayer />
-        </Box>
-      )}
-      
       <Container maxWidth="lg">
         <Typography 
           variant="body2" 
@@ -51,23 +36,23 @@ const Footer = () => {
           sx={{ textShadow: isFuturistic ? '0 0 5px #00fff0' : 'none' }}
         >
           {'© '}
-          {currentYear}
-          {' '}
           <Link 
             color="inherit" 
-            href="https://partisiablockchain.com/" 
-            target="_blank" 
-            rel="noopener"
+            href="https://partivotes.xyz/"
             sx={{ 
-              textDecoration: isFuturistic ? 'none' : 'underline',
+              textDecoration: 'none',
+              fontWeight: 'bold',
+              color: isFuturistic ? '#00fff0' : 'primary.main',
               '&:hover': {
-                textShadow: isFuturistic ? '0 0 8px #00fff0' : 'none'
+                textDecoration: 'underline',
+                textShadow: isFuturistic ? '0 0 8px #00fff0' : 'none',
               }
             }}
           >
             PartiVotes
-          </Link>
-          {' - Built on Partisia Blockchain'}
+          </Link>{' '}
+          {currentYear}
+          {' - Decentralized Voting Platform'}
         </Typography>
       </Container>
     </Box>

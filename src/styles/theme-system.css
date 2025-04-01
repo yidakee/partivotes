@@ -1,0 +1,93 @@
+/**
+ * PartiVotes Theme System
+ * 
+ * This file defines the CSS variables used throughout the application
+ * for consistent theming. It provides a clean way to switch between
+ * standard (light) and futuristic (dark/cyberpunk) themes.
+ */
+
+:root {
+  /* Base colors that don't change between themes */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-error: #f44336;
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  
+  /* Animation durations */
+  --animation-slow: 3s;
+  --animation-medium: 2s;
+  --animation-fast: 1s;
+  
+  /* Z-index system */
+  --z-index-starfield: -9999;
+  --z-index-base: 1;
+  --z-index-content: 10;
+  --z-index-header: 1100;
+  --z-index-footer: 1000;
+  --z-index-modal: 2000;
+  --z-index-tooltip: 2500;
+  --z-index-easter-egg: 3000;
+}
+
+/* Standard (Light) Theme Variables */
+.standard-theme {
+  /* Background colors */
+  --background-primary: #f4f6f8;
+  --background-secondary: #ffffff;
+  --background-tertiary: #e0e0e0;
+  
+  /* Text colors */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  
+  /* Accent colors */
+  --accent-primary: #556cd6;
+  --accent-secondary: #19857b;
+  
+  /* Border colors */
+  --border-color: #dddddd;
+  
+  /* Shadow */
+  --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Futuristic (Dark/Cyberpunk) Theme Variables */
+.futuristic-theme {
+  /* Background colors */
+  --background-primary: #121212;
+  --background-secondary: #1e1e1e;
+  --background-tertiary: #2a2a2a;
+  
+  /* Text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #707070;
+  
+  /* Accent colors */
+  --accent-primary: #00fff0; /* Cyan */
+  --accent-secondary: #ff00ff; /* Magenta */
+  
+  /* Cyberpunk color palette */
+  --cyberpunk-cyan: #00fff0;
+  --cyberpunk-magenta: #ff00ff;
+  --cyberpunk-hot-pink: #ff0055;
+  --cyberpunk-neon-green: #00ffaa;
+  --cyberpunk-neon-orange: #ff9500;
+  --cyberpunk-neon-blue: #0099ff;
+  --cyberpunk-bright-pink: #ff00aa;
+  --cyberpunk-neon-yellow: #ffff00;
+  --cyberpunk-electric-blue: #00ddff;
+  --cyberpunk-neon-red: #ff3300;
+  
+  /* Border colors */
+  --border-color: #444444;
+  
+  /* Shadow */
+  --box-shadow: 0 2px 10px rgba(0, 255, 240, 0.2);
+  
+  /* Glow effects */
+  --text-glow: 0 0 15px var(--accent-primary);
+  --box-glow: 0 0 20px rgba(0, 255, 240, 0.3);
+}

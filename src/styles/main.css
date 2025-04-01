@@ -1,0 +1,26 @@
+/**
+ * PartiVotes Main CSS
+ * 
+ * This is the main entry point for all CSS in the application.
+ * It imports all other CSS files in the correct order to ensure
+ * proper cascade and specificity.
+ */
+
+/* Base styles */
+@import '../index.css';
+
+/* Theme system with CSS variables */
+@import './theme-system.css';
+
+/* Theme-specific styles */
+@import './standard-theme.css';
+@import './futuristic-theme.css';
+
+/* Component-specific styles */
+@import '../components/background/StarfieldBackground.css';
+
+/* Global animations */
+@import './animations.css';
+
+/* Critical overrides - always loaded last */
+@import './critical-overrides.css';

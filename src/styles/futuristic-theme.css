@@ -16,14 +16,15 @@
   
   /* Set basic styles for entire theme */
   color: var(--text-color);
-  background-color: var(--background-dark);
+  background-color: var(--background-dark) !important;
 }
 
 /* CRITICAL: Ensure starfield background shows through */
 body.futuristic-theme,
 html.futuristic-theme,
 #root.futuristic-theme {
-  background-color: var(--background-dark);
+  background-color: var(--background-dark) !important;
+  color: var(--text-color) !important;
 }
 
 /* 
@@ -57,18 +58,76 @@ html.futuristic-theme,
   border-top: 1px solid rgba(0, 255, 240, 0.3);
 }
 
-/* 
- * CONTENT STYLES
- */
-
-/* Content area - ensure it scrolls under header/footer */
+/* Content area - Adjust for fixed header/footer */
 .futuristic-theme main {
-  padding-top: 84px !important; /* Match light mode + header height */
-  padding-bottom: 70px !important; /* Match light mode + footer height */
+  padding-top: 64px !important; /* Match header height */
+  padding-bottom: 64px !important; /* Match footer height */
+  min-height: calc(100vh - 128px) !important; /* Full height minus header/footer */
+  background-color: transparent !important; /* Let starfield show through */
+}
+
+/* Card styling */
+.futuristic-theme .MuiPaper-root {
+  background-color: var(--card-bg) !important;
+  border: 1px solid rgba(0, 255, 240, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 240, 0.2) !important;
+}
+
+/* Text styling */
+.futuristic-theme .MuiTypography-root {
+  color: var(--text-color) !important;
+}
+
+/* Button styling */
+.futuristic-theme .MuiButton-contained:not(.MuiButton-containedPrimary):not(.MuiButton-containedSecondary) {
+  background: linear-gradient(45deg, #4c00ff, #00a3ff) !important;
+  color: white !important;
+  box-shadow: 0 0 10px rgba(0, 163, 255, 0.5) !important;
+}
+
+/* Input styling */
+.futuristic-theme .MuiInputBase-root {
+  background-color: rgba(10, 10, 30, 0.7) !important;
+  color: var(--text-color) !important;
+  border: 1px solid rgba(0, 255, 240, 0.3) !important;
+}
+
+.futuristic-theme .MuiInputLabel-root {
+  color: var(--primary-color) !important;
+}
+
+/* Make sure links are visible */
+.futuristic-theme a {
+  color: var(--primary-color) !important;
+  text-shadow: var(--text-shadow) !important;
+}
+
+/* Poll cards specific styling */
+.futuristic-theme .poll-card {
+  background-color: var(--card-bg) !important;
+  border: 1px solid rgba(0, 255, 240, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 240, 0.2) !important;
+}
+
+/* Ensure all dialogs have proper styling */
+.futuristic-theme .MuiDialog-paper {
+  background-color: var(--card-bg) !important;
+  border: 1px solid rgba(0, 255, 240, 0.3) !important;
+  box-shadow: 0 0 15px rgba(0, 255, 240, 0.5) !important;
+}
+
+/* Ensure all list items have proper styling */
+.futuristic-theme .MuiListItem-root {
+  border-bottom: 1px solid rgba(0, 255, 240, 0.1) !important;
+}
+
+/* Ensure all icons have proper styling */
+.futuristic-theme .MuiSvgIcon-root {
+  color: var(--primary-color) !important;
+  filter: drop-shadow(0 0 3px rgba(0, 255, 240, 0.5)) !important;
 }
 
 /* Cards & Containers - Neon styling */
-.futuristic-theme .MuiPaper-root,
 .futuristic-theme .MuiCard-root {
   background-color: var(--card-bg);
   border: 1px solid rgba(0, 255, 240, 0.3);
@@ -76,10 +135,6 @@ html.futuristic-theme,
 }
 
 /* Typography - Futuristic styling */
-.futuristic-theme .MuiTypography-root {
-  color: var(--text-color);
-}
-
 .futuristic-theme .MuiTypography-h1,
 .futuristic-theme .MuiTypography-h2,
 .futuristic-theme .MuiTypography-h3,
@@ -117,11 +172,6 @@ html.futuristic-theme,
 }
 
 /* Links and Interactive Elements */
-.futuristic-theme a {
-  color: var(--primary-color);
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
 .futuristic-theme a:hover {
   color: var(--accent-color);
   text-shadow: 0 0 8px var(--accent-color);
@@ -151,10 +201,6 @@ html.futuristic-theme,
   background-color: rgba(5, 5, 20, 0.7);
   border: 1px solid var(--primary-color);
   color: var(--text-color);
-}
-
-.futuristic-theme .MuiInputLabel-root {
-  color: var(--primary-color);
 }
 
 /* Ensure non-styled elements still get theme colors */

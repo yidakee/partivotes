@@ -13,8 +13,9 @@
   left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  z-index: -1 !important;
+  z-index: -999 !important;
   pointer-events: none !important;
+  background-color: #000 !important;
 }
 
 /* FIXED HEADER - Always at top, above content */
@@ -56,4 +57,24 @@ body.futuristic-theme,
 html.futuristic-theme,
 #root.futuristic-theme {
   background: transparent !important;
+}
+
+/* CYBERPUNK TITLE ANIMATION - Ensure it cycles through all colors */
+.futuristic-theme .app-header .MuiTypography-root a,
+.app-header .MuiTypography-root[component="a"] {
+  animation: cyberpunk-color-cycle 3s infinite linear, title-pulsate 3s infinite ease-in-out !important;
+}
+
+@keyframes cyberpunk-color-cycle {
+  0% { color: #00fff0 !important; text-shadow: 0 0 15px #00fff0 !important; }
+  10% { color: #ff00ff !important; text-shadow: 0 0 15px #ff00ff !important; }
+  20% { color: #ff0055 !important; text-shadow: 0 0 15px #ff0055 !important; }
+  30% { color: #00ffaa !important; text-shadow: 0 0 15px #00ffaa !important; }
+  40% { color: #ff9500 !important; text-shadow: 0 0 15px #ff9500 !important; }
+  50% { color: #0099ff !important; text-shadow: 0 0 15px #0099ff !important; }
+  60% { color: #ff00aa !important; text-shadow: 0 0 15px #ff00aa !important; }
+  70% { color: #ffff00 !important; text-shadow: 0 0 15px #ffff00 !important; }
+  80% { color: #00ddff !important; text-shadow: 0 0 15px #00ddff !important; }
+  90% { color: #ff3300 !important; text-shadow: 0 0 15px #ff3300 !important; }
+  100% { color: #00fff0 !important; text-shadow: 0 0 15px #00fff0 !important; }
 }

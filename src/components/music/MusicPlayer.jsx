@@ -353,54 +353,35 @@ const MusicPlayer = () => {
   return (
     <Box
       sx={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '20px',
+        zIndex: 1500, // High z-index but below RickRoll button
         display: 'flex',
         alignItems: 'center',
-        width: 'auto',
-        minWidth: '240px',
-        maxWidth: '90vw', // Add maximum width to prevent overflow on small screens
-        padding: '10px 20px',
-        background: '#7e1fff', /* Exact match to the GET FREE $MPC button */
-        color: '#fff',
-        fontWeight: 'bold',
-        border: '2px solid rgba(255, 255, 255, 0.5)',
-        borderRadius: '24px',
-        boxShadow: '0 0 20px rgba(126, 31, 255, 0.7)',
-        animation: 'pulse 1.2s infinite ease-in-out, scale 2s infinite ease-in-out, breathe 3s infinite ease-in-out',
-        '@keyframes pulse': {
-          '0%': { boxShadow: '0 0 10px rgba(126, 31, 255, 0.5)' },
-          '50%': { boxShadow: '0 0 30px rgba(126, 31, 255, 1)' },
-          '100%': { boxShadow: '0 0 10px rgba(126, 31, 255, 0.5)' },
-        },
-        '@keyframes scale': {
-          '0%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.1)' },
-          '100%': { transform: 'scale(1)' },
-        },
-        '@keyframes breathe': {
-          '0%': { filter: 'brightness(1) contrast(1.1)' },
-          '50%': { filter: 'brightness(1.4) contrast(1.3)' },
-          '100%': { filter: 'brightness(1) contrast(1.1)' },
-        },
+        padding: '8px 16px',
+        borderRadius: '50px',
+        background: 'linear-gradient(45deg, #6200ea, #b620e0)',
+        boxShadow: '0 4px 20px rgba(138, 43, 226, 0.6)',
+        maxWidth: 'min(400px, calc(100vw - 150px))', // Dynamic width based on viewport
+        minWidth: '120px', // Minimum width for controls
+        transition: 'all 0.3s ease',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        backdropFilter: 'blur(5px)',
         '&:hover': {
-          background: '#8f3aff',
-          boxShadow: '0 0 35px rgba(126, 31, 255, 1)',
-          transform: 'translateY(-3px) scale(1.05)',
-          transition: 'all 0.2s ease',
-        },
-        fontSize: '1rem',
-        letterSpacing: '0.5px',
-        textShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
-        gap: '15px',
+          boxShadow: '0 6px 25px rgba(138, 43, 226, 0.8)',
+          transform: 'translateY(-2px)',
+        }
       }}
     >
-      {/* Simple icon buttons with no background or borders */}
-      <PlayArrowIcon 
-        onClick={handlePlayPause} 
+      <PlayArrowIcon
+        onClick={handlePlayPause}
         sx={{ 
           color: '#fff',
           cursor: 'pointer',
           fontSize: '1.8rem',
           flexShrink: 0, // Prevent icon from shrinking
+          marginRight: '8px',
           '&:hover': {
             transform: 'scale(1.2)',
             textShadow: '0 0 10px #fff',
@@ -418,6 +399,7 @@ const MusicPlayer = () => {
           cursor: 'pointer',
           fontSize: '1.8rem',
           flexShrink: 0, // Prevent icon from shrinking
+          marginRight: '12px',
           '&:hover': {
             transform: 'scale(1.2)',
             textShadow: '0 0 10px #fff',
@@ -439,7 +421,7 @@ const MusicPlayer = () => {
           whiteSpace: 'nowrap',
           flexGrow: 1, // Allow text to take available space
           minWidth: '50px', // Minimum width for very short titles
-          maxWidth: 'calc(100% - 80px)', // Ensure there's space for the buttons
+          paddingRight: '8px',
         }}
       >
         {tracks[currentTrack]?.title || 'No track selected'}

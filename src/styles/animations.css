@@ -1,0 +1,76 @@
+/**
+ * PartiVotes Animations
+ * 
+ * This file contains all animations used throughout the application.
+ * Centralizing animations ensures consistency in timing and effects.
+ */
+
+/* Title and text animations */
+@keyframes cyberpunk-color-cycle {
+  0% { color: var(--cyberpunk-cyan); text-shadow: 0 0 15px var(--cyberpunk-cyan); }
+  10% { color: var(--cyberpunk-magenta); text-shadow: 0 0 15px var(--cyberpunk-magenta); }
+  20% { color: var(--cyberpunk-hot-pink); text-shadow: 0 0 15px var(--cyberpunk-hot-pink); }
+  30% { color: var(--cyberpunk-neon-green); text-shadow: 0 0 15px var(--cyberpunk-neon-green); }
+  40% { color: var(--cyberpunk-neon-orange); text-shadow: 0 0 15px var(--cyberpunk-neon-orange); }
+  50% { color: var(--cyberpunk-neon-blue); text-shadow: 0 0 15px var(--cyberpunk-neon-blue); }
+  60% { color: var(--cyberpunk-bright-pink); text-shadow: 0 0 15px var(--cyberpunk-bright-pink); }
+  70% { color: var(--cyberpunk-neon-yellow); text-shadow: 0 0 15px var(--cyberpunk-neon-yellow); }
+  80% { color: var(--cyberpunk-electric-blue); text-shadow: 0 0 15px var(--cyberpunk-electric-blue); }
+  90% { color: var(--cyberpunk-neon-red); text-shadow: 0 0 15px var(--cyberpunk-neon-red); }
+  100% { color: var(--cyberpunk-cyan); text-shadow: 0 0 15px var(--cyberpunk-cyan); }
+}
+
+@keyframes title-pulsate {
+  0% { transform: scale(1); letter-spacing: 1px; }
+  50% { transform: scale(1.3); letter-spacing: 3px; }
+  100% { transform: scale(1); letter-spacing: 1px; }
+}
+
+/* Icon animations */
+@keyframes icon-pulse {
+  0% { opacity: 0.7; transform: scale(1) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.5) rotate(180deg); }
+  100% { opacity: 0.7; transform: scale(1) rotate(360deg); }
+}
+
+@keyframes icon-color-cycle {
+  0% { color: var(--cyberpunk-cyan); filter: drop-shadow(0 0 3px var(--cyberpunk-cyan)); }
+  10% { color: var(--cyberpunk-magenta); filter: drop-shadow(0 0 3px var(--cyberpunk-magenta)); }
+  20% { color: var(--cyberpunk-hot-pink); filter: drop-shadow(0 0 3px var(--cyberpunk-hot-pink)); }
+  30% { color: var(--cyberpunk-neon-green); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-green)); }
+  40% { color: var(--cyberpunk-neon-orange); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-orange)); }
+  50% { color: var(--cyberpunk-neon-blue); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-blue)); }
+  60% { color: var(--cyberpunk-bright-pink); filter: drop-shadow(0 0 3px var(--cyberpunk-bright-pink)); }
+  70% { color: var(--cyberpunk-neon-yellow); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-yellow)); }
+  80% { color: var(--cyberpunk-electric-blue); filter: drop-shadow(0 0 3px var(--cyberpunk-electric-blue)); }
+  90% { color: var(--cyberpunk-neon-red); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-red)); }
+  100% { color: var(--cyberpunk-cyan); filter: drop-shadow(0 0 3px var(--cyberpunk-cyan)); }
+}
+
+/* Animation utility classes */
+.animate-cyberpunk-color {
+  animation: cyberpunk-color-cycle var(--animation-slow) infinite linear;
+}
+
+.animate-title-pulse {
+  animation: title-pulsate var(--animation-slow) infinite ease-in-out;
+}
+
+.animate-icon-pulse {
+  animation: icon-pulse 4s infinite ease;
+}
+
+.animate-icon-color {
+  animation: icon-color-cycle var(--animation-slow) infinite linear;
+}
+
+/* Combined animations */
+.animate-title-full {
+  animation: cyberpunk-color-cycle var(--animation-slow) infinite linear, 
+             title-pulsate var(--animation-slow) infinite ease-in-out;
+}
+
+.animate-icon-full {
+  animation: icon-pulse 4s infinite ease, 
+             icon-color-cycle var(--animation-slow) infinite linear;
+}

@@ -6,6 +6,7 @@
     let canvas = document.getElementById('space-travel-effect');
     if (canvas) return canvas; // Return existing if found
 
+    console.log('Creating new starfield canvas');
     canvas = document.createElement('canvas');
     canvas.id = 'space-travel-effect';
     
@@ -15,7 +16,7 @@
     canvas.style.left = '0';
     canvas.style.width = '100vw'; // Use vw/vh for viewport units
     canvas.style.height = '100vh';
-    canvas.style.zIndex = '-1'; // Ensure it's behind everything
+    canvas.style.zIndex = '-999'; // Ensure it's behind everything
     canvas.style.pointerEvents = 'none';
     canvas.style.display = 'none'; // Start hidden
     canvas.style.opacity = '0'; // Start transparent
@@ -40,7 +41,7 @@
     
     // Create stars - more stars for better effect
     const stars = [];
-    for (let i = 0; i < 800; i++) {
+    for (let i = 0; i < 1000; i++) {
       const angle = Math.random() * Math.PI * 2;
       stars.push({
         angle: angle,
@@ -54,7 +55,7 @@
     // Animation function
     function animate() {
       // Clear canvas with black background
-      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Draw stars
@@ -97,10 +98,16 @@
   
   // Global toggle function
   window.toggleStarfield = function(show) {
+    console.log('toggleStarfield called with show =', show);
     const canvas = document.getElementById('space-travel-effect') || createStarfield();
     
     if (show) {
+      console.log('Showing starfield');
       canvas.style.display = 'block';
+      
+      // Force a reflow before setting opacity to ensure transition works
+      canvas.offsetHeight;
+      
       canvas.style.opacity = '1';
       
       if (!window._animationId) {
@@ -108,8 +115,13 @@
         startAnimation(canvas);
       }
     } else {
+      console.log('Hiding starfield');
       canvas.style.opacity = '0';
-      setTimeout(() => { canvas.style.display = 'none'; }, 500);
+      setTimeout(() => { 
+        if (canvas.style.opacity === '0') {
+          canvas.style.display = 'none'; 
+        }
+      }, 500);
       
       if (window._animationId) {
         window._animationActive = false;
@@ -119,11 +131,35 @@
     }
   };
   
-  // Initialize canvas creation on load, but DO NOT toggle based on theme here.
-  // ThemeContext will handle calling toggleStarfield based on the theme state.
+  // Initialize canvas creation on load
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', createStarfield);
+    document.addEventListener('DOMContentLoaded', function() {
+      createStarfield();
+      // Force starfield to be visible immediately in futuristic mode
+      const savedTheme = localStorage.getItem('partivotes-theme');
+      if (savedTheme === 'futuristic') {
+        console.log('Applying futuristic theme from localStorage on page load');
+        setTimeout(() => window.toggleStarfield(true), 100);
+      }
+    });
   } else {
-    createStarfield(); // Create canvas immediately if DOM is already loaded
+    createStarfield();
+    // Force starfield to be visible immediately in futuristic mode
+    const savedTheme = localStorage.getItem('partivotes-theme');
+    if (savedTheme === 'futuristic') {
+      console.log('Applying futuristic theme from localStorage on page load');
+      setTimeout(() => window.toggleStarfield(true), 100);
+    }
+  }
+  
+  // Force apply starfield if currently in futuristic theme
+  const savedTheme = localStorage.getItem('partivotes-theme');
+  if (savedTheme === 'futuristic') {
+    console.log('Forcing starfield activation due to futuristic theme');
+    setTimeout(() => {
+      if (typeof window.toggleStarfield === 'function') {
+        window.toggleStarfield(true);
+      }
+    }, 500);
   }
 })();

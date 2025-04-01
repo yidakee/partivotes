@@ -85,20 +85,6 @@ const Layout = ({ children }) => {
         </Container>
       </Content>
       
-      {/* Get Free $MPC Button - Only shown in dark mode, fixed at bottom right */}
-      {isFuturistic && (
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            zIndex: 1500,
-          }}
-        >
-          <RickRollEasterEgg />
-        </Box>
-      )}
-      
       {/* Fixed position footer */}
       <Footer />
     </MainContainer>

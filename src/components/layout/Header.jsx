@@ -141,6 +141,7 @@ const Header = () => {
           variant="h6"
           component={RouterLink}
           to="/"
+          className={isFuturistic ? 'animate-title-full' : ''}
           sx={{
             textDecoration: 'none',
             color: 'white',
@@ -156,20 +157,6 @@ const Header = () => {
               transform: 'scale(1.05)',
             },
             ...(isFuturistic && {
-              animation: 'cyberpunk-color-cycle 8s infinite linear, title-pulsate 3s infinite ease-in-out',
-              '@keyframes cyberpunk-color-cycle': {
-                '0%': { color: '#00fff0', textShadow: '0 0 15px #00fff0' }, // Cyan
-                '20%': { color: '#ff00ff', textShadow: '0 0 15px #ff00ff' }, // Magenta
-                '40%': { color: '#ff0055', textShadow: '0 0 15px #ff0055' }, // Hot pink
-                '60%': { color: '#00ffaa', textShadow: '0 0 15px #00ffaa' }, // Neon green
-                '80%': { color: '#ff9500', textShadow: '0 0 15px #ff9500' }, // Neon orange
-                '100%': { color: '#00fff0', textShadow: '0 0 15px #00fff0' }, // Back to cyan
-              },
-              '@keyframes title-pulsate': {
-                '0%': { transform: 'scale(1)', letterSpacing: '1px' },
-                '50%': { transform: 'scale(1.3)', letterSpacing: '3px' },
-                '100%': { transform: 'scale(1)', letterSpacing: '1px' },
-              },
               fontWeight: 'bold',
               letterSpacing: '1px',
               fontFamily: '"Orbitron", sans-serif',
@@ -182,18 +169,13 @@ const Header = () => {
         >
           {isFuturistic && (
             <AutoAwesomeIcon 
+              className="animate-icon-full"
               sx={{ 
                 mr: 1,
-                animation: 'icon-pulse 2s infinite',
-                '@keyframes icon-pulse': {
-                  '0%': { opacity: 0.5, transform: 'scale(1) rotate(0deg)' },
-                  '50%': { opacity: 1, transform: 'scale(1.5) rotate(180deg)' },
-                  '100%': { opacity: 0.5, transform: 'scale(1) rotate(360deg)' },
-                },
               }} 
             />
           )}
-          {isFuturistic ? 'PARTI-VOTES 3000' : 'PartiVotes'}
+          {isFuturistic ? 'PARTIVOTES-3000' : 'PartiVotes'}
         </Typography>
         
         {/* Poll Filter Buttons - Centered in the navbar */}

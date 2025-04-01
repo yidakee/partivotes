@@ -9,6 +9,11 @@ const RickRollEasterEgg = () => {
   const { themeMode } = useContext(ThemeContext);
   const isFuturistic = themeMode === 'futuristic';
 
+  // Only show the button in futuristic (dark) mode
+  if (themeMode !== 'futuristic') {
+    return null;
+  }
+
   const handleOpen = () => {
     // Toggle a class on the container to trigger the stars animation
     const container = document.getElementById('app-container');
@@ -76,12 +81,20 @@ const RickRollEasterEgg = () => {
           startIcon={<LocalAtmIcon />}
           onClick={handleOpen}
           sx={{
-            background: 'linear-gradient(45deg, #ff00cc, #ff0055)', // Neon magenta gradient
-            color: isFuturistic ? '#fff' : '#000', // White text in dark mode, dark text in light mode
+            background: isFuturistic 
+              ? 'linear-gradient(45deg, #ff00cc, #ff0055)' // Neon magenta gradient in dark mode
+              : 'linear-gradient(45deg, #ff00cc, #ff0055)', // Same gradient in light mode for consistency
+            color: '#fff', // White text always for better visibility
             fontWeight: 'bold',
-            border: '2px solid rgba(255, 255, 255, 0.5)', // Thicker, more visible border
-            boxShadow: '0 0 20px rgba(255, 0, 204, 0.7)', // Magenta glow
-            animation: 'pulse 1.2s infinite ease-in-out, scale 2s infinite ease-in-out, breathe 3s infinite ease-in-out',
+            border: isFuturistic 
+              ? '2px solid rgba(255, 255, 255, 0.5)' // Visible border in dark mode
+              : '2px solid rgba(255, 255, 255, 0.7)', // Slightly more visible in light mode
+            boxShadow: isFuturistic
+              ? '0 0 20px rgba(255, 0, 204, 0.7)' // Stronger glow in dark mode
+              : '0 0 15px rgba(255, 0, 204, 0.5)', // Subtle glow in light mode
+            animation: isFuturistic
+              ? 'pulse 1.2s infinite ease-in-out, scale 2s infinite ease-in-out, breathe 3s infinite ease-in-out'
+              : 'pulse 2s infinite ease-in-out', // Simpler animation in light mode
             '@keyframes pulse': {
               '0%': { boxShadow: '0 0 10px rgba(255, 0, 204, 0.5)' },
               '50%': { boxShadow: '0 0 30px rgba(255, 0, 204, 1)' },
@@ -107,7 +120,9 @@ const RickRollEasterEgg = () => {
             padding: '10px 20px', // Larger button
             borderRadius: '24px',
             letterSpacing: '0.5px',
-            textShadow: isFuturistic ? '0 0 10px rgba(255, 0, 255, 0.8)' : '0 0 10px rgba(255, 255, 255, 0.8)',
+            textShadow: isFuturistic 
+              ? '0 0 10px rgba(255, 0, 255, 0.8)' 
+              : '0 0 5px rgba(255, 255, 255, 0.6)',
           }}
         >
           Get Free $MPC

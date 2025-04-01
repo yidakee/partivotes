@@ -27,6 +27,9 @@ import StarfieldBackground from './components/background/StarfieldBackground';
 // Music Player
 import MusicPlayer from './components/music/MusicPlayer';
 
+// Easter Egg
+import RickRollEasterEgg from './components/easter-egg/RickRollEasterEgg';
+
 function App() {
   return (
     <MuiThemeProvider theme={theme}>
@@ -51,16 +54,11 @@ function App() {
                 </Routes>
               </Layout>
               
-              {/* Add the music player as a separate component outside the layout */}
-              <div style={{
-                position: 'fixed',
-                bottom: '20px',
-                right: '20px',
-                zIndex: 9999,
-                width: '320px'
-              }}>
-                <MusicPlayer />
-              </div>
+              {/* Music player in bottom left corner */}
+              <MusicPlayer />
+              
+              {/* Add the RickRoll Easter Egg button */}
+              <RickRollEasterEgg />
             </Router>
           </WalletProvider>
         </ThemeProvider>

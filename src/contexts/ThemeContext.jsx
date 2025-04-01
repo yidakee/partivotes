@@ -1,6 +1,12 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-// Create the context
+/**
+ * Theme Context
+ * 
+ * Manages theme switching between standard and futuristic modes.
+ * Applies appropriate CSS classes and handles side effects like
+ * music playback.
+ */
 export const ThemeContext = createContext();
 
 // Create the theme provider component
@@ -27,10 +33,6 @@ export const ThemeProvider = ({ children }) => {
       // Remove all theme classes
       elements.forEach(element => {
         element.classList.remove('standard-theme', 'futuristic-theme');
-        
-        // Clear any inline background styles
-        element.style.removeProperty('background');
-        element.style.removeProperty('background-color');
       });
       
       // Add current theme class to all elements
@@ -45,12 +47,7 @@ export const ThemeProvider = ({ children }) => {
     
     applyTheme(themeMode);
     
-    // Toggle starfield based on theme
-    if (typeof window.toggleStarfield === 'function') {
-      window.toggleStarfield(themeMode === 'futuristic');
-    }
-    
-    // Play music if futuristic theme
+    // Handle music playback for futuristic theme
     if (themeMode === 'futuristic') {
       setTimeout(() => {
         // Try to find and play music

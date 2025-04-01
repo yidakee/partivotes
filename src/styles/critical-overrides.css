@@ -1,0 +1,90 @@
+/**
+ * PartiVotes Critical Overrides
+ * 
+ * This file contains the highest-priority overrides that MUST be applied regardless of theme.
+ * These styles ensure consistent layout and behavior across the application.
+ * 
+ * IMPORTANT: This file should be imported LAST to ensure its styles take precedence.
+ */
+
+/* ===== Z-INDEX SYSTEM ===== */
+
+/* Starfield - Always behind all content */
+#space-travel-effect {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: var(--z-index-starfield) !important;
+  pointer-events: none !important;
+  background-color: var(--color-black) !important;
+}
+
+/* Fixed Header - Always at top, above content */
+.app-header.MuiAppBar-root {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: var(--z-index-header) !important;
+}
+
+/* Fixed Footer - Always at bottom, above content */
+.app-footer.MuiBox-root[component="footer"] {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  z-index: var(--z-index-footer) !important;
+}
+
+/* Main content - Scrolls under fixed elements */
+.MuiContainer-root[component="main"] {
+  position: relative !important;
+  z-index: var(--z-index-content) !important;
+}
+
+/* ===== TITLE ANIMATIONS ===== */
+
+/* PARTIVOTES-3000 Title */
+.futuristic-theme .app-header .MuiTypography-root a,
+.app-header .MuiTypography-root[component="a"] {
+  animation: cyberpunk-color-cycle var(--animation-slow) infinite linear, 
+             title-pulsate var(--animation-slow) infinite ease-in-out !important;
+}
+
+/* Icon animation */
+.futuristic-theme .app-header .MuiSvgIcon-root {
+  animation: icon-pulse 4s infinite ease, 
+             icon-color-cycle var(--animation-slow) infinite linear !important;
+}
+
+/* ===== THEME FIXES ===== */
+
+/* Ensure transparent backgrounds in futuristic theme */
+html.futuristic-theme,
+body.futuristic-theme,
+#root.futuristic-theme {
+  background: transparent !important;
+}
+
+/* Fix for any potential overflow issues */
+html, body {
+  overflow-x: hidden !important;
+}
+
+/* ===== RESPONSIVE FIXES ===== */
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .app-header .MuiToolbar-root {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  
+  .MuiContainer-root[component="main"] {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
