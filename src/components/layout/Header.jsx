@@ -141,7 +141,7 @@ const Header = () => {
           variant="h6"
           component={RouterLink}
           to="/"
-          className={isFuturistic ? 'animate-title-full' : ''}
+          className={isFuturistic ? 'animate-title-full cyberpunk-title' : ''}
           sx={{
             textDecoration: 'none',
             color: isFuturistic ? 'var(--cyberpunk-cyan)' : 'white',
@@ -162,7 +162,7 @@ const Header = () => {
               fontFamily: '"Orbitron", sans-serif',
               '&:hover': {
                 backgroundColor: 'rgba(0, 255, 240, 0.1)',
-                transform: 'scale(1.5)',
+                transform: 'scale(1.05)',
               },
             }),
           }}

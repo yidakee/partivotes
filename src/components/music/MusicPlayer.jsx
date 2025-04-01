@@ -337,7 +337,32 @@ const MusicPlayer = () => {
   
   // Toggle play/pause
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    console.log('Play/pause button clicked, current state:', isPlaying);
+    
+    if (!isPlaying) {
+      // Attempting to play
+      if (audioRef.current) {
+        console.log('Attempting to play audio from button click...');
+        audioRef.current.volume = 0.5; // Set reasonable volume
+        
+        audioRef.current.play()
+          .then(() => {
+            console.log('Audio playing successfully from button click');
+            setIsPlaying(true);
+          })
+          .catch(err => {
+            console.error('Playback prevented from button click:', err);
+            alert('Unable to play audio. This may be due to browser autoplay restrictions.');
+            setIsPlaying(false);
+          });
+      }
+    } else {
+      // Pausing
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
   };
   
   // Next track (random)

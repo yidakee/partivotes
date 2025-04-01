@@ -49,19 +49,69 @@ export const ThemeProvider = ({ children }) => {
     
     // Handle music playback for futuristic theme
     if (themeMode === 'futuristic') {
+      // Dispatch custom event for theme change
+      document.dispatchEvent(new CustomEvent('themeChange', { 
+        detail: { theme: 'futuristic' } 
+      }));
+      
+      // Try to trigger music playback with a delay
       setTimeout(() => {
-        // Try to find and play music
+        // Dispatch custom event for music playback
+        document.dispatchEvent(new CustomEvent('playMusic'));
+        
+        // Try to find and play music directly
         const musicPlayer = document.getElementById('music-player-audio');
         if (musicPlayer) {
+          console.log('Found music player, attempting to play...');
+          
+          // Set volume to avoid startling the user
+          musicPlayer.volume = 0.5;
+          
           const playPromise = musicPlayer.play();
           if (playPromise !== undefined) {
-            playPromise.catch(e => console.log('Music play failed:', e));
+            playPromise
+              .then(() => {
+                console.log('Music autoplay successful');
+              })
+              .catch(e => {
+                console.log('Music autoplay failed, likely due to browser policy:', e);
+                // Create a notification for the user that they need to interact
+                const notification = document.createElement('div');
+                notification.id = 'music-autoplay-notification';
+                notification.style.position = 'fixed';
+                notification.style.bottom = '80px';
+                notification.style.left = '20px';
+                notification.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                notification.style.color = '#00fff0';
+                notification.style.padding = '10px';
+                notification.style.borderRadius = '5px';
+                notification.style.zIndex = '9999';
+                notification.style.boxShadow = '0 0 10px #00fff0';
+                notification.style.fontFamily = 'Orbitron, sans-serif';
+                notification.style.fontSize = '12px';
+                notification.innerHTML = 'Click to enable music <button id="enable-music-btn" style="background: #00fff0; color: black; border: none; padding: 5px 10px; margin-left: 10px; cursor: pointer; border-radius: 3px;">Play</button>';
+                document.body.appendChild(notification);
+                
+                // Add click handler to the button
+                document.getElementById('enable-music-btn').addEventListener('click', () => {
+                  musicPlayer.play()
+                    .then(() => {
+                      console.log('Music playing after user interaction');
+                      notification.remove();
+                    })
+                    .catch(err => console.error('Still failed to play:', err));
+                });
+                
+                // Remove notification after 10 seconds
+                setTimeout(() => {
+                  if (document.getElementById('music-autoplay-notification')) {
+                    document.getElementById('music-autoplay-notification').remove();
+                  }
+                }, 10000);
+              });
           }
         }
-        
-        // Dispatch custom event for any other listeners
-        document.dispatchEvent(new CustomEvent('playMusic'));
-      }, 100);
+      }, 300);
     }
   }, [themeMode]);
 

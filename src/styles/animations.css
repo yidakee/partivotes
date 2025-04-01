@@ -7,17 +7,17 @@
 
 /* Title and text animations */
 @keyframes cyberpunk-color-cycle {
-  0% { color: var(--cyberpunk-cyan); text-shadow: 0 0 15px var(--cyberpunk-cyan); }
-  10% { color: var(--cyberpunk-magenta); text-shadow: 0 0 15px var(--cyberpunk-magenta); }
-  20% { color: var(--cyberpunk-hot-pink); text-shadow: 0 0 15px var(--cyberpunk-hot-pink); }
-  30% { color: var(--cyberpunk-neon-green); text-shadow: 0 0 15px var(--cyberpunk-neon-green); }
-  40% { color: var(--cyberpunk-neon-orange); text-shadow: 0 0 15px var(--cyberpunk-neon-orange); }
-  50% { color: var(--cyberpunk-neon-blue); text-shadow: 0 0 15px var(--cyberpunk-neon-blue); }
-  60% { color: var(--cyberpunk-bright-pink); text-shadow: 0 0 15px var(--cyberpunk-bright-pink); }
-  70% { color: var(--cyberpunk-neon-yellow); text-shadow: 0 0 15px var(--cyberpunk-neon-yellow); }
-  80% { color: var(--cyberpunk-electric-blue); text-shadow: 0 0 15px var(--cyberpunk-electric-blue); }
-  90% { color: var(--cyberpunk-neon-red); text-shadow: 0 0 15px var(--cyberpunk-neon-red); }
-  100% { color: var(--cyberpunk-cyan); text-shadow: 0 0 15px var(--cyberpunk-cyan); }
+  0% { color: #00fff0; text-shadow: 0 0 15px #00fff0; }
+  10% { color: #ff00ff; text-shadow: 0 0 15px #ff00ff; }
+  20% { color: #ff0055; text-shadow: 0 0 15px #ff0055; }
+  30% { color: #00ff77; text-shadow: 0 0 15px #00ff77; }
+  40% { color: #ff9500; text-shadow: 0 0 15px #ff9500; }
+  50% { color: #0099ff; text-shadow: 0 0 15px #0099ff; }
+  60% { color: #ff00aa; text-shadow: 0 0 15px #ff00aa; }
+  70% { color: #ffff00; text-shadow: 0 0 15px #ffff00; }
+  80% { color: #00ddff; text-shadow: 0 0 15px #00ddff; }
+  90% { color: #ff3300; text-shadow: 0 0 15px #ff3300; }
+  100% { color: #00fff0; text-shadow: 0 0 15px #00fff0; }
 }
 
 @keyframes title-pulsate {
@@ -34,17 +34,17 @@
 }
 
 @keyframes icon-color-cycle {
-  0% { color: var(--cyberpunk-cyan); filter: drop-shadow(0 0 3px var(--cyberpunk-cyan)); }
-  10% { color: var(--cyberpunk-magenta); filter: drop-shadow(0 0 3px var(--cyberpunk-magenta)); }
-  20% { color: var(--cyberpunk-hot-pink); filter: drop-shadow(0 0 3px var(--cyberpunk-hot-pink)); }
-  30% { color: var(--cyberpunk-neon-green); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-green)); }
-  40% { color: var(--cyberpunk-neon-orange); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-orange)); }
-  50% { color: var(--cyberpunk-neon-blue); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-blue)); }
-  60% { color: var(--cyberpunk-bright-pink); filter: drop-shadow(0 0 3px var(--cyberpunk-bright-pink)); }
-  70% { color: var(--cyberpunk-neon-yellow); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-yellow)); }
-  80% { color: var(--cyberpunk-electric-blue); filter: drop-shadow(0 0 3px var(--cyberpunk-electric-blue)); }
-  90% { color: var(--cyberpunk-neon-red); filter: drop-shadow(0 0 3px var(--cyberpunk-neon-red)); }
-  100% { color: var(--cyberpunk-cyan); filter: drop-shadow(0 0 3px var(--cyberpunk-cyan)); }
+  0% { color: #00fff0; filter: drop-shadow(0 0 3px #00fff0); }
+  10% { color: #ff00ff; filter: drop-shadow(0 0 3px #ff00ff); }
+  20% { color: #ff0055; filter: drop-shadow(0 0 3px #ff0055); }
+  30% { color: #00ff77; filter: drop-shadow(0 0 3px #00ff77); }
+  40% { color: #ff9500; filter: drop-shadow(0 0 3px #ff9500); }
+  50% { color: #0099ff; filter: drop-shadow(0 0 3px #0099ff); }
+  60% { color: #ff00aa; filter: drop-shadow(0 0 3px #ff00aa); }
+  70% { color: #ffff00; filter: drop-shadow(0 0 3px #ffff00); }
+  80% { color: #00ddff; filter: drop-shadow(0 0 3px #00ddff); }
+  90% { color: #ff3300; filter: drop-shadow(0 0 3px #ff3300); }
+  100% { color: #00fff0; filter: drop-shadow(0 0 3px #00fff0); }
 }
 
 /* Animation utility classes */

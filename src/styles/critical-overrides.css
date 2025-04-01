@@ -48,8 +48,9 @@
 /* ===== TITLE ANIMATIONS ===== */
 
 /* PARTIVOTES-3000 Title */
-.futuristic-theme .app-header .MuiTypography-root a,
-.app-header .MuiTypography-root[component="a"] {
+.futuristic-theme .app-header .MuiTypography-root.cyberpunk-title,
+.futuristic-theme .app-header .MuiTypography-root.cyberpunk-title a,
+.app-header .MuiTypography-root.cyberpunk-title[component="a"] {
   animation: cyberpunk-color-cycle 3s infinite linear, 
              title-pulsate 3s infinite ease-in-out !important;
   color: var(--cyberpunk-cyan) !important; /* Initial color to prevent white flash */
@@ -57,6 +58,9 @@
   font-family: "Orbitron", sans-serif !important;
   font-weight: bold !important;
   letter-spacing: 1px !important;
+  /* Force animation to work */
+  animation-play-state: running !important;
+  will-change: color, text-shadow, transform, letter-spacing !important;
 }
 
 /* Icon animation */
@@ -65,6 +69,9 @@
              icon-color-cycle 3s infinite linear !important;
   color: var(--cyberpunk-cyan) !important; /* Initial color to prevent white flash */
   filter: drop-shadow(0 0 3px var(--cyberpunk-cyan)) !important;
+  /* Force animation to work */
+  animation-play-state: running !important;
+  will-change: color, filter, transform, opacity !important;
 }
 
 /* ===== THEME FIXES ===== */
