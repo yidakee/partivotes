@@ -49,11 +49,11 @@
 
 /* Animation utility classes */
 .animate-cyberpunk-color {
-  animation: cyberpunk-color-cycle var(--animation-slow) infinite linear;
+  animation: cyberpunk-color-cycle 3s infinite linear !important;
 }
 
 .animate-title-pulse {
-  animation: title-pulsate var(--animation-slow) infinite ease-in-out;
+  animation: title-pulsate 3s infinite ease-in-out !important;
 }
 
 .animate-icon-pulse {
@@ -61,16 +61,16 @@
 }
 
 .animate-icon-color {
-  animation: icon-color-cycle var(--animation-slow) infinite linear;
+  animation: icon-color-cycle 3s infinite linear !important;
 }
 
 /* Combined animations */
 .animate-title-full {
-  animation: cyberpunk-color-cycle var(--animation-slow) infinite linear, 
-             title-pulsate var(--animation-slow) infinite ease-in-out;
+  animation: cyberpunk-color-cycle 3s infinite linear, 
+             title-pulsate 3s infinite ease-in-out !important;
 }
 
 .animate-icon-full {
   animation: icon-pulse 4s infinite ease, 
-             icon-color-cycle var(--animation-slow) infinite linear;
+             icon-color-cycle 3s infinite linear !important;
 }

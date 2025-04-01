@@ -50,14 +50,21 @@
 /* PARTIVOTES-3000 Title */
 .futuristic-theme .app-header .MuiTypography-root a,
 .app-header .MuiTypography-root[component="a"] {
-  animation: cyberpunk-color-cycle var(--animation-slow) infinite linear, 
-             title-pulsate var(--animation-slow) infinite ease-in-out !important;
+  animation: cyberpunk-color-cycle 3s infinite linear, 
+             title-pulsate 3s infinite ease-in-out !important;
+  color: var(--cyberpunk-cyan) !important; /* Initial color to prevent white flash */
+  text-shadow: 0 0 15px var(--cyberpunk-cyan) !important;
+  font-family: "Orbitron", sans-serif !important;
+  font-weight: bold !important;
+  letter-spacing: 1px !important;
 }
 
 /* Icon animation */
 .futuristic-theme .app-header .MuiSvgIcon-root {
   animation: icon-pulse 4s infinite ease, 
-             icon-color-cycle var(--animation-slow) infinite linear !important;
+             icon-color-cycle 3s infinite linear !important;
+  color: var(--cyberpunk-cyan) !important; /* Initial color to prevent white flash */
+  filter: drop-shadow(0 0 3px var(--cyberpunk-cyan)) !important;
 }
 
 /* ===== THEME FIXES ===== */

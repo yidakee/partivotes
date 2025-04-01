@@ -144,7 +144,7 @@ const Header = () => {
           className={isFuturistic ? 'animate-title-full' : ''}
           sx={{
             textDecoration: 'none',
-            color: 'white',
+            color: isFuturistic ? 'var(--cyberpunk-cyan)' : 'white',
             fontWeight: 'bold',
             display: 'flex',
             alignItems: 'center',
@@ -172,6 +172,7 @@ const Header = () => {
               className="animate-icon-full"
               sx={{ 
                 mr: 1,
+                color: 'var(--cyberpunk-cyan)',
               }} 
             />
           )}
